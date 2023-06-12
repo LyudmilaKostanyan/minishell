@@ -78,7 +78,9 @@ int	check_builtins(char *cmd, char **args, t_vars *vars)
 {
 	char	*pwd;
 	int		i;
+	t_env	*tmp;
 
+	// Creat builtins file and func!!!!!!!!
 	if (!ft_strcmp(cmd, "pwd"))
 	{
 		pwd = getcwd(NULL, 0);
@@ -88,10 +90,20 @@ int	check_builtins(char *cmd, char **args, t_vars *vars)
 	}
 	else if (!ft_strcmp(cmd, "cd"))
 	{
+		// Change pwd in env!!!!!!!!
 		if (chdir(args[1]) != 0)
 			perror("cd: ");
 		else
 			vars->exit_stat++;
+	}
+	else if (!ft_strcmp(cmd, "env"))
+	{
+		tmp = vars->env;
+		while (tmp)
+		{
+			printf("%s\n", tmp->line);
+			tmp = tmp->next;
+		}
 	}
 	else if (!ft_strcmp(cmd, "echo"))
 	{
