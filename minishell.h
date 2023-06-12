@@ -11,4 +11,20 @@
 # include <signal.h>
 # include <sys/stat.h>
 
+typedef struct s_env
+{
+	char			*line;
+	char			*key;
+	char			*value;
+	struct s_env	*next;
+	struct s_env	*prev;
+}	t_env;
+
+typedef struct s_vars
+{
+	int		exit_stat;
+	t_env	*env;
+	char	**cmd_arg;
+}	t_vars;
+
 #endif

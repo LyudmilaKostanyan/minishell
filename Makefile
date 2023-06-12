@@ -1,18 +1,19 @@
 NAME = minishell
 CC = cc
-FLAGS = -Wall -Wextra -Werror
+FLAGS = -Wall -Wextra -Werror 
+f = -fsanitize=address -g
 LFLAGS = -lreadline -L./libft -lft
 IFLAGS = -I./libft
 FILES = main.c
 OBJS = $(FILES:.c=.o)
 
 %.o: %.c Makefile minishell.h
-	$(CC) $(FLAGS) $(IFLAGS) -c $< -o $@
+	$(CC) $(FLAGS) $(f) $(IFLAGS) -c $< -o $@
 
 all: lib $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(LFLAGS) $(OBJS) -o $(NAME)
+	$(CC) $(LFLAGS) $(f) $(OBJS) -o $(NAME)
 
 lib:
 	make -C libft
