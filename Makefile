@@ -4,7 +4,8 @@ FLAGS = -Wall -Wextra -Werror
 f = -fsanitize=address -g
 LFLAGS = -lreadline -L./libft -lft
 IFLAGS = -I./libft
-FILES = main.c
+FILES = $(wildcard *.c)
+
 OBJS = $(FILES:.c=.o)
 
 %.o: %.c Makefile minishell.h
