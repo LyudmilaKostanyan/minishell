@@ -24,14 +24,13 @@
 # include <signal.h>
 # include <sys/stat.h>
 
-# define MALL_ERR "malloc error"
 # define EXIT_ERR "numeric argument required"
 
 typedef struct s_env
 {
 	char			*line;
-	// char			*key;
-	// char			*value;
+	char			*key;
+	char			*value;
 	struct s_env	*next;
 	// struct s_env	*prev;
 }	t_env;
@@ -51,9 +50,11 @@ void		export(t_vars *vars);
 void		unset(t_vars *vars);
 void		exit_prog(t_vars *vars);
 void		stop_program(int condition, char *cmd, char *issue, int exit_stat);
+void		malloc_err(int condition, char *cmd);
+void		err_mes(int condition, t_vars *vars, char *line, char *issue);
 long long	ft_atoll(char *str);
 void		split_free(char **split);
 char		*tolower_str(char **str);
-int			ft_isalnum_str(char *str);
+int			ft_isalnum_str(char *str, char c);
 
 #endif

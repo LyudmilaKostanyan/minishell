@@ -13,32 +13,31 @@
 #include "minishell.h"
 #include <libft.h>
 
-t_env	*creat_env_list(char **env, int exit_stat)
+t_env	*creat_env_list(char **env)
 {
 	t_env	*head;
 	t_env	*node;
-	int		i;
+	int		equal;
 
-	// key-value create
-	i = -1;
 	head = malloc(sizeof(t_env));
-	stop_program(!head, "history", MALL_ERR, exit_stat);
+	malloc_err(!head, "env list");
 	node = head;
-	while (env[++i])
+	while (*env)
 	{
-		// if (!i)
-		// 	node->prev = NULL;
-		node->line = ft_strdup(env[i]);
-		stop_program(!node->line, "history", MALL_ERR, exit_stat);
-		if (!env[i + 1])
+		equal = ft_strchr(*env, '=') - *env;
+		node->line = ft_strdup(*env);
+		node->key = ft_substr(*env, 0, equal);
+		node->value = ft_substr(*env, equal + 1, ft_strlen(*env) - equal);
+		malloc_err(!node->line || !node->key || !node->line, "env list");
+		if (!*(env + 1))
 			node->next = NULL;
 		else
 		{
 			node->next = malloc(sizeof(t_env));
-			stop_program(!node->next, "history", MALL_ERR, exit_stat);
-			// node->next->prev = node;
+			malloc_err(!node->next, "env list");
 		}
 		node = node->next;
+		env++;
 	}
 	return (head);
 }
@@ -59,7 +58,6 @@ int	check_builtins(char *cmd, t_vars *vars)
 		unset(vars);
 	else if (!ft_strcmp(cmd, "exit"))
 		exit_prog(vars);
-	// echo without ""!!!!!!!!
 	return (0);
 }
 
@@ -75,7 +73,7 @@ int	main(int argc, char **argv, char **env)
 		exit(0);
 	}
 	vars.exit_stat = 0;
-	vars.env = creat_env_list(env, vars.exit_stat);
+	vars.env = creat_env_list(env);
 	while (1)
 	{
 		input_str = readline("\e[34mminishell$ \e[0m");
@@ -89,13 +87,20 @@ int	main(int argc, char **argv, char **env)
 		add_history(input_str);
 		vars.cmd = ft_split(input_str, ' ');
 		free(input_str);
-		stop_program(!vars.cmd, "history", MALL_ERR, vars.exit_stat);
+		malloc_err(!vars.cmd, "creating cmd list");
 		if (!*vars.cmd)
 			continue ;
 		if (check_builtins(tolower_str(&*vars.cmd), &vars))
-			printf("minishell: %s: command not found\n", *vars.cmd);
+			printf("minishell: %s: command not found\n", *vars.cmd);	//err_mes
 		split_free(vars.cmd);
+
+		// t_env *tmp;
+		// tmp = vars.env;
+		// while (tmp)
+		// {
+		// 	printf("line: %s\nkey: %s\nkey: %s\n", tmp->line, tmp->key, tmp->value);
+		// 	tmp = tmp->next;
+		// }
 	}
-	system("leaks minishell");
 	return (0);
 }
