@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <libft.h>
 
 t_env	*creat_env_list(char **env)
 {
@@ -49,7 +48,7 @@ int	check_builtins(char *cmd, t_vars *vars)
 	else if (!ft_strcmp(cmd, "cd"))
 		cd(vars);
 	else if (!ft_strcmp(cmd, "env"))
-		env(vars);
+		env(vars, 1);
 	else if (!ft_strcmp(cmd, "echo"))
 		echo(vars);
 	else if (!ft_strcmp(cmd, "export"))

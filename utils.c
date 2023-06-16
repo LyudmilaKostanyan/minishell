@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <libft.h>
 
 void	split_free(char **split)
 {

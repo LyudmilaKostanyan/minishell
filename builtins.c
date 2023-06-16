@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <libft.h>
 
 void	pwd(t_vars *vars)
 {
@@ -72,102 +71,20 @@ void	echo(t_vars *vars)
 	vars->exit_stat = 0;
 }
 
-void	env(t_vars *vars)
+void	env(t_vars *vars, int cmd)
 {
 	t_env	*tmp;
 
 	tmp = vars->env;
 	while (tmp)
 	{
-		printf("%s\n", tmp->line);
+		if (cmd)
+			printf("%s\n", tmp->line);
+		else
+			printf("declare -x %s=\"%s\"\n", tmp->key, tmp->value);
 		tmp = tmp->next;
 	}
 	vars->exit_stat = 0;
-}
-
-int	chech(char *cmd) //nameing suka
-{
-	t_env	*tmp;
-	int		stat;
-
-	stat = 0;
-	while (tmp)
-	{
-		if (!ft_strcmp(cmd, tmp))
-			stat = 1;
-		tmp = tmp->next;
-	}
-	return (stat);
-
-}
-
-int	check_export_env(t_vars *vars, int i, char *key)
-{
-	t_env	*tmp;
-	int		stat;
-
-	tmp = vars->env;
-	if (key[ft_strlen(key) - 1] != '+')
-		if (!check(vars->cmd[i], i))
-			return (0);
-	else
-	{
-		key[ft_strlen(key) - 1] = '='
-		if ()
-	}
-	//+ case
-	//other value case
-}
-
-//same varisble in env
-void	export(t_vars *vars)
-{
-	t_env	*tmp;
-	int		i;
-	int		equal;
-	char	*key;
-
-	i = 0;
-	vars->exit_stat = 0;
-	while (vars->cmd[++i])
-	{
-		equal = ft_strchr(vars->cmd[i], '=') - vars->cmd[i];
-		if (equal >= 0)
-		{
-			key = ft_substr(vars->cmd[i], 0, equal);
-			malloc_err(!key, vars->cmd[0]);
-			if (!ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e'))
-			{
-				tmp = vars->env;
-				while (tmp->next)
-					tmp = tmp->next;
-				tmp->next = malloc(sizeof(t_env));
-				malloc_err(!tmp->next, vars->cmd[0]);
-				if (key[ft_strlen(key) - 1] == '+')
-				{
-					tmp->next->key = ft_substr(key, 0, ft_strlen(key) - 1);
-					free(key);
-				}
-				else
-					tmp->next->key = key;
-				tmp->next->value = ft_substr(vars->cmd[i], equal + 1,
-					ft_strlen(vars->cmd[i]) - equal);
-				malloc_err(!tmp->next->key || !tmp->next->value, vars->cmd[0]);
-				key = ft_strjoin(tmp->next->key, "=");
-				malloc_err(!key, vars->cmd[0]);
-				tmp->next->line = ft_strjoin(key, tmp->next->value);
-				malloc_err(!tmp->next->line, vars->cmd[0]);
-				free(key);
-				tmp->next->next = NULL;
-			}
-			else
-			{
-				err_mes(1, vars, vars->cmd[i], "not a valid identifier");
-				vars->exit_stat = 1;
-				free(key);
-			}
-		}
-	}
 }
 
 void	unset(t_vars *vars)
@@ -203,7 +120,6 @@ void	unset(t_vars *vars)
 		}
 		else
 		{
-			printf("asdfg\n");
 			vars->exit_stat = 0;
 			err_mes(1, vars, vars->cmd[i], "not a valid identifier");
 		}

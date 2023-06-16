@@ -23,6 +23,7 @@
 # include <sys/wait.h>
 # include <signal.h>
 # include <sys/stat.h>
+#include <libft.h>
 
 # define EXIT_ERR "numeric argument required"
 
@@ -45,8 +46,10 @@ typedef struct s_vars
 void		pwd(t_vars *vars);
 void		cd(t_vars *vars);
 void		echo(t_vars *vars);
-void		env(t_vars *vars);
+void		env(t_vars *vars, int cmd);
 void		export(t_vars *vars);
+int			check_export_env(t_vars *vars, char *cmd, char *key, int equal);
+void		merge_key_value(t_vars *vars, t_env *node, char *key);
 void		unset(t_vars *vars);
 void		exit_prog(t_vars *vars);
 void		stop_program(int condition, char *cmd, char *issue, int exit_stat);
