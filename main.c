@@ -92,14 +92,6 @@ int	main(int argc, char **argv, char **env)
 		if (check_builtins(tolower_str(&*vars.cmd), &vars))
 			printf("minishell: %s: command not found\n", *vars.cmd);	//err_mes
 		split_free(vars.cmd);
-
-		// t_env *tmp;
-		// tmp = vars.env;
-		// while (tmp)
-		// {
-		// 	printf("line: %s\nkey: %s\nkey: %s\n", tmp->line, tmp->key, tmp->value);
-		// 	tmp = tmp->next;
-		// }
 	}
 	return (0);
 }
