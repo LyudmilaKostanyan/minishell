@@ -12,6 +12,7 @@
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
+# define EXIT_ERR "numeric argument required"
 
 # include <limits.h>
 # include <unistd.h>
@@ -23,9 +24,7 @@
 # include <sys/wait.h>
 # include <signal.h>
 # include <sys/stat.h>
-#include <libft.h>
-
-# define EXIT_ERR "numeric argument required"
+# include <libft.h>
 
 typedef struct s_env
 {
@@ -33,7 +32,6 @@ typedef struct s_env
 	char			*key;
 	char			*value;
 	struct s_env	*next;
-	// struct s_env	*prev;
 }	t_env;
 
 typedef struct s_vars
@@ -57,5 +55,7 @@ long long	ft_atoll(char *str);
 void		split_free(char **split);
 char		*tolower_str(char **str);
 int			ft_isalnum_str(char *str, char c);
+void		creat_env_var(t_vars *vars, char *cmd, char *key, long long equal);
+int			check_env_vars(t_vars *vars, char *cmd, char *key, long long equal);
 
 #endif

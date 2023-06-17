@@ -41,7 +41,7 @@ int	ft_isalnum_str(char *str, char c)
 	while (str && str[++i])
 	{
 		if (c == 'e' && (ft_isalnum(str[i]) || str[i] == '_'
-			|| (i == (int)ft_strlen(str) - 1 && str[i] == '+')))
+				|| (i == (int)ft_strlen(str) - 1 && str[i] == '+')))
 			continue ;
 		else if (c == 'u' && (ft_isalnum(str[i]) || str[i] == '_'))
 			continue ;

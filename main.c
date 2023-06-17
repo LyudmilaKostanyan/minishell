@@ -60,6 +60,67 @@ int	check_builtins(char *cmd, t_vars *vars)
 	return (0);
 }
 
+int	change_spaces(char **str, int *i, char c)
+{
+	while ((*str)[++*i] && (*str)[*i] != c)
+		if ((*str)[*i] == 32)
+			(*str)[*i] = 1;
+	if ((*str)[*i] == c)
+		return (1);
+	return (0);
+}
+
+void	quotes_handler(char **str)
+{
+	int	i;
+	int	d_count;
+	int	s_count;
+
+	i = -1;
+	d_count = 0;
+	s_count = 0;
+	while ((*str)[++i])
+	{
+		if ((*str)[i] == '\"')
+		{
+			d_count++;
+			if (change_spaces(str, &i, '\"'))
+				d_count++;
+			else
+				break ;
+		}
+		else if ((*str)[i] == '\'')
+		{
+			s_count++;
+			if (change_spaces(str, &i, '\''))
+				s_count++;
+			else
+				break ;
+		}
+	}
+	// if (d_count % 2 != 0)
+	// 	// 
+	// if (s_count % 2 != 0)
+	// 	// 
+}
+
+void	restore_spaces(t_vars *vars)
+{
+	int	i;
+	int	j;
+
+	i = -1;
+	while (vars->cmd[++i])
+	{
+		j = -1;
+		while (vars->cmd[i][++j])
+		{
+			if (vars->cmd[i][j] == 1)
+				vars->cmd[i][j] = 32;
+		}
+	}
+}
+
 int	main(int argc, char **argv, char **env)
 {
 	t_vars	vars;
@@ -84,13 +145,15 @@ int	main(int argc, char **argv, char **env)
 		else if (!*input_str)
 			continue ;
 		add_history(input_str);
+		quotes_handler(&input_str);
 		vars.cmd = ft_split(input_str, ' ');
 		free(input_str);
 		malloc_err(!vars.cmd, "creating cmd list");
+		restore_spaces(&vars);
 		if (!*vars.cmd)
 			continue ;
 		if (check_builtins(tolower_str(&*vars.cmd), &vars))
-			printf("minishell: %s: command not found\n", *vars.cmd);	//err_mes
+			printf("minishell: %s: command not found\n", *vars.cmd); //err_mes
 		split_free(vars.cmd);
 	}
 	return (0);
