@@ -60,17 +60,61 @@ int	check_builtins(char *cmd, t_vars *vars)
 	return (0);
 }
 
-int	change_spaces(char **str, int *i, char c)
+void	wait_stop(char **input_str, char c, int *count)
 {
-	while ((*str)[++*i] && (*str)[*i] != c)
-		if ((*str)[*i] == 32)
-			(*str)[*i] = 1;
-	if ((*str)[*i] == c)
+	char	*line;
+	char	*tmp;
+
+	while (1)
+	{
+		tmp = ft_strjoin(*input_str, "\n");
+		malloc_err(!tmp, "reading input");
+		free(*input_str);
+		*input_str = tmp;
+		line = readline("> ");
+		if (!line)
+		{
+			printf("bash: unexpected EOF while looking for matching `\"\'\nbash: syntax error: unexpected end of file\n"); // ^D ??????????
+			break ;
+		}
+		
+		tmp = ft_strjoin(*input_str, line);
+		malloc_err(!tmp, "reading input");
+		free(*input_str);
+		*input_str = tmp;
+		if (ft_strchr(line, c))
+		{
+			(*count)++;
+			free(line);
+			break ;
+		}
+		free(line);
+	}
+}
+
+int	change_spaces(char **input_str, int *i, char c, int *count)
+{
+	while ((*input_str)[++*i] && (*input_str)[*i] != c)
+	{
+		if (c == '\"')
+		{
+			if ((*input_str)[*i] == '\"')
+				(*count)++;
+		}
+		else if (c == '\'')
+			if ((*input_str)[*i] == '\'')
+				(*count)++;
+		if ((*input_str)[*i] == 32)
+			(*input_str)[*i] = 1;						//other func!!!!!!
+	}
+	if ((*input_str)[*i] == c)
 		return (1);
+	if (!(*input_str)[*i] && *count % 2 != 0)
+		wait_stop(input_str, c, count);
 	return (0);
 }
 
-void	quotes_handler(char **str)
+void	quotes_handler(char **input_str)
 {
 	int	i;
 	int	d_count;
@@ -79,29 +123,26 @@ void	quotes_handler(char **str)
 	i = -1;
 	d_count = 0;
 	s_count = 0;
-	while ((*str)[++i])
+	while ((*input_str)[++i])
 	{
-		if ((*str)[i] == '\"')
+		if ((*input_str)[i] == '\"')
 		{
 			d_count++;
-			if (change_spaces(str, &i, '\"'))
-				d_count++;
-			else
+			if (!change_spaces(input_str, &i, '\"', &d_count))
 				break ;
 		}
-		else if ((*str)[i] == '\'')
+		else if ((*input_str)[i] == '\'')
 		{
 			s_count++;
-			if (change_spaces(str, &i, '\''))
-				s_count++;
-			else
+			if (!change_spaces(input_str, &i, '\'', &s_count))
 				break ;
 		}
 	}
-	// if (d_count % 2 != 0)
-	// 	// 
-	// if (s_count % 2 != 0)
-	// 	// 
+}
+
+char	*rm_quotes()
+{
+	
 }
 
 void	restore_spaces(t_vars *vars)
@@ -125,6 +166,7 @@ int	main(int argc, char **argv, char **env)
 {
 	t_vars	vars;
 	char	*input_str;
+	char	*for_split;
 
 	(void)argv;
 	if (argc != 1)
@@ -144,12 +186,12 @@ int	main(int argc, char **argv, char **env)
 		}
 		else if (!*input_str)
 			continue ;
-		add_history(input_str);
 		quotes_handler(&input_str);
 		vars.cmd = ft_split(input_str, ' ');
-		free(input_str);
 		malloc_err(!vars.cmd, "creating cmd list");
 		restore_spaces(&vars);
+		add_history(input_str);
+		free(input_str);
 		if (!*vars.cmd)
 			continue ;
 		if (check_builtins(tolower_str(&*vars.cmd), &vars))
