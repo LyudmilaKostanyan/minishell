@@ -12,24 +12,21 @@
 
 #include "minishell.h"
 
-void	merge_key_value(t_vars *vars, t_env *node)
+void	merge_key_value(t_env *node, char *err)
 {
 	char	*key;
 
 	key = ft_strjoin(node->key, "=");
-	malloc_err(!key, vars->cmd[0]);
+	malloc_err(!key, err);
 	node->line = ft_strjoin(key, node->value);
-	malloc_err(!node->line, vars->cmd[0]);
+	malloc_err(!node->line, err);
 	free(key);
 }
 
-t_env	*checking_env_key(t_vars *vars, char *key)
+t_env	*checking_env_key(t_env *env, char *key)
 {
-	t_env	*env;
-
 	if (key[ft_strlen(key) - 1] == '+')
 		key[ft_strlen(key) - 1] = 0;
-	env = vars->env;
 	while (env)
 	{
 		if (!ft_strcmp(key, env->key))
@@ -39,13 +36,36 @@ t_env	*checking_env_key(t_vars *vars, char *key)
 	return (NULL);
 }
 
-int	check_env_vars(t_vars *vars, char *cmd, char *key, long long equal)
+void	add_value(char *cmd, t_env **env)
 {
-	t_env	*env;
+	char	*tmp;
 
-	env = checking_env_key(vars, key);
+	tmp = ft_strjoin((*env)->value, ft_strchr(cmd, '=') + 1);
+	malloc_err(!tmp, "add value in env variable");
+	free((*env)->value);
+	(*env)->value = tmp;
+	tmp = ft_strjoin((*env)->line, ft_strchr(cmd, '=') + 1);
+	malloc_err(!tmp, "add value in env variable");
+	free((*env)->line);
+	(*env)->line = tmp;
+}
+
+int	check_env_vars(t_env *env, char *cmd, char *key, long long equal)
+{
+	// t_env	*env;
+	int		plus;
+
+	plus = 0;
+	if (key[ft_strlen(key) - 1] == '+')
+		plus++;
+	env = checking_env_key(env, key);
 	if (!env)
 		return (0);
+	if (plus)
+	{
+		add_value(cmd, &env);
+		return (1);
+	}
 	if (equal > 0)
 	{
 		if (!ft_strcmp(ft_strchr(cmd, '=') + 1, env->value))
@@ -60,33 +80,42 @@ int	check_env_vars(t_vars *vars, char *cmd, char *key, long long equal)
 		free(env->value);
 		env->value = ft_strdup(cmd);
 	}
-	malloc_err(!env->value, vars->cmd[0]);
+	malloc_err(!env->value, "sadfg");					//???????????????
 	free(env->line);
-	merge_key_value(vars, env);
+	merge_key_value(env, "asdfg");
 	return (1);
 }
 
-void	creat_env_var(t_vars *vars, char *cmd, char *key, long long equal)
+void	creat_env_var(t_env **env, char *cmd, char *key, long long equal)
 {
-	t_env	*env;
+	t_env	*head;
+	t_env	*tmp;
 
-	env = vars->env;
-	while (env->next)
-		env = env->next;
-	env->next = malloc(sizeof(t_env));
-	malloc_err(!env->next, vars->cmd[0]);
+	head = *env;
+	while (*env)
+	{
+		if (!(*env)->next)
+			tmp = *env;
+		*env = (*env)->next;
+	}
+	(*env) = malloc(sizeof(t_env));
+	malloc_err(!*env, "asdfgh");		//????????
+	if (head)
+		tmp->next = *env;
 	if (key[ft_strlen(key) - 1] == '+')
-		env->next->key = ft_substr(key, 0, ft_strlen(key) - 1);
+		(*env)->key = ft_substr(key, 0, ft_strlen(key) - 1);
 	else
-		env->next->key = ft_strdup(key);
+		(*env)->key = ft_strdup(key);
 	if (equal > 0)
-		env->next->value = ft_substr(cmd, equal + 1,
+		(*env)->value = ft_substr(cmd, equal + 1,
 				ft_strlen(cmd) - equal);
 	else
-		env->next->value = ft_strdup(cmd);
-	malloc_err(!env->next->key || !env->next->value, vars->cmd[0]);
-	merge_key_value(vars, env->next);
-	env->next->next = NULL;
+		(*env)->value = ft_strdup(cmd);
+	malloc_err(!(*env)->key || !(*env)->value, "asdfgh");	//????????
+	merge_key_value(*env, "dsasdas");		//?????
+	(*env)->next = NULL;
+	if (head)
+		*env = head;
 }
 
 void	export(t_vars *vars)
@@ -106,8 +135,8 @@ void	export(t_vars *vars)
 		key = ft_substr(vars->cmd[i], 0, equal);
 		malloc_err(!key, vars->cmd[0]);
 		if (!ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e') && equal >= 0
-			&& !check_env_vars(vars, vars->cmd[i], key, equal))
-			creat_env_var(vars, vars->cmd[i], key, equal);
+			&& !check_env_vars(vars->env, vars->cmd[i], key, equal))
+			creat_env_var(&vars->env, vars->cmd[i], key, equal);
 		else if (ft_isdigit(*key) || !*key || !ft_isalnum_str(key, 'u'))
 		{
 			err_mes(1, vars, vars->cmd[i], "not a valid identifier");

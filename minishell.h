@@ -42,6 +42,7 @@ typedef struct s_vars
 {
 	int		exit_stat;
 	t_env	*env;
+	t_env	*env_vars;
 	char	**cmd;
 }	t_vars;
 
@@ -59,8 +60,8 @@ long long	ft_atoll(char *str);
 void		split_free(char **split);
 char		*tolower_str(char **str);
 int			ft_isalnum_str(char *str, char c);
-void		creat_env_var(t_vars *vars, char *cmd, char *key, long long equal);
-int			check_env_vars(t_vars *vars, char *cmd, char *key, long long equal);
+void		creat_env_var(t_env **env, char *cmd, char *key, long long equal);
+int			check_env_vars(t_env *env, char *cmd, char *key, long long equal);
 char		*get_next_line(int fd);
 int			ft_strchr_gnl(char *str, int c);
 char		*ft_strdup_gnl(char *s, int start, int j);

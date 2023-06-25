@@ -32,8 +32,8 @@ void	cd(t_vars *vars)
 	vars->exit_stat = 1;
 	old_pwd = getcwd(NULL, 0);
 	malloc_err(!old_pwd, vars->cmd[0]);
-	if (!check_env_vars(vars, old_pwd, "OLDPWD", 0))
-		creat_env_var(vars, old_pwd, "OLDPWD", 0);
+	if (!check_env_vars(vars->env, old_pwd, "OLDPWD", 0))
+		creat_env_var(&vars->env, old_pwd, "OLDPWD", 0);
 	free(old_pwd);
 	if (chdir(vars->cmd[1]))
 		err_mes(1, vars, vars->cmd[1], "No such file or directory");
