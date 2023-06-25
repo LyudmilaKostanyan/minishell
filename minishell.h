@@ -44,6 +44,8 @@ typedef struct s_vars
 	t_env	*env;
 	t_env	*env_vars;
 	char	**cmd;
+	char	main_c;
+	int		q_count;
 }	t_vars;
 
 void		pwd(t_vars *vars);

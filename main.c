@@ -97,50 +97,55 @@ void	wait_stop(char **input_str, char c, int *count)
 	}
 }
 
-int	change_spaces(char **input_str, int *i, char c, int *count)
+int	quotes_counter(char *input_str, char *main_c)
 {
-	while ((*input_str)[++*i] && (*input_str)[*i] != c)
+	int		count;
+
+	count = 0;
+	while (*input_str)
 	{
-		if (c == '\"')
+		if (*input_str == '\"' || *input_str == '\'')
 		{
-			if ((*input_str)[*i] == '\"')
-				(*count)++;
+			*main_c = *input_str;
+			break ;
 		}
-		else if (c == '\'')
-			if ((*input_str)[*i] == '\'')
-				(*count)++;
-		if ((*input_str)[*i] == 32)
-			(*input_str)[*i] = 1;						//other func!!!!!!
+		input_str++;
 	}
-	if ((*input_str)[*i] == c)
-		return (1);
-	while (!(*input_str)[*i] && *count % 2 != 0)
-		wait_stop(input_str, c, count);
-	return (0);
+	while (*input_str)
+	{
+		if (*input_str == *main_c)
+			count++;
+		input_str++;
+	}
+	return (count);
 }
 
-void	quotes_handler(char **input_str)
+void	quotes_handler(t_vars *vars, char **input_str)
 {
-	int	i;
-	int	d_count;
-	int	s_count;
+	int		i;
+	int		count;
 
+	vars->q_count = quotes_counter(*input_str, &vars->main_c);
+	if (!vars->q_count)
+		return ;
+	if (vars->q_count % 2 != 0)
+		wait_stop(input_str, vars->main_c, &vars->q_count);
+	count = vars->q_count;
 	i = -1;
-	d_count = 0;
-	s_count = 0;
 	while ((*input_str)[++i])
 	{
-		if ((*input_str)[i] == '\"')
+		if ((*input_str)[i] == vars->main_c)
 		{
-			d_count++;
-			if (!change_spaces(input_str, &i, '\"', &d_count))
-				break ;
-		}
-		else if ((*input_str)[i] == '\'')
-		{
-			s_count++;
-			if (!change_spaces(input_str, &i, '\'', &s_count))
-				break ;
+			count--;
+			while ((*input_str)[++i] && count)
+			{
+				if ((*input_str)[i] == vars->main_c)
+					count--;
+				if ((*input_str)[i] == 32)
+					(*input_str)[i] = 1;
+			}
+			if (!(*input_str)[i])
+				break ;							//annormal
 		}
 	}
 }
@@ -179,34 +184,28 @@ char	*rm_quotes(t_vars *vars, char *input_str) //$!!!!!!!!!!!! //""
 {
 	char	*out_str;
 	int		i;
-	char	main_c;
 	char	*tmp;
 	int		val_len;
+	int		key_len;
+	t_env	*env;
 
-	i = -1;
-	main_c = 0;
-	while (input_str[++i])
-	{
-		if (input_str[i] == '\"' || input_str[i] == '\'')
-		{
-			main_c = input_str[i];
-			break ;
-		}
-	}
 	val_len = 0;
-	t_env *env = find_var_value(vars->env_vars, input_str);
+	key_len = 0;
+	env = find_var_value(vars->env_vars, input_str);
 	if (env)
+	{
+		key_len = ft_strlen(env->key) + 1;
 		val_len = ft_strlen(env->value);
-	else if (!main_c)
+	}
+	else if (!vars->main_c)
 		return (NULL);
-	out_str = malloc(ft_strlen(input_str) + val_len - ft_strlen(env->key) - 1 - 0 + 1);	//-0!!!!!!!!
+	out_str = malloc(ft_strlen(input_str) + val_len - key_len - vars->q_count + 1);	//-0!!!!!!!!
 	malloc_err(!out_str, "rm_quotes");
 	i = -1;
 	tmp = input_str;
 	while (*tmp)
 	{
-		if (tmp != ft_strchr(input_str, main_c)
-			&& tmp != ft_strrchr(input_str, main_c))
+		if (*tmp != vars->main_c)
 		{
 			if (*tmp == '$')
 			{
@@ -281,7 +280,7 @@ int	main(int argc, char **argv, char **env)
 		}
 		else if (!*input_str)
 			continue ;
-		quotes_handler(&input_str);
+		quotes_handler(&vars, &input_str);
 		for_split = rm_quotes(&vars, input_str);
 		if (!for_split)
 			vars.cmd = ft_split(input_str, ' ');
