@@ -76,7 +76,7 @@ long long	ft_atoll(char *str)
 		u_num = u_num * 10 + (*str++ - 48);
 	}
 	stop_program((sign == 1 && u_num > LLONG_MAX)
-		|| (sign == -1 && u_num > (unsigned long long)(-LLONG_MIN)),
+		|| (sign == -1 && u_num > (unsigned long long)(LLONG_MAX) + 1),
 		"export", EXIT_ERR, 255);
 	ll_num = sign * u_num;
 	return (ll_num);

@@ -26,10 +26,6 @@
 # include <sys/stat.h>
 # include <libft.h>
 
-# ifndef BUFFER_SIZE
-# define BUFFER_SIZE 42
-# endif
-
 typedef struct s_env
 {
 	char			*line;
@@ -64,9 +60,10 @@ char		*tolower_str(char **str);
 int			ft_isalnum_str(char *str, char c);
 void		creat_env_var(t_env **env, char *cmd, char *key, long long equal);
 int			check_env_vars(t_env *env, char *cmd, char *key, long long equal);
-char		*get_next_line(int fd);
-int			ft_strchr_gnl(char *str, int c);
-char		*ft_strdup_gnl(char *s, int start, int j);
-char		*ft_strjoin_gnl(char *s1, char *s2);
+char		*rm_quotes(t_vars *vars, char *input_str);
+t_env		*find_var_value(t_env *env, char *input_str);
+void		quotes_handler(t_vars *vars, char **input_str);
+int			quotes_counter(char *input_str, char *main_c);
+void		wait_stop(char **input_str, char c, int *count);
 
 #endif

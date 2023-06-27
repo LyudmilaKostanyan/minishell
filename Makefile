@@ -1,6 +1,6 @@
 NAME = minishell
 CC = cc
-FLAGS = -Wall -Wextra -Werror 
+FLAGS = -Wall -Wextra -Werror
 f = -fsanitize=address -g
 LFLAGS = -lreadline -L./libft -lft
 IFLAGS = -I./libft
@@ -14,7 +14,7 @@ OBJS = $(FILES:.c=.o)
 all: lib $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(LFLAGS) $(f) $(OBJS) -o $(NAME)
+	$(CC) $(f) $(OBJS) $(LFLAGS) -o $(NAME)
 
 lib:
 	make -C libft

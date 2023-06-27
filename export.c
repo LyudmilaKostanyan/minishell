@@ -52,7 +52,6 @@ void	add_value(char *cmd, t_env **env)
 
 int	check_env_vars(t_env *env, char *cmd, char *key, long long equal)
 {
-	// t_env	*env;
 	int		plus;
 
 	plus = 0;
