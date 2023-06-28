@@ -81,23 +81,42 @@ void	check_equal(t_vars	*vars)
 	i = -1;
 	while (vars->cmd[++i])
 	{
-		equal = (uintptr_t)ft_strchr(vars->cmd[i], '=')
-			- (uintptr_t)vars->cmd[i];
+		equal = ft_strchr(vars->cmd[i], '=') - vars->cmd[i];
 		key = ft_substr(vars->cmd[i], 0, equal);
 		malloc_err(!key, vars->cmd[0]);
-		if (!ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e') && equal >= 0
-			&& !check_env_vars(vars->env_vars, vars->cmd[i], key, equal)
-			&& !check_env_vars(vars->env, vars->cmd[i], key, equal))
-			creat_env_var(&vars->env_vars, vars->cmd[i], key, equal);//mall_err!!!
+		if (equal >= 0 && !ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e')
+			&& !check_env_vars(vars->env, vars->cmd[i], key, equal)
+			&& !check_env_vars(vars->env_vars, vars->cmd[i], key, equal))
+			creat_env_var(&vars->env_vars, vars->cmd[i], key, equal);
 		free(key);
 	}
+}
+
+void	str_changes(t_vars *vars, char **input_str)
+{
+	char	*for_split;
+	int		i;
+
+	quotes_handler(vars, input_str);
+	for_split = rm_quotes(vars, *input_str);
+	if (!for_split)
+		vars->cmd = ft_split(*input_str, ' ');
+	else
+		vars->cmd = ft_split(for_split, ' ');
+	malloc_err(!vars->cmd, "creating cmd list");
+	i = -1;
+	while (vars->cmd[++i])
+		restore_spaces(&vars->cmd[i]);
+	restore_spaces(input_str);
+	add_history(*input_str);
+	free(*input_str);
+	free(for_split);
 }
 
 int	main(int argc, char **argv, char **env)
 {
 	t_vars	vars;
 	char	*input_str;
-	char	*for_split;
 
 	(void)argv;
 	if (argc != 1)
@@ -117,24 +136,11 @@ int	main(int argc, char **argv, char **env)
 		}
 		else if (!*input_str)
 			continue ;
-		quotes_handler(&vars, &input_str);
-		for_split = rm_quotes(&vars, input_str);
-		if (!for_split)
-			vars.cmd = ft_split(input_str, ' ');
-		else
-			vars.cmd = ft_split(for_split, ' ');
-		malloc_err(!vars.cmd, "creating cmd list");
-		int	i = -1;
-		while (vars.cmd[++i])
-			restore_spaces(&vars.cmd[i]);
-		restore_spaces(&input_str);
-		add_history(input_str);
-		free(input_str);
-		free(for_split);
+		str_changes(&vars, &input_str);
 		if (!*vars.cmd)
 			continue ;
-		if (!check_builtins(tolower_str(&*vars.cmd), &vars))
-			check_equal(&vars);
+		check_equal(&vars);
+		check_builtins(tolower_str(*vars.cmd), &vars);
 		split_free(vars.cmd);
 	}
 	return (0);

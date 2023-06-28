@@ -23,14 +23,14 @@ void	split_free(char **split)
 	split = NULL;
 }
 
-char	*tolower_str(char **str)
+char	*tolower_str(char *str)
 {
 	int	i;
 
 	i = -1;
-	while (*str && (*str)[++i])
-			(*str)[i] = ft_tolower((*str)[i]);
-	return (*str);
+	while (str && str[++i])
+			str[i] = ft_tolower(str[i]);
+	return (str);
 }
 
 int	ft_isalnum_str(char *str, char c)

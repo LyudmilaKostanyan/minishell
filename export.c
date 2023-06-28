@@ -12,14 +12,14 @@
 
 #include "minishell.h"
 
-void	merge_key_value(t_env *node, char *err)
+void	merge_key_value(t_env *node)
 {
 	char	*key;
 
 	key = ft_strjoin(node->key, "=");
-	malloc_err(!key, err);
+	malloc_err(!key, "merge_key_value");
 	node->line = ft_strjoin(key, node->value);
-	malloc_err(!node->line, err);
+	malloc_err(!node->line, "merge_key_value");
 	free(key);
 }
 
@@ -79,9 +79,9 @@ int	check_env_vars(t_env *env, char *cmd, char *key, long long equal)
 		free(env->value);
 		env->value = ft_strdup(cmd);
 	}
-	malloc_err(!env->value, "sadfg");					//???????????????
+	malloc_err(!env->value, "check_env_vars : env->value");
 	free(env->line);
-	merge_key_value(env, "asdfg");
+	merge_key_value(env);
 	return (1);
 }
 
@@ -98,7 +98,7 @@ void	creat_env_var(t_env **env, char *cmd, char *key, long long equal)
 		*env = (*env)->next;
 	}
 	(*env) = malloc(sizeof(t_env));
-	malloc_err(!*env, "asdfgh");		//????????
+	malloc_err(!*env, "creat_env_var: env");
 	if (head)
 		tmp->next = *env;
 	if (key[ft_strlen(key) - 1] == '+')
@@ -110,8 +110,8 @@ void	creat_env_var(t_env **env, char *cmd, char *key, long long equal)
 				ft_strlen(cmd) - equal);
 	else
 		(*env)->value = ft_strdup(cmd);
-	malloc_err(!(*env)->key || !(*env)->value, "asdfgh");	//????????
-	merge_key_value(*env, "dsasdas");		//?????
+	malloc_err(!(*env)->key || !(*env)->value, "creat_env_var: key/value");
+	merge_key_value(*env);
 	(*env)->next = NULL;
 	if (head)
 		*env = head;
@@ -129,8 +129,7 @@ void	export(t_vars *vars)
 		env(vars, 0);
 	while (vars->cmd[++i])
 	{
-		equal = (uintptr_t)ft_strchr(vars->cmd[i], '=')
-			- (uintptr_t)vars->cmd[i];
+		equal = ft_strchr(vars->cmd[i], '=') - vars->cmd[i];
 		key = ft_substr(vars->cmd[i], 0, equal);
 		malloc_err(!key, vars->cmd[0]);
 		if (!ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e') && equal >= 0
