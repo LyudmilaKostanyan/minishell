@@ -27,14 +27,14 @@ t_env	*key_cmp(t_vars vars, char *input_str, long long keys_end)
 		}
 		vars.env = vars.env->next;
 	}
-	while (vars.env_vars)
+	while (vars.set)
 	{
-		if (!ft_strcmp(vars.env_vars->key, key))
+		if (!ft_strcmp(vars.set->key, key))
 		{
 			free(key);
-			return (vars.env_vars);
+			return (vars.set);
 		}
-		vars.env_vars = vars.env_vars->next;
+		vars.set = vars.set->next;
 	}
 	free(key);
 	return (NULL);

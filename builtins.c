@@ -17,13 +17,13 @@ void	pwd(t_vars *vars)
 	char	*pwd;
 
 	pwd = getcwd(NULL, 0);
-	malloc_err(!pwd, vars->cmd[0]);
+	malloc_err(!pwd, "pwd");
 	printf("%s\n", pwd);
 	free(pwd);
 	vars->exit_stat = 0;
 }
 
-void	cd(t_vars *vars)
+void	cd(t_vars *vars, char **cmd)
 {
 	char	*pwd;
 	char	*old_pwd;
@@ -31,16 +31,16 @@ void	cd(t_vars *vars)
 
 	vars->exit_stat = 1;
 	old_pwd = getcwd(NULL, 0);
-	malloc_err(!old_pwd, vars->cmd[0]);
-	if (!check_env_vars(vars->env, old_pwd, "OLDPWD", 0))
+	malloc_err(!old_pwd, cmd[0]);
+	if (!check_set(vars->env, old_pwd, "OLDPWD", 0))
 		creat_env_var(&vars->env, old_pwd, "OLDPWD", 0);
 	free(old_pwd);
-	if (chdir(vars->cmd[1]))
-		err_mes(1, vars, vars->cmd[1], "No such file or directory");
+	if (chdir(cmd[1]))
+		err_mes(1, vars, cmd, cmd[0]);
 	else
 	{
 		pwd = getcwd(NULL, 0);
-		malloc_err(!pwd, vars->cmd[0]);
+		malloc_err(!pwd, cmd[0]);
 		tmp = vars->env;
 		while (tmp)
 		{
@@ -48,7 +48,7 @@ void	cd(t_vars *vars)
 			{
 				free(tmp->line);
 				tmp->line = ft_strjoin("PWD=", pwd);
-				malloc_err(!tmp->line, vars->cmd[0]);
+				malloc_err(!tmp->line, cmd[0]);
 				break ;
 			}
 			tmp = tmp->next;
@@ -58,21 +58,21 @@ void	cd(t_vars *vars)
 	}
 }
 
-void	echo(t_vars *vars)
+void	echo(t_vars *vars, char **cmd)
 {
 	int	i;
 
-	if (ft_strcmp(vars->cmd[1], "-n"))
+	if (ft_strcmp(cmd[1], "-n"))
 		i = 0;
 	else
 		i = 1;
-	while (vars->cmd[++i])
+	while (cmd[++i])
 	{
-		printf("%s", vars->cmd[i]);
-		if (vars->cmd[i + 1])
+		printf("%s", cmd[i]);
+		if (cmd[i + 1])
 			printf(" ");
 	}
-	if (ft_strcmp(vars->cmd[1], "-n"))
+	if (ft_strcmp(cmd[1], "-n"))
 		printf("\n");
 	vars->exit_stat = 0;
 }
@@ -101,7 +101,7 @@ void	free_node(t_vars *vars, char *cmd)
 
 	env = vars->env;
 	str = ft_strjoin(cmd, "=");
-	malloc_err(!str, vars->cmd[0]);
+	malloc_err(!str, "unset");
 	while (env && env->next)
 	{
 		if (!ft_strncmp(env->next->line, str, ft_strlen(str)))
@@ -118,31 +118,31 @@ void	free_node(t_vars *vars, char *cmd)
 	free(str);
 }
 
-void	unset(t_vars *vars)
+void	unset(t_vars *vars, char **cmd)
 {
 	int		i;
 
 	i = 0;
 	vars->exit_stat = 0;
-	while (vars->cmd[++i])
+	while (cmd[++i])
 	{
-		if (!ft_isdigit(*vars->cmd[i]) && ft_isalnum_str(vars->cmd[i], 'u'))
-			free_node(vars, vars->cmd[i]);
+		if (!ft_isdigit(*cmd[i]) && ft_isalnum_str(cmd[i], 'u'))
+			free_node(vars, cmd[i]);
 		else
 		{
 			vars->exit_stat = 1;
-			err_mes(1, vars, vars->cmd[i], "not a valid identifier");
+			err_mes(1, vars, cmd, cmd[i]);
 		}
 	}
 }
 
-void	exit_prog(t_vars *vars)
+void	exit_prog(char **cmd)
 {
 	long long	exit_code;
 
-	if (vars->cmd[1])
+	if (cmd[1])
 	{
-		exit_code = ft_atoll(vars->cmd[1]);
+		exit_code = ft_atoll(cmd[1]);
 		exit(exit_code % 256);
 	}
 	else

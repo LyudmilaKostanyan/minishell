@@ -41,22 +41,22 @@ t_env	*creat_env_list(char **env)
 	return (head);
 }
 
-int	check_builtins(char *cmd, t_vars *vars)
+int	check_builtins(t_vars *vars, char **cmd)
 {
-	if (!ft_strcmp(cmd, "pwd"))
+	if (!ft_strcmp(*cmd, "pwd"))
 		pwd(vars);
-	else if (!ft_strcmp(cmd, "cd"))
-		cd(vars);
-	else if (!ft_strcmp(cmd, "env"))
+	else if (!ft_strcmp(*cmd, "cd"))
+		cd(vars, cmd);
+	else if (!ft_strcmp(*cmd, "env"))
 		env(vars, 1);
-	else if (!ft_strcmp(cmd, "echo"))
-		echo(vars);
-	else if (!ft_strcmp(cmd, "export"))
-		export(vars);
-	else if (!ft_strcmp(cmd, "unset"))
-		unset(vars);
-	else if (!ft_strcmp(cmd, "exit"))
-		exit_prog(vars);
+	else if (!ft_strcmp(*cmd, "echo"))
+		echo(vars, cmd);
+	else if (!ft_strcmp(*cmd, "export"))
+		export(vars, cmd);
+	else if (!ft_strcmp(*cmd, "unset"))
+		unset(vars, cmd);
+	else if (!ft_strcmp(*cmd, "exit"))
+		exit_prog(cmd);
 	else
 		return (0);
 	return (1);
@@ -72,51 +72,71 @@ void	restore_spaces(char **str)
 			(*str)[i] = 32;
 }
 
-void	check_equal(t_vars	*vars)
+void	check_equal(t_vars	*vars, char **cmd)
 {
 	int			i;
 	long long	equal;
 	char		*key;
 
 	i = -1;
-	while (vars->cmd[++i])
+	while (cmd[++i])
 	{
-		equal = ft_strchr(vars->cmd[i], '=') - vars->cmd[i];
-		key = ft_substr(vars->cmd[i], 0, equal);
-		malloc_err(!key, vars->cmd[0]);
+		equal = ft_strchr(cmd[i], '=') - cmd[i];
+		key = ft_substr(cmd[i], 0, equal);
+		malloc_err(!key, cmd[0]);
 		if (equal >= 0 && !ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e')
-			&& !check_env_vars(vars->env, vars->cmd[i], key, equal)
-			&& !check_env_vars(vars->env_vars, vars->cmd[i], key, equal))
-			creat_env_var(&vars->env_vars, vars->cmd[i], key, equal);
+			&& !check_set(vars->env, cmd[i], key, equal)
+			&& !check_set(vars->set, cmd[i], key, equal))
+			creat_env_var(&vars->set, cmd[i], key, equal);
 		free(key);
 	}
 }
 
-void	str_changes(t_vars *vars, char **input_str)
+void	str_changes(t_vars *vars, t_cmds *cmds, char *input_str)
 {
 	char	*for_split;
-	int		i;
+	int		j;
 
-	quotes_handler(vars, input_str);
-	for_split = rm_quotes(vars, *input_str);
+	quotes_handler(vars, &input_str);
+	for_split = rm_quotes(vars, input_str);
 	if (!for_split)
-		vars->cmd = ft_split(*input_str, ' ');
+		cmds->cmd = ft_split(input_str, ' ');
 	else
-		vars->cmd = ft_split(for_split, ' ');
-	malloc_err(!vars->cmd, "creating cmd list");
-	i = -1;
-	while (vars->cmd[++i])
-		restore_spaces(&vars->cmd[i]);
-	restore_spaces(input_str);
-	add_history(*input_str);
-	free(*input_str);
+		cmds->cmd = ft_split(for_split, ' ');
+	malloc_err(!*cmds->cmd, "creating cmd list");
+	j = -1;
+	while (cmds->cmd[++j])
+		restore_spaces(&cmds->cmd[j]);
+	restore_spaces(&input_str);
+	add_history(input_str);
 	free(for_split);
+}
+
+void	pipes(t_vars *vars, t_cmds **cmds, int count)
+{
+	int	i;
+
+	i = -1;
+	while (++i < count - 1)
+	{
+		printf("asd\n");
+		if (pipe(cmds[i]->pipe) == -1)
+		{
+			while (--i >= 0)
+			{
+				close(cmds[i]->pipe[0]);
+				close(cmds[i]->pipe[1]);
+			}
+			stop_program(1, "", "creat pipes", vars->exit_stat);
+		}
+	}
 }
 
 int	main(int argc, char **argv, char **env)
 {
 	t_vars	vars;
 	char	*input_str;
+	t_cmds	*cmds;
 
 	(void)argv;
 	if (argc != 1)
@@ -136,12 +156,39 @@ int	main(int argc, char **argv, char **env)
 		}
 		else if (!*input_str)
 			continue ;
-		str_changes(&vars, &input_str);
-		if (!*vars.cmd)
-			continue ;
-		check_equal(&vars);
-		check_builtins(tolower_str(*vars.cmd), &vars);
-		split_free(vars.cmd);
+		char	**pipe_splt = ft_split(input_str, '|');
+		malloc_err(!pipe_splt, "split cmds");
+		int	count = split_size(pipe_splt);
+		cmds = malloc((sizeof(t_cmds) * count) + 1);
+		malloc_err(!cmds, "creat cmds");
+		int	i = -1;
+		while (++i < count)
+		{
+			str_changes(&vars, &cmds[i], pipe_splt[i]);
+			// if (!*vars.cmd)								//?????????
+			// 	continue ;
+		}
+		// i = -1;
+		// while (++i < count - 1)
+		// {
+		// 	cmds[i].pipe = malloc(sizeof(int) * 2);
+		// 	malloc_err(!cmds[i].pipe, "creat pipes");
+		// }
+		// // system("leaks minishell");
+		// pipes(&vars, &cmds, count);
+		i = -1;
+		while (++i < count)
+		{
+			check_equal(&vars, cmds[i].cmd);
+			tolower_str(*cmds[i].cmd);
+			check_builtins(&vars, cmds[i].cmd);
+		}
+		i = -1;
+		while (++i < count)
+			split_free(cmds[i].cmd);
+		split_free(pipe_splt);
+		free(cmds);
+		free(input_str);
 	}
 	return (0);
 }

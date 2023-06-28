@@ -50,7 +50,7 @@ void	add_value(char *cmd, t_env **env)
 	(*env)->line = tmp;
 }
 
-int	check_env_vars(t_env *env, char *cmd, char *key, long long equal)
+int	check_set(t_env *env, char *cmd, char *key, long long equal)
 {
 	int		plus;
 
@@ -79,7 +79,7 @@ int	check_env_vars(t_env *env, char *cmd, char *key, long long equal)
 		free(env->value);
 		env->value = ft_strdup(cmd);
 	}
-	malloc_err(!env->value, "check_env_vars : env->value");
+	malloc_err(!env->value, "check_set : env->value");
 	free(env->line);
 	merge_key_value(env);
 	return (1);
@@ -117,7 +117,7 @@ void	creat_env_var(t_env **env, char *cmd, char *key, long long equal)
 		*env = head;
 }
 
-void	export(t_vars *vars)
+void	export(t_vars *vars, char **cmd)
 {
 	int			i;
 	long long	equal;
@@ -125,19 +125,19 @@ void	export(t_vars *vars)
 
 	i = 0;
 	vars->exit_stat = 0;
-	if (!vars->cmd[1])
+	if (!cmd[1])
 		env(vars, 0);
-	while (vars->cmd[++i])
+	while (cmd[++i])
 	{
-		equal = ft_strchr(vars->cmd[i], '=') - vars->cmd[i];
-		key = ft_substr(vars->cmd[i], 0, equal);
-		malloc_err(!key, vars->cmd[0]);
+		equal = ft_strchr(cmd[i], '=') - cmd[i];
+		key = ft_substr(cmd[i], 0, equal);
+		malloc_err(!key, cmd[0]);
 		if (!ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e') && equal >= 0
-			&& !check_env_vars(vars->env, vars->cmd[i], key, equal))
-			creat_env_var(&vars->env, vars->cmd[i], key, equal);
+			&& !check_set(vars->env, cmd[i], key, equal))
+			creat_env_var(&vars->env, cmd[i], key, equal);
 		else if (ft_isdigit(*key) || !*key || !ft_isalnum_str(key, 'u'))
 		{
-			err_mes(1, vars, vars->cmd[i], "not a valid identifier");
+			err_mes(1, vars, cmd, cmd[i]);
 			vars->exit_stat = 1;
 		}
 		free(key);

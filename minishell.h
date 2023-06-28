@@ -15,6 +15,8 @@
 # define EXIT_ERR "numeric argument required"
 # define QUOTES_ERR "bash: unexpected EOF while looking for matching `\"\'\n"
 # define QUOTES_SYN_ERR "bash: syntax error: unexpected end of file\n"
+# define CD_ERR "No such file or directory"
+# define E_U_ERR "not a valid identifier"
 
 # include <limits.h>
 # include <unistd.h>
@@ -36,36 +38,45 @@ typedef struct s_env
 	struct s_env	*next;
 }	t_env;
 
+typedef struct s_cmds
+{
+	char	**cmd;
+	char	**path;
+	int		*pipe;
+	// t_pid	pid;
+}	t_cmds;
+
 typedef struct s_vars
 {
 	int		exit_stat;
 	t_env	*env;
-	t_env	*env_vars;
-	char	**cmd;
+	t_env	*set;
+	// char	**cmd;
 	char	main_c;
 	int		q_count;
 }	t_vars;
 
 void		pwd(t_vars *vars);
-void		cd(t_vars *vars);
-void		echo(t_vars *vars);
+void		cd(t_vars *vars, char **cmd);
+void		echo(t_vars *vars, char **cmd);
 void		env(t_vars *vars, int cmd);
-void		export(t_vars *vars);
-void		unset(t_vars *vars);
-void		exit_prog(t_vars *vars);
+void		export(t_vars *vars, char **cmd);
+void		unset(t_vars *vars, char **cmd);
+void		exit_prog(char **cmd);
 void		stop_program(int condition, char *cmd, char *issue, int exit_stat);
 void		malloc_err(int condition, char *cmd);
-void		err_mes(int condition, t_vars *vars, char *line, char *issue);
+void		err_mes(int condition, t_vars *vars, char **cmd, char *line);
 long long	ft_atoll(char *str);
 void		split_free(char **split);
 char		*tolower_str(char *str);
 int			ft_isalnum_str(char *str, char c);
 void		creat_env_var(t_env **env, char *cmd, char *key, long long equal);
-int			check_env_vars(t_env *env, char *cmd, char *key, long long equal);
+int			check_set(t_env *env, char *cmd, char *key, long long equal);
 char		*rm_quotes(t_vars *vars, char *input_str);
 t_env		*find_same_key(t_vars vars, char *input_str);
 void		quotes_handler(t_vars *vars, char **input_str);
 int			quotes_counter(char *input_str, char *main_c);
 void		wait_quote(char **input_str, char c, int *count);
+int			split_size(char **split);
 
 #endif

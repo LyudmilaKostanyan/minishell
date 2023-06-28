@@ -12,6 +12,16 @@
 
 #include "minishell.h"
 
+int	split_size(char **split)
+{
+	int	i;
+
+	i = -1;
+	while (split[++i])
+		;
+	return (i);
+}
+
 void	split_free(char **split)
 {
 	int	i;
@@ -100,11 +110,14 @@ void	stop_program(int condition, char *cmd, char *issue, int exit_stat)
 	}
 }
 
-void	err_mes(int condition, t_vars *vars, char *line, char *issue)
+void	err_mes(int condition, t_vars *vars, char **cmd, char *line)
 {
 	if (condition)
 	{
-		printf("minishell: %s: `%s': %s\n", vars->cmd[0], line, issue);
+		if (*cmd[0] == 'u' || *cmd[0] == 'e')
+			printf("minishell: %s: `%s': %s\n", cmd[0], line, E_U_ERR);
+		if (*cmd[0] == 'c')
+			printf("minishell: %s: `%s': %s\n", cmd[0], line, CD_ERR);
 		vars->exit_stat = 1;
 	}
 }
