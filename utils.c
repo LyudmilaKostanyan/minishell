@@ -105,19 +105,28 @@ void	stop_program(int condition, char *cmd, char *issue, int exit_stat)
 {
 	if (condition)
 	{
-		printf("minishell: %s: %s\n", cmd, issue);
+		if (!cmd && !ft_strcmp(issue, "exit"))
+			printf("%s\n", issue);
+		else if (!cmd)
+			printf("minishell: %s\n", issue);
+		else
+			printf("minishell: %s: %s\n", cmd, issue);
 		exit(exit_stat);
 	}
 }
 
-void	err_mes(int condition, t_vars *vars, char **cmd, char *line)
+int	err_mes(int condition, t_vars *vars, char **cmd, char *line)
 {
 	if (condition)
 	{
-		if (*cmd[0] == 'u' || *cmd[0] == 'e')
+		if (!cmd)
+			printf("minishell: %s\n", line);
+		else if (*cmd[0] == 'u' || *cmd[0] == 'e')
 			printf("minishell: %s: `%s': %s\n", cmd[0], line, E_U_ERR);
-		if (*cmd[0] == 'c')
+		else if (*cmd[0] == 'c')
 			printf("minishell: %s: `%s': %s\n", cmd[0], line, CD_ERR);
 		vars->exit_stat = 1;
+		return (1);
 	}
+	return (0);
 }

@@ -17,6 +17,7 @@
 # define QUOTES_SYN_ERR "bash: syntax error: unexpected end of file\n"
 # define CD_ERR "No such file or directory"
 # define E_U_ERR "not a valid identifier"
+# define PIPE_ERR "syntax error near unexpected token `|'"
 
 # include <limits.h>
 # include <unistd.h>
@@ -41,19 +42,22 @@ typedef struct s_env
 typedef struct s_cmds
 {
 	char	**cmd;
+	char	*ex_cmd;
 	char	**path;
 	int		*pipe;
-	// t_pid	pid;
+	pid_t	pid;
 }	t_cmds;
 
 typedef struct s_vars
 {
 	int		exit_stat;
 	t_env	*env;
+	char	**env_var;
 	t_env	*set;
-	// char	**cmd;
 	char	main_c;
 	int		q_count;
+	int		in_fd;
+	char	**paths;
 }	t_vars;
 
 void		pwd(t_vars *vars);
@@ -65,7 +69,7 @@ void		unset(t_vars *vars, char **cmd);
 void		exit_prog(char **cmd);
 void		stop_program(int condition, char *cmd, char *issue, int exit_stat);
 void		malloc_err(int condition, char *cmd);
-void		err_mes(int condition, t_vars *vars, char **cmd, char *line);
+int			err_mes(int condition, t_vars *vars, char **cmd, char *line);
 long long	ft_atoll(char *str);
 void		split_free(char **split);
 char		*tolower_str(char *str);

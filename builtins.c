@@ -35,9 +35,7 @@ void	cd(t_vars *vars, char **cmd)
 	if (!check_set(vars->env, old_pwd, "OLDPWD", 0))
 		creat_env_var(&vars->env, old_pwd, "OLDPWD", 0);
 	free(old_pwd);
-	if (chdir(cmd[1]))
-		err_mes(1, vars, cmd, cmd[0]);
-	else
+	if (!err_mes(chdir(cmd[1]), vars, cmd, cmd[0]))
 	{
 		pwd = getcwd(NULL, 0);
 		malloc_err(!pwd, cmd[0]);
@@ -129,10 +127,7 @@ void	unset(t_vars *vars, char **cmd)
 		if (!ft_isdigit(*cmd[i]) && ft_isalnum_str(cmd[i], 'u'))
 			free_node(vars, cmd[i]);
 		else
-		{
-			vars->exit_stat = 1;
 			err_mes(1, vars, cmd, cmd[i]);
-		}
 	}
 }
 
