@@ -90,12 +90,6 @@ void check_equal(t_vars *vars, char **cmd)
 	}
 }
 
-// int str_changes(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
-// {
-
-// 	return (0);
-// }
-
 void pipes(t_vars *vars, t_cmds **cmds, int count)
 {
 	int i;
@@ -232,17 +226,64 @@ void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 	exit(1);
 }
 
-int main(int argc, char **argv, char **env)
+int	meh2(t_cmds **cmds, char **pipe_splt, char **input_str)
 {
-	t_vars	vars;
-	t_cmds	*cmds;
+	int count;
+	int	i;
+
+	restore_spaces(input_str);
+	add_history(*input_str);
+	count = split_size(pipe_splt);
+	free(*cmds);
+	*cmds = malloc((sizeof(t_cmds) * count) + 1);
+	malloc_err(!*cmds, "creat cmds");
+	i = -1;
+	while (++i < count)
+	{
+		(*cmds)[i].cmd = ft_split(pipe_splt[i], ' ');
+		malloc_err(!(*cmds)[i].cmd, "creating cmd list");
+		if (!*(*cmds)[i].cmd)
+			return (0);
+		int j = -1;
+		while ((*cmds)[i].cmd[++j])
+			restore_spaces(&(*cmds)[i].cmd[j]);
+	}
+	return (count);
+}
+
+int meh(t_vars *vars, t_cmds **cmds)	//nameing
+{
 	char	*input_str;
 	char	**pipe_splt;
-	int		i;
 
 	input_str = NULL;
 	pipe_splt = NULL;
-	cmds = NULL;
+	*cmds = NULL;
+	free(input_str);
+	input_str = readline("\e[34mminishell$ \e[0m");
+	stop_program(!input_str, NULL, "exit", vars->exit_stat);
+	if (!*input_str)
+		return (0);
+	quotes_handler(vars, &input_str);
+	char *for_split;
+	split_free(pipe_splt);
+	for_split = rm_quotes(vars, input_str);
+	if (!for_split)
+		pipe_splt = ft_split(input_str, '|');
+	else
+		pipe_splt = ft_split(for_split, '|');
+	free(for_split);
+	malloc_err(!pipe_splt, "split cmds");
+	if (err_mes(!*pipe_splt, vars, NULL, PIPE_ERR))
+		return (0);
+	return (meh2(cmds, pipe_splt, &input_str));
+}
+
+int main(int argc, char **argv, char **env)
+{
+	t_vars	vars;
+	t_cmds	*cmds = NULL;
+
 	(void)argv;
 	if (argc != 1)
 	{
@@ -253,43 +294,11 @@ int main(int argc, char **argv, char **env)
 	vars.env = creat_env_list(env);
 	while (1)
 	{
-		free(input_str);
-		input_str = readline("\e[34mminishell$ \e[0m");
-		stop_program(!input_str, NULL, "exit", vars.exit_stat);
-		if (!*input_str)
-			continue;
-		split_free(pipe_splt);
-
-		quotes_handler(&vars, &input_str);
-		char *for_split;
-		for_split = rm_quotes(&vars, input_str);
-		if (!for_split)
-			pipe_splt = ft_split(input_str, '|');
-		else
-			pipe_splt = ft_split(for_split, '|');
-		free(for_split);
-		malloc_err(!pipe_splt, "split cmds");
-		if (err_mes(!*pipe_splt, &vars, NULL, PIPE_ERR))
-			continue;
-		int count = split_size(pipe_splt);
-		free(cmds);
-		cmds = malloc((sizeof(t_cmds) * count) + 1);
-		malloc_err(!cmds, "creat cmds");
-		i = -1;
-		while (++i < count)
-		{
-			cmds[i].cmd = ft_split(pipe_splt[i], ' ');
-			malloc_err(!cmds[i].cmd, "creating cmd list");
-			// if (cmds[i])				!!!!
-			int j = -1;
-			while (cmds[i].cmd[++j])
-				restore_spaces(&cmds[i].cmd[j]);
-		}
-		restore_spaces(&input_str);
-		add_history(input_str);
-
+		int count = meh(&vars, &cmds);
+		if (err_mes(!count, &vars, NULL, PIPE_ERR))
+			continue ;
 		pipes(&vars, &cmds, count);
-		i = -1;
+		int i = -1;
 		while (++i < count && count > 1)
 		{
 			cmds[i].pid = fork();
