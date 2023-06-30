@@ -67,11 +67,11 @@ t_env	*find_same_key(t_vars vars, char *input_str)
 	return (NULL);
 }
 
-t_env	*creat_out_str(t_vars *vars, char *input_str, char **out_str)
+char	*creat_out_str(t_vars *vars, char *input_str, t_env *env)
 {
 	int		val_len;
 	int		key_len;
-	t_env	*env;
+	char	*out_str;
 
 	val_len = 0;
 	key_len = 0;
@@ -84,12 +84,12 @@ t_env	*creat_out_str(t_vars *vars, char *input_str, char **out_str)
 	else if (!vars->main_c)
 		return (NULL);
 	if (vars->main_c != '\'')
-		*out_str = malloc(ft_strlen(input_str) + val_len
+		out_str = malloc(ft_strlen(input_str) + val_len
 				- key_len - vars->q_count + 1);
 	else
-		*out_str = malloc(ft_strlen(input_str) - vars->q_count + 1);
-	malloc_err(!*out_str, "rm_quotes");
-	return (env);
+		out_str = malloc(ft_strlen(input_str) - vars->q_count + 1);
+	malloc_err(!out_str, "rm_quotes");
+	return (out_str);
 }
 
 void	fill_out_str(char **tmp, char **out_str, t_env *env, int *i)
@@ -112,8 +112,9 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	char	*tmp;
 	t_env	*env;
 
-	env = creat_out_str(vars, input_str, &out_str);
-	if (!env)
+	env = NULL;
+	out_str = creat_out_str(vars, input_str, env);
+	if (!out_str)
 		return (NULL);
 	i = -1;
 	tmp = input_str;

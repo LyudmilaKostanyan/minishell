@@ -27,7 +27,7 @@ void	split_free(char **split)
 	int	i;
 
 	i = -1;
-	while (split[++i])
+	while (split && split[++i])
 		free(split[i]);
 	free(split);
 	split = NULL;

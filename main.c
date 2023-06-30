@@ -90,34 +90,11 @@ void check_equal(t_vars *vars, char **cmd)
 	}
 }
 
-int str_changes(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
-{
-	char *for_split;
-	int j;
+// int str_changes(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
+// {
 
-	int i = -1;
-	while (++i < count)
-	{
-		quotes_handler(vars, &pipe_splt[i]);
-		for_split = rm_quotes(vars, pipe_splt[i]);
-		if (!for_split)
-			(*cmds)[i].cmd = ft_split(pipe_splt[i], ' ');
-		else
-			(*cmds)[i].cmd = ft_split(for_split, ' ');
-		free(for_split);
-		if (!*(*cmds)[i].cmd && count > 1)
-			return (1);
-		else if (!*(*cmds)[i].cmd)
-			return (-1);
-		malloc_err(!(*cmds)[i].cmd, "creating cmd list"); //???
-		j = -1;
-		while ((*cmds)[i].cmd[++j])
-			restore_spaces(&(*cmds)[i].cmd[j]);
-		restore_spaces(&pipe_splt[i]);
-		add_history(pipe_splt[i]);		//out while
-	}
-	return (0);
-}
+// 	return (0);
+// }
 
 void pipes(t_vars *vars, t_cmds **cmds, int count)
 {
@@ -199,7 +176,7 @@ void	env_to_str(t_vars *vars)
 	t_env	*head;
 
 	len = env_len(vars->env);
-	vars->env_var = malloc((sizeof(char *) * len) + 1);
+	vars->env_var = malloc(sizeof(char *) * (len + 1));
 	i = -1;
 	head = vars->env;
 	while (++i < len)
@@ -207,6 +184,7 @@ void	env_to_str(t_vars *vars)
 		vars->env_var[i] = vars->env->line;
 		vars->env = vars->env->next;
 	}
+	vars->env_var[i] = NULL;
 	vars->env = head;
 }
 
@@ -256,10 +234,15 @@ void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 
 int main(int argc, char **argv, char **env)
 {
-	t_vars vars;
-	char *input_str;
-	t_cmds *cmds;
+	t_vars	vars;
+	t_cmds	*cmds;
+	char	*input_str;
+	char	**pipe_splt;
+	int		i;
 
+	input_str = NULL;
+	pipe_splt = NULL;
+	cmds = NULL;
 	(void)argv;
 	if (argc != 1)
 	{
@@ -270,40 +253,41 @@ int main(int argc, char **argv, char **env)
 	vars.env = creat_env_list(env);
 	while (1)
 	{
-		// system("leaks minishell");
+		free(input_str);
 		input_str = readline("\e[34mminishell$ \e[0m");
 		stop_program(!input_str, NULL, "exit", vars.exit_stat);
 		if (!*input_str)
 			continue;
-		char **pipe_splt = ft_split(input_str, '|');
-		free(input_str);
+		split_free(pipe_splt);
+
+		quotes_handler(&vars, &input_str);
+		char *for_split;
+		for_split = rm_quotes(&vars, input_str);
+		if (!for_split)
+			pipe_splt = ft_split(input_str, '|');
+		else
+			pipe_splt = ft_split(for_split, '|');
+		free(for_split);
 		malloc_err(!pipe_splt, "split cmds");
 		if (err_mes(!*pipe_splt, &vars, NULL, PIPE_ERR))
 			continue;
 		int count = split_size(pipe_splt);
+		free(cmds);
 		cmds = malloc((sizeof(t_cmds) * count) + 1);
 		malloc_err(!cmds, "creat cmds");
-		int i;
-		i = str_changes(&vars, &cmds, pipe_splt, count);
-		if (err_mes(i, &vars, NULL, PIPE_ERR))
+		i = -1;
+		while (++i < count)
 		{
-			// i = -1;
-			// while (++i < count)						//payman
-			// 	split_free(cmds[i].cmd);
-			split_free(pipe_splt);
-			free(cmds);
-			continue;
+			cmds[i].cmd = ft_split(pipe_splt[i], ' ');
+			malloc_err(!cmds[i].cmd, "creating cmd list");
+			// if (cmds[i])				!!!!
+			int j = -1;
+			while (cmds[i].cmd[++j])
+				restore_spaces(&cmds[i].cmd[j]);
 		}
-		else if (i == -1)
-		{
-			i = -1;
-			while (++i < count)
-				split_free(cmds[i].cmd);
-			split_free(pipe_splt);
-			free(cmds);
-			continue;
-		}
-		// system("leaks minishell");
+		restore_spaces(&input_str);
+		add_history(input_str);
+
 		pipes(&vars, &cmds, count);
 		i = -1;
 		while (++i < count && count > 1)
@@ -314,15 +298,9 @@ int main(int argc, char **argv, char **env)
 			{
 				redirect_in_out(i, count, &cmds, &vars);
 				check_equal(&vars, cmds[i].cmd);
-				tolower_str(*cmds[i].cmd);
-				if (check_builtins(&vars, cmds[i].cmd))
-					exit(vars.exit_stat);
-				else
-				{
-					path_check(&vars, &cmds, cmds[i].cmd[0], i);
-					printf("%s\n", *cmds[i].cmd);
-					exit(execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var));
-				}
+				close_pipes(&cmds, count);
+				path_check(&vars, &cmds, cmds[i].cmd[0], i);
+				exit(execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var));
 			}
 			close_pipes(&cmds, count);
 		}
@@ -343,8 +321,6 @@ int main(int argc, char **argv, char **env)
 			if (i != count - 1)
 				free(cmds[i].pipe);
 		}
-		split_free(pipe_splt);
-		free(cmds);
 	}
 	return (0);
 }
