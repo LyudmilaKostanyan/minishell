@@ -98,12 +98,7 @@ void pipes(t_vars *vars, t_cmds **cmds, int count)
 	while (++i < count - 1)
 	{
 		(*cmds)[i].pipe = malloc(sizeof(int) * 2);
-		malloc_err(!(*cmds)[i].pipe, "creat pipes");
-	}
-	i = -1;
-	while (++i < count - 1)
-	{
-		if (pipe((*cmds)[i].pipe) == -1)
+		if (!(*cmds)[i].pipe || pipe((*cmds)[i].pipe) == -1)
 		{
 			while (--i >= 0)
 			{
@@ -115,23 +110,22 @@ void pipes(t_vars *vars, t_cmds **cmds, int count)
 	}
 }
 
-void redirect_in_out(int i, int count, t_cmds **cmds, t_vars *vars)
+void redirect_in_out(t_vars *vars, t_cmds **cmds, int count, int i)
 {
-	vars->in_fd = dup(1);		//???????
 	if (i == 0)
 	{
+		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", "redirection input/output", vars->exit_stat);
 		close((*cmds)[i].pipe[0]);
-		dup2((*cmds)[i].pipe[1], 1);
 	}
 	else if (i == count - 1)
 	{
-		dup2((*cmds)[i - 1].pipe[0], 0);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", "redirection input/output", vars->exit_stat);
 		close((*cmds)[i - 1].pipe[1]);
 	}
 	else
 	{
-		dup2((*cmds)[i - 1].pipe[0], 0);
-		dup2((*cmds)[i].pipe[1], 1);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", "redirection input/output", vars->exit_stat);
+		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", "redirection input/output", vars->exit_stat);
 	}
 }
 
@@ -182,7 +176,7 @@ void	env_to_str(t_vars *vars)
 	vars->env = head;
 }
 
-void	path(t_vars *vars)
+void	creating_exec_path(t_vars *vars)
 {
 	int		i;
 	char	*tmp;
@@ -205,7 +199,7 @@ void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 	char	*tmp;
 	int		j;
 
-	path(vars);
+	creating_exec_path(vars);
 	if (access(cmd, X_OK) != -1)
 	{
 		(*cmds)[i].ex_cmd = ft_strdup(cmd);
@@ -226,7 +220,7 @@ void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 	exit(1);
 }
 
-int	meh2(t_cmds **cmds, char **pipe_splt, char **input_str)
+int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 {
 	int count;
 	int	i;
@@ -243,7 +237,7 @@ int	meh2(t_cmds **cmds, char **pipe_splt, char **input_str)
 		(*cmds)[i].cmd = ft_split(pipe_splt[i], ' ');
 		malloc_err(!(*cmds)[i].cmd, "creating cmd list");
 		if (!*(*cmds)[i].cmd)
-			return (0);
+			return (-1);
 		int j = -1;
 		while ((*cmds)[i].cmd[++j])
 			restore_spaces(&(*cmds)[i].cmd[j]);
@@ -251,7 +245,7 @@ int	meh2(t_cmds **cmds, char **pipe_splt, char **input_str)
 	return (count);
 }
 
-int meh(t_vars *vars, t_cmds **cmds)	//nameing
+int read_input(t_vars *vars, t_cmds **cmds)	
 {
 	char	*input_str;
 	char	**pipe_splt;
@@ -263,7 +257,7 @@ int meh(t_vars *vars, t_cmds **cmds)	//nameing
 	input_str = readline("\e[34mminishell$ \e[0m");
 	stop_program(!input_str, NULL, "exit", vars->exit_stat);
 	if (!*input_str)
-		return (0);
+		return (-1);
 	quotes_handler(vars, &input_str);
 	char *for_split;
 	split_free(pipe_splt);
@@ -276,7 +270,7 @@ int meh(t_vars *vars, t_cmds **cmds)	//nameing
 	malloc_err(!pipe_splt, "split cmds");
 	if (err_mes(!*pipe_splt, vars, NULL, PIPE_ERR))
 		return (0);
-	return (meh2(cmds, pipe_splt, &input_str));
+	return (merge_cmds(cmds, pipe_splt, &input_str));
 }
 
 int main(int argc, char **argv, char **env)
@@ -294,35 +288,34 @@ int main(int argc, char **argv, char **env)
 	vars.env = creat_env_list(env);
 	while (1)
 	{
-		int count = meh(&vars, &cmds);
-		if (err_mes(!count, &vars, NULL, PIPE_ERR))
+		int count = read_input(&vars, &cmds);
+		if (count == -1)
+			continue;
+		else if (err_mes(!count, &vars, NULL, PIPE_ERR))
 			continue ;
 		pipes(&vars, &cmds, count);
 		int i = -1;
-		while (++i < count && count > 1)
+		while (++i < count)
 		{
 			cmds[i].pid = fork();
 			stop_program(cmds[i].pid == -1, NULL, "Fork error", vars.exit_stat);
 			if (cmds[i].pid == 0)
 			{
-				redirect_in_out(i, count, &cmds, &vars);
+				if (count > 1)
+					redirect_in_out(&vars, &cmds, count, i);
 				check_equal(&vars, cmds[i].cmd);
-				close_pipes(&cmds, count);
+				tolower_str(*cmds[i].cmd);
 				path_check(&vars, &cmds, cmds[i].cmd[0], i);
-				exit(execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var));
+				if (check_builtins(&vars, cmds[i].cmd))
+					exit(vars.exit_stat);
+				else
+					exit(execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var));
 			}
-			close_pipes(&cmds, count);
 		}
+		close_pipes(&cmds, count);
 		i = -1;
 		while (++i < count)
 			waitpid(cmds[i].pid, 0, 0);
-		i = -1;
-		while (++i < count && count < 2)
-		{
-			check_equal(&vars, cmds[i].cmd);
-			tolower_str(*cmds[i].cmd);
-			check_builtins(&vars, cmds[i].cmd);
-		}
 		i = -1;
 		while (++i < count)
 		{

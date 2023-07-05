@@ -59,18 +59,33 @@ void	cd(t_vars *vars, char **cmd)
 void	echo(t_vars *vars, char **cmd)
 {
 	int	i;
+	int	j;
+	int	cond;
 
-	if (ft_strcmp(cmd[1], "-n"))
-		i = 0;
-	else
-		i = 1;
+	i = 0;
 	while (cmd[++i])
 	{
-		printf("%s", cmd[i]);
+		j = 0;
+		if (cmd[i][j] != '-')
+			break ;
+		while (cmd[i][++j])
+			if (cmd[i][j] != 'n')
+				break ;
+		if (j != (int)ft_strlen(cmd[i]))
+			break ;
+	}
+	cond = i;
+	while (cmd[i])
+	{
+		if (ft_strcmp(cmd[i], "$?"))
+			printf("%s", cmd[i]);
+		else
+			printf("%d", vars->exit_stat);
 		if (cmd[i + 1])
 			printf(" ");
+		i++;
 	}
-	if (ft_strcmp(cmd[1], "-n"))
+	if (cond == 1)
 		printf("\n");
 	vars->exit_stat = 0;
 }

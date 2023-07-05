@@ -44,8 +44,8 @@ typedef struct s_cmds
 	char	**cmd;
 	char	*ex_cmd;
 	char	**path;
-	int		*pipe;
 	pid_t	pid;
+	int		*pipe;
 }	t_cmds;
 
 typedef struct s_vars
@@ -58,6 +58,7 @@ typedef struct s_vars
 	int		q_count;
 	int		in_fd;
 	char	**paths;
+	// int		**pipe;
 }	t_vars;
 
 void		pwd(t_vars *vars);
