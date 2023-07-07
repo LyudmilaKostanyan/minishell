@@ -124,7 +124,12 @@ int	err_mes(int condition, t_vars *vars, char **cmd, char *line)
 		else if (*cmd[0] == 'u' || *cmd[0] == 'e')
 			printf("minishell: %s: `%s': %s\n", cmd[0], line, E_U_ERR);
 		else if (*cmd[0] == 'c')
-			printf("minishell: %s: `%s': %s\n", cmd[0], line, CD_ERR);
+		{
+			if (!cmd[2])
+				printf("minishell: %s: `%s': %s\n", cmd[0], line, CD_ERR);
+			else
+				printf("minishell: %s: %s\n", cmd[0], TMA);
+		}
 		vars->exit_stat = 1;
 		return (1);
 	}

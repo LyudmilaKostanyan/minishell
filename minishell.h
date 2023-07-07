@@ -18,6 +18,7 @@
 # define CD_ERR "No such file or directory"
 # define E_U_ERR "not a valid identifier"
 # define PIPE_ERR "syntax error near unexpected token `|'"
+# define TMA "too many arguments"
 
 # include <limits.h>
 # include <unistd.h>
