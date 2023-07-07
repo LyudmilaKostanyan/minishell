@@ -58,7 +58,6 @@ typedef struct s_vars
 	int		q_count;
 	int		in_fd;
 	char	**paths;
-	// int		**pipe;
 }	t_vars;
 
 void		pwd(t_vars *vars);

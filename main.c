@@ -245,7 +245,7 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 	return (count);
 }
 
-int read_input(t_vars *vars, t_cmds **cmds)	
+int read_input(t_vars *vars, t_cmds **cmds)
 {
 	char	*input_str;
 	char	**pipe_splt;
@@ -277,7 +277,9 @@ int main(int argc, char **argv, char **env)
 {
 	t_vars	vars;
 	t_cmds	*cmds = NULL;
+	int		i;
 
+	vars.set = NULL;
 	(void)argv;
 	if (argc != 1)
 	{
@@ -293,29 +295,34 @@ int main(int argc, char **argv, char **env)
 			continue;
 		else if (err_mes(!count, &vars, NULL, PIPE_ERR))
 			continue ;
-		pipes(&vars, &cmds, count);
-		int i = -1;
-		while (++i < count)
+		if (count == 1 && check_builtins(&vars, cmds[0].cmd))
+			printf("asd\n");
+		else
 		{
-			cmds[i].pid = fork();
-			stop_program(cmds[i].pid == -1, NULL, "Fork error", vars.exit_stat);
-			if (cmds[i].pid == 0)
+			pipes(&vars, &cmds, count);
+			i = -1;
+			while (++i < count)
 			{
-				if (count > 1)
-					redirect_in_out(&vars, &cmds, count, i);
-				check_equal(&vars, cmds[i].cmd);
-				tolower_str(*cmds[i].cmd);
-				path_check(&vars, &cmds, cmds[i].cmd[0], i);
-				if (check_builtins(&vars, cmds[i].cmd))
-					exit(vars.exit_stat);
-				else
-					exit(execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var));
+				cmds[i].pid = fork();
+				stop_program(cmds[i].pid == -1, NULL, "Fork error", vars.exit_stat);
+				if (cmds[i].pid == 0)
+				{
+					if (count > 1)
+						redirect_in_out(&vars, &cmds, count, i);
+					check_equal(&vars, cmds[i].cmd);
+					tolower_str(*cmds[i].cmd);
+					path_check(&vars, &cmds, cmds[i].cmd[0], i);
+					if (check_builtins(&vars, cmds[i].cmd))
+						exit(vars.exit_stat);
+					else
+						exit(execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var));
+				}
 			}
+			close_pipes(&cmds, count);
+			i = -1;
+			while (++i < count)
+				waitpid(cmds[i].pid, 0, 0);
 		}
-		close_pipes(&cmds, count);
-		i = -1;
-		while (++i < count)
-			waitpid(cmds[i].pid, 0, 0);
 		i = -1;
 		while (++i < count)
 		{
