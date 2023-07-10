@@ -58,23 +58,28 @@ void	wait_quote(char **input_str, char c, int *count)
 	}
 }
 
-int	quotes_counter(char *input_str, char *main_c)
+void	find_main_c(t_vars *vars, char *tmp)
+{
+	while (*tmp)
+	{
+		if (*tmp == '\'' || *tmp == '\"')
+		{
+			vars->main_c = *tmp;
+			break ;
+		}
+		tmp++;
+	}
+}
+
+int	quotes_counter(t_vars *vars, char *input_str)
 {
 	int		count;
 
+	find_main_c(vars, input_str);
 	count = 0;
 	while (*input_str)
 	{
-		if (*input_str == '\"' || *input_str == '\'')
-		{
-			*main_c = *input_str;
-			break ;
-		}
-		input_str++;
-	}
-	while (*input_str)
-	{
-		if (*input_str == *main_c)
+		if (*input_str == vars->main_c)
 			count++;
 		input_str++;
 	}
@@ -86,7 +91,7 @@ void	quotes_handler(t_vars *vars, char **input_str)
 	int		i;
 	int		count;
 
-	vars->q_count = quotes_counter(*input_str, &vars->main_c);
+	vars->q_count = quotes_counter(vars, *input_str);
 	if (!vars->q_count)
 		return ;
 	if (vars->q_count % 2 != 0)
@@ -105,6 +110,15 @@ void	quotes_handler(t_vars *vars, char **input_str)
 					(*input_str)[i] = 1;
 				i++;
 			}
+		}
+		if ((*input_str)[i] && !count)
+		{
+			count = quotes_counter(vars, *input_str + i);
+			if (!count)
+				continue ;
+			if (count % 2 != 0)
+				wait_quote(input_str, vars->main_c, &count);
+			vars->q_count += count;
 		}
 	}
 }

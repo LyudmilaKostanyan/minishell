@@ -72,22 +72,26 @@ void restore_spaces(char **str)
 			(*str)[i] = 32;
 }
 
-void check_equal(t_vars *vars, char **cmd)
+int check_equal(t_vars *vars, char **cmd)
 {
-	int i;
-	long long equal;
-	char *key;
+	int			i;
+	long long	equal;
+	char		*key;
+	int			cond;
 
 	i = -1;
+	cond = 0;
 	while (cmd[++i])
 	{
 		equal = ft_strchr(cmd[i], '=') - cmd[i];
 		key = ft_substr(cmd[i], 0, equal);
 		malloc_err(!key, cmd[0]);
-		if (equal >= 0 && !ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e') && !check_set(vars->env, cmd[i], key, equal) && !check_set(vars->set, cmd[i], key, equal))
+		if (equal >= 0 && !ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e')
+			&& !check_set(vars->env, cmd[i], key, equal) && !check_set(vars->set, cmd[i], key, equal) && ++cond)
 			creat_env_var(&vars->set, cmd[i], key, equal);
 		free(key);
 	}
+	return (cond);
 }
 
 void pipes(t_vars *vars, t_cmds **cmds, int count)
@@ -296,7 +300,9 @@ int main(int argc, char **argv, char **env)
 		else if (err_mes(!count, &vars, NULL, PIPE_ERR))
 			continue ;
 		if (count == 1 && check_builtins(&vars, cmds[0].cmd))
-			printf("asd\n");
+			printf("1\n");
+		else if (check_equal(&vars, cmds[0].cmd))
+			printf("2\n");
 		else
 		{
 			pipes(&vars, &cmds, count);
@@ -309,13 +315,11 @@ int main(int argc, char **argv, char **env)
 				{
 					if (count > 1)
 						redirect_in_out(&vars, &cmds, count, i);
-					check_equal(&vars, cmds[i].cmd);
 					tolower_str(*cmds[i].cmd);
 					path_check(&vars, &cmds, cmds[i].cmd[0], i);
-					if (check_builtins(&vars, cmds[i].cmd))
-						exit(vars.exit_stat);
-					else
-						exit(execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var));
+					if (!check_builtins(&vars, cmds[i].cmd))
+						vars.exit_stat = execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var);
+					exit(vars.exit_stat);
 				}
 			}
 			close_pipes(&cmds, count);
