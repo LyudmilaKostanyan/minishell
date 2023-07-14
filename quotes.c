@@ -63,12 +63,10 @@ void	find_main_c(t_vars *vars, char *tmp)
 	while (*tmp)
 	{
 		if (*tmp == '\'' || *tmp == '\"')
-		{
-			vars->main_c = *tmp;
 			break ;
-		}
 		tmp++;
 	}
+	vars->main_c = *tmp;
 }
 
 int	quotes_counter(t_vars *vars, char *input_str)
@@ -106,8 +104,11 @@ void	quotes_handler(t_vars *vars, char **input_str)
 			{
 				if ((*input_str)[i] == vars->main_c)
 					count--;
-				if ((*input_str)[i] == 32)
+				if ((*input_str)[i] == 32 && count % 2 != 0)
+				// {
+				// 	printf("quotes: %c\n", (*input_str)[i - 1]);
 					(*input_str)[i] = 1;
+				// }
 				i++;
 			}
 		}
