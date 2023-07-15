@@ -133,11 +133,23 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 	}
 }
 
+void	action(int signal)
+{
+	if (signal == SIGINT)
+		printf("\e[34mminishell$ \e[0m\n\e[34mminishell$ \e[0m");
+}
+
 int main(int argc, char **argv, char **env)
 {
-	t_vars	vars;
-	t_cmds	*cmds;
+	t_vars				vars;
+	t_cmds				*cmds;
+	struct sigaction	sig;
 
+	sig.sa_handler = &action;
+	sig.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &sig, NULL);
+	sig.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &sig, NULL);
 	cmds = NULL;
 	vars.set = NULL;
 	(void)argv;

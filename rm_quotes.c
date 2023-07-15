@@ -116,7 +116,7 @@ void	fill_out_str(char **tmp, char **out_str, t_env *env, int *i)
 		(*out_str)[++(*i)] = env->value[j];
 	(*tmp)++;
 	j = -1;
-	while (*(*tmp + 1) && *(*tmp + 1) == env->key[++j])
+	while (*(*tmp + 1) && **tmp == env->key[++j])
 		(*tmp)++;
 	if (**tmp == '/')
 		(*out_str)[++(*i)] = **tmp;
