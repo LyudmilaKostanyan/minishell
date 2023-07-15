@@ -21,10 +21,16 @@
 # define TMA "too many arguments"
 # define IO "redirection input/output"
 
+# ifndef BUFFER_SIZE
+# define BUFFER_SIZE 42
+# endif
+
 # include <limits.h>
 # include <unistd.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <stdint.h>
+# include <limits.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <fcntl.h>
@@ -83,12 +89,30 @@ char		*tolower_str(char *str);
 int			ft_isalnum_str(char *str, char c);
 void		creat_env_var(t_env **env, char *cmd, char *key, long long equal);
 int			check_set(t_env *env, char *cmd, char *key, long long equal);
-t_env		*key_cmp(t_vars vars, char *key);
 char		*rm_quotes(t_vars *vars, char *input_str);
 void		find_main_c(t_vars *vars, char *tmp);
 t_env		*find_same_key(t_vars vars, char *input_str);
 void		quotes_handler(t_vars *vars, char **input_str);
 void		wait_quote(char **input_str, char c, int *count);
+void		restore_spaces(char **str);
 int			split_size(char **split);
+char		*get_next_line(int fd);
+int			ft_strchr_gnl(char *str, int c);
+char		*ft_strdup_gnl(char *s, int start, int j);
+char		*ft_strjoin_gnl(char *s1, char *s2);
+int			read_input(t_vars *vars, t_cmds **cmds);
+int			merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str);
+int			env_len(t_env *env);
+void		env_to_str(t_vars *vars);
+void		creating_exec_path(t_vars *vars);
+void		path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
+void		here_doc(char *end);
+int			redirection(t_vars *vars, t_cmds **cmds, int i);
+int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
+void		pipes(t_vars *vars, t_cmds **cmds, int count);
+void		close_pipes(t_cmds **cmds, int count);
+void		malloc_err(int condition, char *cmd);
+void		stop_program(int condition, char *cmd, char *issue, int exit_stat);
+int			err_mes(int condition, t_vars *vars, char **cmd, char *line);
 
 #endif

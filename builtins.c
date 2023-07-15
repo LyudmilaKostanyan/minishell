@@ -106,7 +106,7 @@ void	env(t_vars *vars, int cmd)
 	vars->exit_stat = 0;
 }
 
-int	asd(t_env **list, t_env *env, char *cmd)	//nameing
+int	free_node(t_env **list, t_env *env, char *cmd)
 {
 	t_env	*tmp;
 
@@ -132,21 +132,21 @@ int	asd(t_env **list, t_env *env, char *cmd)	//nameing
 	return (1);
 }
 
-void	free_node(t_vars *vars, char *cmd)
+void	find_node(t_vars *vars, char *cmd)
 {
 	t_env	*env;
 
 	env = vars->env;
 	while (env)
 	{
-		if (asd(&vars->env, env, cmd))
+		if (free_node(&vars->env, env, cmd))
 			break ;
 		env = env->next;
 	}
 	env = vars->set;
 	while (env)
 	{
-		if (asd(&vars->set, env, cmd))
+		if (free_node(&vars->set, env, cmd))
 			break ;
 		env = env->next;
 	}
@@ -161,7 +161,7 @@ void	unset(t_vars *vars, char **cmd)
 	while (cmd[++i])
 	{
 		if (!ft_isdigit(*cmd[i]) && ft_isalnum_str(cmd[i], 'u'))
-			free_node(vars, cmd[i]);
+			find_node(vars, cmd[i]);
 		else
 			err_mes(1, vars, cmd, cmd[i]);
 	}

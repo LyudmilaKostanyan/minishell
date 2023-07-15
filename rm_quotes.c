@@ -12,9 +12,8 @@
 
 #include "minishell.h"
 
-t_env	*key_cmp(t_vars vars, char *key)
+t_env	*find_key(t_vars vars, char *key)
 {
-	// printf("key: %s\n", key);
 	while (vars.env)
 	{
 		if (!ft_strcmp(vars.env->key, key))
@@ -30,7 +29,7 @@ t_env	*key_cmp(t_vars vars, char *key)
 	return (NULL);
 }
 
-t_env	*meh(t_vars vars, char **input_str)		//nameing
+t_env	*key_cmp(t_vars vars, char **input_str)
 {
 	int		keys_end;
 	t_env	*env;
@@ -46,7 +45,7 @@ t_env	*meh(t_vars vars, char **input_str)		//nameing
 		keys_end++;
 	key = ft_substr(*input_str, 0, keys_end);
 	malloc_err(!key, "check $ case");
-	env = key_cmp(vars, key);
+	env = find_key(vars, key);
 	free(key);
 	return (env);
 }
@@ -56,7 +55,7 @@ t_env	*find_same_key(t_vars vars, char *input_str)
 	while (*input_str)
 	{
 		if (*input_str == '$' && *(input_str + 1))
-			return(meh(vars, &input_str));
+			return(key_cmp(vars, &input_str));
 		input_str++;
 	}
 	return (NULL);
@@ -76,11 +75,10 @@ int	count_key_val(t_vars vars, char *input_str, int *key_len, int *val_len)
 		if (*input_str == vars.main_c)
 			if (--q_count % 2 == 0)
 				find_main_c(&vars, input_str + 1);
-		// printf("%c\n", vars.main_c);
 		if (*input_str == '$' && *(input_str + 1) && vars.main_c != '\'')
 		{
 			cond++;
-			env = meh(vars, &input_str);
+			env = key_cmp(vars, &input_str);
 			if (env)
 			{
 				*key_len += ft_strlen(env->key) + 1;
@@ -103,7 +101,6 @@ int	creat_out_str(t_vars *vars, char *input_str, char **out_str)
 	cond = count_key_val(*vars, input_str, &key_len, &val_len);
 	if (!vars->main_c && !key_len && !cond)
 		return (0);
-	// printf("key_len: %d\tval_len: %d\tmall_len: %zu\n", key_len, val_len, ft_strlen(input_str) + val_len - key_len - vars->q_count + 1);
 	*out_str = malloc(ft_strlen(input_str) + val_len
 			- key_len - vars->q_count + 1);
 	malloc_err(!*out_str, "rm_quotes");
@@ -141,7 +138,7 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	{
 		if (*tmp != vars->main_c)
 		{
-			if (vars->main_c != '\'' && *tmp == '$')
+			if (vars->main_c != '\'' && *tmp == '$' && *(tmp + 1) != '?')
 			{
 				env = find_same_key(*vars, tmp);
 				if (env)
