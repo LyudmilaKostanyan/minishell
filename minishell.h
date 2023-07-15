@@ -19,6 +19,7 @@
 # define E_U_ERR "not a valid identifier"
 # define PIPE_ERR "syntax error near unexpected token `|'"
 # define TMA "too many arguments"
+# define IO "redirection input/output"
 
 # include <limits.h>
 # include <unistd.h>
@@ -47,6 +48,10 @@ typedef struct s_cmds
 	char	**path;
 	pid_t	pid;
 	int		*pipe;
+	char	*red_in;
+	char	*red_out;
+	int		in_stat;
+	int		out_stat;
 }	t_cmds;
 
 typedef struct s_vars
@@ -57,7 +62,8 @@ typedef struct s_vars
 	t_env	*set;
 	char	main_c;
 	int		q_count;
-	int		in_fd;
+	int		fd_in;
+	int		fd_out;
 	char	**paths;
 }	t_vars;
 

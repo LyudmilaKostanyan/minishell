@@ -114,23 +114,40 @@ void pipes(t_vars *vars, t_cmds **cmds, int count)
 	}
 }
 
-void redirect_in_out(t_vars *vars, t_cmds **cmds, int count, int i)
+int	redirection_blya(t_vars *vars, t_cmds **cmds, int i)		//naming
 {
-	if (i == 0)
+	if ((*cmds)[i].in_stat == 1 && err_mes(dup2(open((*cmds)[i].red_in,		//mehhhhhh
+		O_RDONLY), 0) == -1, vars, NULL, CD_ERR))
+			return (0);
+	// else if ((*cmds)[i].in_stat == 2)
+	// 	;
+	if ((*cmds)[i].out_stat == 1 && err_mes(dup2(open((*cmds)[i].red_out,
+		O_CREAT | O_TRUNC | O_WRONLY, 0644), 1) == -1, vars, NULL, CD_ERR))
+			return (0);
+	else if ((*cmds)[i].out_stat == 2 && err_mes(dup2(open((*cmds)[i].red_out,
+		O_CREAT | O_APPEND | O_WRONLY, 0644), 1) == -1, vars, NULL, CD_ERR))
+			return (0);
+	return (1);
+}
+
+int redirect_in_out(t_vars *vars, t_cmds **cmds, int count, int i)
+{
+	if (i == 0 && !(*cmds)[i].red_out && count != 1)
 	{
-		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", "redirection input/output", vars->exit_stat);
+		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO, vars->exit_stat);
 		close((*cmds)[i].pipe[0]);
 	}
-	else if (i == count - 1)
+	else if (count -1 && i == count - 1 && !(*cmds)[i].red_in && count != 1)
 	{
-		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", "redirection input/output", vars->exit_stat);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO, vars->exit_stat);
 		close((*cmds)[i - 1].pipe[1]);
 	}
-	else
+	else if (count != 1)
 	{
-		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", "redirection input/output", vars->exit_stat);
-		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", "redirection input/output", vars->exit_stat);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO, vars->exit_stat);
+		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO, vars->exit_stat);
 	}
+	return (redirection_blya(vars, cmds, i));
 }
 
 void	close_pipes(t_cmds **cmds, int count)
@@ -226,8 +243,11 @@ void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 
 int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 {
-	int count;
-	int	i;
+	int		count;
+	int		i;
+	int		j;
+	char	**sp_split;
+	int		cmds_count;
 
 	restore_spaces(input_str);
 	add_history(*input_str);
@@ -238,11 +258,62 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 	i = -1;
 	while (++i < count)
 	{
-		(*cmds)[i].cmd = ft_split(pipe_splt[i], ' ');
-		malloc_err(!(*cmds)[i].cmd, "creating cmd list");
-		if (!*(*cmds)[i].cmd)
+		sp_split = ft_split(pipe_splt[i], ' ');
+		malloc_err(!sp_split, "creating cmd list");
+		if (!*sp_split)
 			return (-1);
-		int j = -1;
+
+		j = -1;
+		cmds_count = 0;
+		while (sp_split[++j])
+			if (ft_strcmp(sp_split[j], ">") && ft_strcmp(sp_split[j], "<")
+				&& ft_strcmp(sp_split[j], ">>") && ft_strcmp(sp_split[j], "<<"))
+				if (j == 0 || (ft_strcmp(sp_split[j - 1], ">") && ft_strcmp(sp_split[j - 1], "<")
+					&& ft_strcmp(sp_split[j - 1], ">>") && ft_strcmp(sp_split[j - 1], "<<")))
+					cmds_count++;
+		(*cmds)[i].cmd = malloc(sizeof(char *) * (cmds_count + 1));
+		malloc_err(!(*cmds)[i].cmd, "creating cmd list");
+		j = -1;
+		int	k = -1;
+		(*cmds)[i].in_stat = 0;
+		(*cmds)[i].out_stat = 0;
+		(*cmds)[i].red_in = NULL;
+		(*cmds)[i].red_out = NULL;
+		while (sp_split[++j])
+		{
+			if (ft_strcmp(sp_split[j], ">") && ft_strcmp(sp_split[j], "<")
+				&& ft_strcmp(sp_split[j], ">>") && ft_strcmp(sp_split[j], "<<"))
+			{
+				if (j == 0 || (ft_strcmp(sp_split[j - 1], ">") && ft_strcmp(sp_split[j - 1], "<")
+					&& ft_strcmp(sp_split[j - 1], ">>") && ft_strcmp(sp_split[j - 1], "<<")))
+				{
+					(*cmds)[i].cmd[++k] = ft_strdup(sp_split[j]);
+					malloc_err(!(*cmds)[i].cmd[k], "creating cmd list");
+				}
+			}
+			else if (!ft_strcmp(sp_split[j], ">") || !ft_strcmp(sp_split[j], ">>"))
+			{
+				if (!ft_strcmp(sp_split[j], ">"))
+					(*cmds)[i].out_stat = 1;
+				else
+					(*cmds)[i].out_stat = 2;
+				(*cmds)[i].red_out = ft_strdup(sp_split[j + 1]);		//error
+				malloc_err(!(*cmds)[i].red_out, "creating redirection vars");
+			}
+			else if (!ft_strcmp(sp_split[j], "<") || !ft_strcmp(sp_split[j], "<<"))
+			{
+				if (!ft_strcmp(sp_split[j], "<"))
+					(*cmds)[i].in_stat = 1;
+				else
+					(*cmds)[i].in_stat = 2;
+				(*cmds)[i].red_in = ft_strdup(sp_split[j + 1]);		//error
+				malloc_err(!(*cmds)[i].red_in, "creating redirection vars");
+			}
+		}
+		(*cmds)[i].cmd[++k] = NULL;
+		split_free(sp_split);
+
+		j = -1;
 		while ((*cmds)[i].cmd[++j])
 			restore_spaces(&(*cmds)[i].cmd[j]);
 	}
@@ -300,6 +371,16 @@ int main(int argc, char **argv, char **env)
 			continue;
 		else if (err_mes(!count, &vars, NULL, PIPE_ERR))
 			continue ;
+
+		vars.fd_in = dup(0);
+		vars.fd_out = dup(1);
+
+		if (count == 1 && !redirect_in_out(&vars, &cmds, count, 0))
+		{
+			dup2(vars.fd_out, 1);
+			continue ;		//leaks
+		}
+
 		if (!(count == 1 && check_builtins(&vars, cmds[0].cmd)) && !check_equal(&vars, cmds[0].cmd))
 		{
 			pipes(&vars, &cmds, count);
@@ -310,8 +391,8 @@ int main(int argc, char **argv, char **env)
 				stop_program(cmds[i].pid == -1, NULL, "Fork error", vars.exit_stat);
 				if (cmds[i].pid == 0)
 				{
-					if (count > 1)
-						redirect_in_out(&vars, &cmds, count, i);
+					if (!redirect_in_out(&vars, &cmds, count, i))
+						exit(1);
 					tolower_str(*cmds[i].cmd);
 					path_check(&vars, &cmds, cmds[i].cmd[0], i);
 					if (!check_builtins(&vars, cmds[i].cmd))
@@ -324,10 +405,16 @@ int main(int argc, char **argv, char **env)
 			while (++i < count)
 				waitpid(cmds[i].pid, 0, 0);
 		}
+
+		dup2(vars.fd_in, 0);
+		dup2(vars.fd_out, 1);
+
 		i = -1;
 		while (++i < count)
 		{
 			split_free(cmds[i].cmd);
+			free(cmds[i].red_in);
+			free(cmds[i].red_out);
 			if (i != count - 1)
 				free(cmds[i].pipe);
 		}
