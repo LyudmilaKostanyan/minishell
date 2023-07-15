@@ -106,29 +106,50 @@ void	env(t_vars *vars, int cmd)
 	vars->exit_stat = 0;
 }
 
+int	asd(t_env **list, t_env *env, char *cmd)	//nameing
+{
+	t_env	*tmp;
+
+	if (!ft_strcmp(env->key, cmd))
+	{
+		*list = env->next;
+		free(env->line);
+		free(env->key);
+		free(env->value);
+		free(env);
+	}
+	else if (env->next && !ft_strcmp(env->next->key, cmd))
+	{
+		tmp = env->next->next;
+		free(env->next->line);
+		free(env->next->key);
+		free(env->next->value);
+		free(env->next);
+		env->next = tmp;
+	}
+	else
+		return (0);
+	return (1);
+}
+
 void	free_node(t_vars *vars, char *cmd)
 {
 	t_env	*env;
-	t_env	*tmp;
-	char	*str;
 
 	env = vars->env;
-	str = ft_strjoin(cmd, "=");
-	malloc_err(!str, "unset");
-	while (env && env->next)
+	while (env)
 	{
-		if (!ft_strncmp(env->next->line, str, ft_strlen(str)))
-		{
-			tmp = env->next->next;
-			free(env->next->line);
-			free(env->next->key);
-			free(env->next->value);
-			free(env->next);
-			env->next = tmp;
-		}
+		if (asd(&vars->env, env, cmd))
+			break ;
 		env = env->next;
 	}
-	free(str);
+	env = vars->set;
+	while (env)
+	{
+		if (asd(&vars->set, env, cmd))
+			break ;
+		env = env->next;
+	}
 }
 
 void	unset(t_vars *vars, char **cmd)

@@ -86,8 +86,8 @@ int check_equal(t_vars *vars, char **cmd)
 		equal = ft_strchr(cmd[i], '=') - cmd[i];
 		key = ft_substr(cmd[i], 0, equal);
 		malloc_err(!key, cmd[0]);
-		if (equal >= 0 && !ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e')
-			&& !check_set(vars->env, cmd[i], key, equal) && !check_set(vars->set, cmd[i], key, equal) && ++cond)
+		if (equal >= 0 && !ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e') && ++cond
+			&& !check_set(vars->env, cmd[i], key, equal) && !check_set(vars->set, cmd[i], key, equal))
 			creat_env_var(&vars->set, cmd[i], key, equal);
 		free(key);
 	}
@@ -246,6 +246,7 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 		while ((*cmds)[i].cmd[++j])
 			restore_spaces(&(*cmds)[i].cmd[j]);
 	}
+	split_free(pipe_splt);
 	return (count);
 }
 
@@ -299,11 +300,7 @@ int main(int argc, char **argv, char **env)
 			continue;
 		else if (err_mes(!count, &vars, NULL, PIPE_ERR))
 			continue ;
-		if (count == 1 && check_builtins(&vars, cmds[0].cmd))
-			printf("1\n");
-		else if (check_equal(&vars, cmds[0].cmd))
-			printf("2\n");
-		else
+		if (!(count == 1 && check_builtins(&vars, cmds[0].cmd)) && !check_equal(&vars, cmds[0].cmd))
 		{
 			pipes(&vars, &cmds, count);
 			i = -1;
@@ -318,7 +315,7 @@ int main(int argc, char **argv, char **env)
 					tolower_str(*cmds[i].cmd);
 					path_check(&vars, &cmds, cmds[i].cmd[0], i);
 					if (!check_builtins(&vars, cmds[i].cmd))
-						vars.exit_stat = execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var);
+						exit(execve(cmds[i].ex_cmd, cmds[i].cmd, vars.env_var));
 					exit(vars.exit_stat);
 				}
 			}
@@ -334,6 +331,7 @@ int main(int argc, char **argv, char **env)
 			if (i != count - 1)
 				free(cmds[i].pipe);
 		}
+		free(cmds);
 	}
 	return (0);
 }

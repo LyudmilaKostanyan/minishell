@@ -77,6 +77,7 @@ char		*tolower_str(char *str);
 int			ft_isalnum_str(char *str, char c);
 void		creat_env_var(t_env **env, char *cmd, char *key, long long equal);
 int			check_set(t_env *env, char *cmd, char *key, long long equal);
+t_env		*key_cmp(t_vars vars, char *key);
 char		*rm_quotes(t_vars *vars, char *input_str);
 void		find_main_c(t_vars *vars, char *tmp);
 t_env		*find_same_key(t_vars vars, char *input_str);

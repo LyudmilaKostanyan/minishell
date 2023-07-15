@@ -12,32 +12,21 @@
 
 #include "minishell.h"
 
-t_env	*key_cmp(t_vars vars, char *input_str, int keys_end)
+t_env	*key_cmp(t_vars vars, char *key)
 {
-	char	*key;
-
-	key = ft_substr(input_str, 0, keys_end);
-	// printf("key = %s\n", key);
-	malloc_err(!key, "check $ case");
+	// printf("key: %s\n", key);
 	while (vars.env)
 	{
 		if (!ft_strcmp(vars.env->key, key))
-		{
-			free(key);
 			return (vars.env);
-		}
 		vars.env = vars.env->next;
 	}
 	while (vars.set)
 	{
 		if (!ft_strcmp(vars.set->key, key))
-		{
-			free(key);
 			return (vars.set);
-		}
 		vars.set = vars.set->next;
 	}
-	free(key);
 	return (NULL);
 }
 
@@ -46,6 +35,7 @@ t_env	*meh(t_vars vars, char **input_str)		//nameing
 	int		keys_end;
 	t_env	*env;
 	char	*tmp;
+	char	*key;
 
 	keys_end = 0;
 	tmp = (*input_str)++;
@@ -54,22 +44,19 @@ t_env	*meh(t_vars vars, char **input_str)		//nameing
 			keys_end++;
 	if (*(tmp - 1) == '/')
 		keys_end++;
-	env = key_cmp(vars, *input_str, keys_end);
+	key = ft_substr(*input_str, 0, keys_end);
+	malloc_err(!key, "check $ case");
+	env = key_cmp(vars, key);
+	free(key);
 	return (env);
 }
 
 t_env	*find_same_key(t_vars vars, char *input_str)
 {
-	t_env	*env;
-
 	while (*input_str)
 	{
 		if (*input_str == '$' && *(input_str + 1))
-		{
-			env = meh(vars, &input_str);
-			if (env)
-				return (env);
-		}
+			return(meh(vars, &input_str));
 		input_str++;
 	}
 	return (NULL);
@@ -160,9 +147,9 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 				if (env)
 					fill_out_str(&tmp, &out_str, env, &i);
 				else
-					while (*(++tmp) && *(tmp + 1) && *tmp != 1
+					while (*(++tmp) && *(tmp + 1) && *(tmp + 1) != '$' && *tmp != 1
 						&& *tmp != vars->main_c && *tmp != 32)
-						;
+							;
 			}
 			else
 				out_str[++i] = *tmp;
