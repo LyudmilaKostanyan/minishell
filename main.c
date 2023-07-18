@@ -117,7 +117,7 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 		{
 			if (!redirect_pipes(vars, cmds, count, i))
 				exit(1);
-			tolower_str(*(*cmds)[i].cmd);
+			// tolower_str(*(*cmds)[i].cmd);
 			path_check(vars, cmds, (*cmds)[i].cmd[0], i);
 			if (!check_builtins(vars, (*cmds)[i].cmd))
 				exit(execve((*cmds)[i].ex_cmd, (*cmds)[i].cmd, vars->env_var));

@@ -73,6 +73,13 @@ typedef struct s_vars
 	char	**paths;
 }	t_vars;
 
+typedef struct s_mall_size
+{
+	int	sp_count;
+	int	key_len;
+	int	val_len;
+}	t_mall_size;
+
 void		pwd(t_vars *vars);
 void		cd(t_vars *vars, char **cmd);
 void		echo(t_vars *vars, char **cmd);

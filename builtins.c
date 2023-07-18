@@ -30,18 +30,17 @@ void	cd(t_vars *vars, char **cmd)
 	t_env	*tmp;
 
 	vars->exit_stat = 1;
-	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))
+	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))		//diferent
 	{
 		tmp = find_key(*vars, "HOME");
-		if (!tmp)
-			chdir("/");			//change
-		else
+		err_mes(!tmp, vars, cmd, "HOME not set");
+		if (tmp)
 			chdir(tmp->value);
 	}
 	else if (!ft_strcmp(cmd[1], "-"))
 	{
 		tmp = find_key(*vars, "OLDPWD");
-		err_mes(!tmp, vars, cmd, "OLDPWD not set");
+		err_mes(!tmp, vars, cmd, "OLDPWD not set");		//?????????
 		if (tmp)
 			chdir(tmp->value);
 	}
@@ -56,18 +55,8 @@ void	cd(t_vars *vars, char **cmd)
 	{
 		pwd = getcwd(NULL, 0);
 		malloc_err(!pwd, cmd[0]);
-		tmp = vars->env;
-		while (tmp)
-		{
-			if (!ft_strncmp(tmp->line, "PWD=", 4))
-			{
-				free(tmp->line);
-				tmp->line = ft_strjoin("PWD=", pwd);
-				malloc_err(!tmp->line, cmd[0]);
-				break ;
-			}
-			tmp = tmp->next;
-		}
+		if (!check_set(vars->env, pwd, "PWD", 0))
+			creat_env_var(&vars->env, pwd, "PWD", 0);
 		free(pwd);
 		vars->exit_stat = 0;
 	}

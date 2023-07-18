@@ -20,7 +20,7 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 		sp_split = ft_split(pipe_splt[i], ' ');
 		malloc_err(!sp_split, "creating cmd list");
 		if (!*sp_split)
-			return (-1);
+			return (0);
 
 		j = -1;
 		cmds_count = 0;
@@ -86,10 +86,35 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 	return (count);
 }
 
+int	check_pipes(char *input_str)
+{
+	int	i;
+	int	len;
+
+	len = ft_strlen(input_str);
+	i = -1;
+	while (input_str[++i] == 32 && input_str[len - i - 1] == 32)
+		;
+	if (input_str[i] && (input_str[i] == '|' || input_str[len - i - 1] == '|'))
+		return (0);
+	while (++i < len)
+	{
+		if (input_str[i] == '|')
+		{
+			while (input_str[++i] == 32)
+				;
+			if (input_str[i] == '|')
+				return (0);
+		}
+	}
+	return (1);
+}
+
 int	read_input(t_vars *vars, t_cmds **cmds)
 {
 	char	*input_str;
 	char	**pipe_splt;
+	char	*for_split;
 
 	input_str = NULL;
 	pipe_splt = NULL;
@@ -99,8 +124,12 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	stop_program(!input_str, NULL, "exit", vars->exit_stat);
 	if (!*input_str)
 		return (-1);
+	if (!check_pipes(input_str))
+	{
+		add_history(input_str);
+		return (0);
+	}
 	quotes_handler(vars, &input_str);
-	char *for_split;
 	split_free(pipe_splt);
 	for_split = rm_quotes(vars, input_str);
 	if (!for_split)
@@ -109,7 +138,5 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 		pipe_splt = ft_split(for_split, '|');
 	free(for_split);
 	malloc_err(!pipe_splt, "split cmds");
-	if (err_mes(!*pipe_splt, vars, NULL, PIPE_ERR))
-		return (0);
 	return (merge_cmds(cmds, pipe_splt, &input_str));
 }

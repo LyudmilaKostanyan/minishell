@@ -61,7 +61,7 @@ t_env	*find_same_key(t_vars vars, char *input_str)
 	return (NULL);
 }
 
-int	count_key_val(t_vars vars, char *input_str, int *key_len, int *val_len)
+int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size)
 {
 	t_env		*env;
 	int		q_count;
@@ -81,9 +81,17 @@ int	count_key_val(t_vars vars, char *input_str, int *key_len, int *val_len)
 			env = key_cmp(vars, &input_str);
 			if (env)
 			{
-				*key_len += ft_strlen(env->key) + 1;
-				*val_len += ft_strlen(env->value);
+				mall_size->key_len += ft_strlen(env->key) + 1;
+				mall_size->val_len += ft_strlen(env->value);
 			}
+		}
+		if (*input_str == '>' || *input_str == '<')
+		{
+			if (*(input_str + 1) && *(input_str + 1) == *input_str
+				&&  *(input_str + 2) &&  *(input_str + 2) != 32)
+					mall_size->sp_count++;
+			else if (*(input_str + 1) && *(input_str + 1) != 32)
+					mall_size->sp_count++;
 		}
 		input_str++;
 	}
@@ -92,17 +100,17 @@ int	count_key_val(t_vars vars, char *input_str, int *key_len, int *val_len)
 
 int	creat_out_str(t_vars *vars, char *input_str, char **out_str)
 {
-	int		val_len;
-	int		key_len;
-	int		cond;
+	t_mall_size	mall_size;
+	int			cond;
 
-	val_len = 0;
-	key_len = 0;
-	cond = count_key_val(*vars, input_str, &key_len, &val_len);
-	if (!vars->main_c && !key_len && !cond)
+	mall_size.sp_count = 0;
+	mall_size.key_len = 0;
+	mall_size.val_len = 0;
+	cond = count_key_val(*vars, input_str, &mall_size);
+	if (!vars->main_c && !mall_size.key_len && !cond && !mall_size.sp_count)
 		return (0);
-	*out_str = malloc(ft_strlen(input_str) + val_len
-			- key_len - vars->q_count + 1);
+	*out_str = malloc(ft_strlen(input_str) + mall_size.val_len
+			- mall_size.key_len - vars->q_count + mall_size.sp_count + 1);
 	malloc_err(!*out_str, "rm_quotes");
 	return (1);
 }
@@ -149,7 +157,20 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 							;
 			}
 			else
+			{
 				out_str[++i] = *tmp;
+				if ((*tmp == '>' || *tmp == '<') && *(tmp + 1) && *(tmp + 1) == *tmp
+					&& *(tmp + 2) != 32 && *(tmp + 2) != *tmp)
+				{
+						out_str[++i] = *(tmp + 1);
+						out_str[++i] = 32;
+						tmp++;
+				}
+				else if ((*tmp == '>' || *tmp == '<') && *(tmp + 1)
+					&& *(tmp + 1) != 32 && *(tmp + 1) != *tmp)
+					out_str[++i] = 32;
+
+			}
 		}
 		else
 			if (--vars->q_count % 2 == 0)
