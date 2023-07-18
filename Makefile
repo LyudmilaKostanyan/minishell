@@ -19,11 +19,11 @@ $(NAME): $(OBJS)
 lib:
 	make -C libft
 
-clear:
+clean:
 	make clean -C libft
 	rm -f $(OBJS)
 
-fclean: clear
+fclean: clean
 	make fclean -C libft
 	rm -f $(NAME)
 
