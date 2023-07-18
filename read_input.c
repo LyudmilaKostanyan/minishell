@@ -20,7 +20,12 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 		sp_split = ft_split(pipe_splt[i], ' ');
 		malloc_err(!sp_split, "creating cmd list");
 		if (!*sp_split)
-			return (0);
+		{
+			split_free(sp_split);
+			split_free(pipe_splt);
+			free(*cmds);
+			return (-1);
+		}
 
 		j = -1;
 		cmds_count = 0;
@@ -115,17 +120,21 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	char	*input_str;
 	char	**pipe_splt;
 	char	*for_split;
+	int		count;
 
-	input_str = NULL;
+	// input_str = NULL;
 	pipe_splt = NULL;
 	*cmds = NULL;
-	free(input_str);
 	input_str = readline("\e[34mminishell$ \e[0m");
 	stop_program(!input_str, NULL, "exit", vars->exit_stat);
 	if (!*input_str)
+	{
+		free(input_str);
 		return (-1);
+	}
 	if (!check_pipes(input_str))
 	{
+		free(input_str);
 		add_history(input_str);
 		return (0);
 	}
@@ -138,5 +147,7 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 		pipe_splt = ft_split(for_split, '|');
 	free(for_split);
 	malloc_err(!pipe_splt, "split cmds");
-	return (merge_cmds(cmds, pipe_splt, &input_str));
+	count = merge_cmds(cmds, pipe_splt, &input_str);
+	free(input_str);
+	return (count);
 }
