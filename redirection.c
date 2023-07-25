@@ -1,26 +1,29 @@
 #include "minishell.h"
 
-void	here_doc(char *end)
+void	here_doc(t_vars *vars, char *end)
 {
 	char	*line;
 	char	*s;
 	int		fd;
 
 	s = ft_strjoin(end, "\n");
-	fd = open("tmp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	fd = open("tmp", O_RDWR | O_CREAT | O_TRUNC, 0644);
 	if (fd < 0)
 		return ;
 	while (1)
 	{
-		write(1, "> ", 2);
+		write(vars->fd_out, "> ", 2);
 		line = get_next_line(0);
 		if (!line || !ft_strncmp(line, s, ft_strlen(line)))
 		{
 			free(line);
 			break ;
 		}
-		write(fd, line, ft_strlen(line));
-		free(line);
+		else
+		{
+			write(fd, line, ft_strlen(line));
+			free(line);
+		}
 	}
 	close(fd);
 	free(s);
@@ -33,8 +36,7 @@ int	redirection(t_vars *vars, t_cmds **cmds, int i)
 			return (0);
 	else if ((*cmds)[i].in_stat == 2)
 	{
-		
-		here_doc((*cmds)[i].red_in);
+		here_doc(vars, (*cmds)[i].red_in);
 		stop_program(dup2(open("tmp", O_RDONLY), 0) == -1, "", IO, vars->exit_stat);
 	}
 	if ((*cmds)[i].out_stat == 1)

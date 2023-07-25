@@ -1,7 +1,7 @@
 NAME = minishell
 CC = cc
 FLAGS = -Wall -Wextra -Werror
-f = #-fsanitize=address -g
+f = -fsanitize=address -g
 LFLAGS = -lreadline -L./libft -lft
 IFLAGS = -I./libft
 FILES = $(wildcard *.c)
@@ -19,11 +19,11 @@ $(NAME): $(OBJS)
 lib:
 	make -C libft
 
-clean:
+clear:
 	make clean -C libft
 	rm -f $(OBJS)
 
-fclean: clean
+fclean: clear
 	make fclean -C libft
 	rm -f $(NAME)
 

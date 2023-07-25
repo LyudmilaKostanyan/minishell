@@ -114,7 +114,7 @@ int			env_len(t_env *env);
 void		env_to_str(t_vars *vars);
 void		creating_exec_path(t_vars *vars);
 void		path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
-void		here_doc(char *end);
+void		here_doc(t_vars *vars, char *end);
 int			redirection(t_vars *vars, t_cmds **cmds, int i);
 int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
 void		pipes(t_vars *vars, t_cmds **cmds, int count);

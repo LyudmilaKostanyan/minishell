@@ -136,26 +136,7 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 void	action(int signal)
 {
 	if (signal == SIGINT)
-	{
-		rl_replace_line("", 0);
-		rl_done = 1;
-	}
-}
-
-int	rl_sig(void)
-{
-	return (0);
-}
-
-void	signals(struct sigaction *sig)
-{
-	rl_catch_signals = 0;
-	rl_event_hook = &rl_sig;
-	sigemptyset(&sig->sa_mask);
-	sig->sa_handler = &action;
-	sig->sa_flags = SA_RESTART;
-	sigaction(SIGINT, sig, NULL);
-	sigaction(SIGQUIT, sig, NULL);
+		printf("\e[34mminishell$ \e[0m\n\e[34mminishell$ \e[0m");
 }
 
 int main(int argc, char **argv, char **env)
@@ -164,7 +145,11 @@ int main(int argc, char **argv, char **env)
 	t_cmds				*cmds;
 	struct sigaction	sig;
 
-	signals(&sig);
+	sig.sa_handler = &action;
+	sig.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &sig, NULL);
+	sig.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &sig, NULL);
 	cmds = NULL;
 	vars.set = NULL;
 	(void)argv;
@@ -198,34 +183,3 @@ int main(int argc, char **argv, char **env)
 	}
 	return (0);
 }
-
-/*
-chashxatox caser
-
-$aud | wc
-
-  | wc
-  | ls
-
-//ls > $HOME
-
-ls <<$USER (limitery pti lini $USER)
-
-heredoc i meji gracy expand anel ete limiteri mej chakert chka, ete ka chanel
-ete
-cat <<'a' kam cat "a", expand chanel meji gracy
-else ete
-cat <<a, expand anel mejiny
-erku depqum el expand chanel limitery
-
-<<" "
-
-nenc anel heredoc y signal haskana
-
-CTRL C chi ashxatum heredoc um
-CTRL C pti poxi a exit_code to 1
-cat ic durs CTRL C ov durs galuc exit code sxal a
-
-../bin/ls chpti ashxati
-
-*/

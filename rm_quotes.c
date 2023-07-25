@@ -136,17 +136,19 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	int		i;
 	char	*tmp;
 	t_env	*env;
+	int		here_doc;
 
 	if (!creat_out_str(vars, input_str, &out_str))
 		return (NULL);
 	i = -1;
 	tmp = input_str;
 	find_main_c(vars, tmp);
+	here_doc = 0;
 	while (*tmp)
 	{
 		if (*tmp != vars->main_c)
 		{
-			if (vars->main_c != '\'' && *tmp == '$' && *(tmp + 1) != '?')
+			if (vars->main_c != '\'' && *tmp == '$' && *(tmp + 1) != '?' && !here_doc)
 			{
 				env = find_same_key(*vars, tmp);
 				if (env)
@@ -159,17 +161,20 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 			else
 			{
 				out_str[++i] = *tmp;
-				if ((*tmp == '>' || *tmp == '<') && *(tmp + 1) && *(tmp + 1) == *tmp
-					&& *(tmp + 2) != 32 && *(tmp + 2) != *tmp)
+				if ((*tmp == '>' || *tmp == '<'))
 				{
+					if (*tmp == '<' && *(tmp + 1) && *(tmp + 1) == *tmp)
+						here_doc++;
+					if(*(tmp + 1) && *(tmp + 1) == *tmp
+						&& *(tmp + 2) != 32 && *(tmp + 2) != *tmp)
+					{
 						out_str[++i] = *(tmp + 1);
 						out_str[++i] = 32;
 						tmp++;
+					}
+					else if (*(tmp + 1) && *(tmp + 1) != 32 && *(tmp + 1) != *tmp)
+						out_str[++i] = 32;
 				}
-				else if ((*tmp == '>' || *tmp == '<') && *(tmp + 1)
-					&& *(tmp + 1) != 32 && *(tmp + 1) != *tmp)
-					out_str[++i] = 32;
-
 			}
 		}
 		else

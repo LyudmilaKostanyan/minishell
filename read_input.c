@@ -98,9 +98,9 @@ int	check_pipes(char *input_str)
 
 	len = ft_strlen(input_str);
 	i = -1;
-	while (input_str[++i] == 32 && input_str[len - i - 1] == 32)
+	while (input_str[++i] == 32)
 		;
-	if (input_str[i] && (input_str[i] == '|' || input_str[len - i - 1] == '|'))
+	if (input_str[i] && input_str[i] == '|')
 		return (0);
 	while (++i < len)
 	{
@@ -108,7 +108,7 @@ int	check_pipes(char *input_str)
 		{
 			while (input_str[++i] == 32)
 				;
-			if (input_str[i] == '|')
+			if (input_str[i] == '|' || !input_str[i])
 				return (0);
 		}
 	}
@@ -122,7 +122,6 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	char	*for_split;
 	int		count;
 
-	// input_str = NULL;
 	pipe_splt = NULL;
 	*cmds = NULL;
 	input_str = readline("\e[34mminishell$ \e[0m");
@@ -134,8 +133,8 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	}
 	if (!check_pipes(input_str))
 	{
-		free(input_str);
 		add_history(input_str);
+		free(input_str);
 		return (0);
 	}
 	quotes_handler(vars, &input_str);
