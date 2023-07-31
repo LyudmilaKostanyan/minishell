@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirection.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/07/31 22:46:27 by lykostan          #+#    #+#             */
+/*   Updated: 2023/07/31 23:56:27 by tgalyaut         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_env	*qwe(t_vars *vars, char *line)
@@ -37,19 +49,25 @@ int	asd(t_vars *vars, char *input_str, t_mall_size *mall_size)
 	return (cond);
 }
 
-void	check_env_var(t_vars *vars, char **line)
+static char	*cev_init(t_vars *vars, char **line)
 {
-	int			i;
-	int			cond;
 	char		*out_str;
-	t_env		*env;
 	t_mall_size	mall_size;
 
-	cond = 0;
 	mall_size.key_len = 0;
 	mall_size.val_len = 0;
 	asd(vars, *line, &mall_size);
-	out_str = malloc(ft_strlen(*line) - mall_size.key_len + mall_size.val_len + 2);
+	out_str = malloc(ft_strlen(*line) - mall_size.key_len
+			+ mall_size.val_len + 2);
+	return (out_str);
+}
+
+static char	*cev_help(t_vars *vars, char **line, t_env *env, int *cond)
+{
+	char	*out_str;
+	int		i;
+
+	out_str = cev_init(vars, line);
 	i = -1;
 	while (**line)
 	{
@@ -69,7 +87,16 @@ void	check_env_var(t_vars *vars, char **line)
 	if (cond)
 		out_str[++i] = '\n';
 	out_str[++i] = 0;
-	*line = out_str;
+	return (out_str);
+}
+
+void	check_env_var(t_vars *vars, char **line)
+{
+	t_env		env;
+	int			cond;
+
+	cond = 0;
+	*line = cev_help(vars, line, &env, &cond);
 }
 
 void	here_doc(t_vars *vars, char *end)
@@ -106,18 +133,19 @@ int	redirection(t_vars *vars, t_cmds **cmds, int i)
 {
 	if ((*cmds)[i].in_stat == 1 && err_mes(dup2(open((*cmds)[i].red_in,		//meh
 		O_RDONLY), 0) == -1, vars, NULL, CD_ERR))
-			return (0);
+		return (0);
 	else if ((*cmds)[i].in_stat == 2)
 	{
 		here_doc(vars, (*cmds)[i].red_in);
-		stop_program(dup2(open("tmp", O_RDONLY), 0) == -1, "", IO, vars->exit_stat);
+		stop_program(dup2(open("tmp", O_RDONLY), 0)
+			== -1, "", IO, vars->exit_stat);
 	}
 	if ((*cmds)[i].out_stat == 1)
 		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_TRUNC
-			| O_WRONLY, 0644), 1) == -1, "", IO, vars->exit_stat);
+					| O_WRONLY, 0644), 1) == -1, "", IO, vars->exit_stat);
 	else if ((*cmds)[i].out_stat == 2)
 		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_APPEND
-			| O_WRONLY, 0644), 1) == -1, "", IO, vars->exit_stat);
+					| O_WRONLY, 0644), 1) == -1, "", IO, vars->exit_stat);
 	return (1);
 }
 
@@ -125,25 +153,29 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 {
 	if (i == 0 && !(*cmds)[i].red_out && count != 1)
 	{
-		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO, vars->exit_stat);
+		stop_program(dup2((*cmds)[i].pipe[1], 1)
+			== -1, "", IO, vars->exit_stat);
 		close((*cmds)[i].pipe[0]);
 	}
 	else if (count -1 && i == count - 1 && !(*cmds)[i].red_in && count != 1)
 	{
-		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO, vars->exit_stat);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0)
+			== -1, "", IO, vars->exit_stat);
 		close((*cmds)[i - 1].pipe[1]);
 	}
 	else if (count != 1)
 	{
-		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO, vars->exit_stat);
-		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO, vars->exit_stat);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0)
+			== -1, "", IO, vars->exit_stat);
+		stop_program(dup2((*cmds)[i].pipe[1], 1)
+			== -1, "", IO, vars->exit_stat);
 	}
 	return (redirection(vars, cmds, i));
 }
 
 void	pipes(t_vars *vars, t_cmds **cmds, int count)
 {
-	int i;
+	int	i;
 
 	i = -1;
 	while (++i < count - 1)

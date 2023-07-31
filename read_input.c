@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   read_input.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/07/31 22:40:34 by lykostan          #+#    #+#             */
+/*   Updated: 2023/07/31 23:56:27 by tgalyaut         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
@@ -26,14 +38,15 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 			free(*cmds);
 			return (-1);
 		}
-
 		j = -1;
 		cmds_count = 0;
 		while (sp_split[++j])
 			if (ft_strcmp(sp_split[j], ">") && ft_strcmp(sp_split[j], "<")
 				&& ft_strcmp(sp_split[j], ">>") && ft_strcmp(sp_split[j], "<<"))
-				if (j == 0 || (ft_strcmp(sp_split[j - 1], ">") && ft_strcmp(sp_split[j - 1], "<")
-					&& ft_strcmp(sp_split[j - 1], ">>") && ft_strcmp(sp_split[j - 1], "<<")))
+				if (j == 0 || (ft_strcmp(sp_split[j - 1], ">")
+						&& ft_strcmp(sp_split[j - 1], "<")
+						&& ft_strcmp(sp_split[j - 1], ">>")
+						&& ft_strcmp(sp_split[j - 1], "<<")))
 					cmds_count++;
 		(*cmds)[i].cmd = malloc(sizeof(char *) * (cmds_count + 1));
 		malloc_err(!(*cmds)[i].cmd, "creating cmd list");
@@ -48,14 +61,17 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 			if (ft_strcmp(sp_split[j], ">") && ft_strcmp(sp_split[j], "<")
 				&& ft_strcmp(sp_split[j], ">>") && ft_strcmp(sp_split[j], "<<"))
 			{
-				if (j == 0 || (ft_strcmp(sp_split[j - 1], ">") && ft_strcmp(sp_split[j - 1], "<")
-					&& ft_strcmp(sp_split[j - 1], ">>") && ft_strcmp(sp_split[j - 1], "<<")))
+				if (j == 0 || (ft_strcmp(sp_split[j - 1], ">")
+						&& ft_strcmp(sp_split[j - 1], "<")
+						&& ft_strcmp(sp_split[j - 1], ">>")
+						&& ft_strcmp(sp_split[j - 1], "<<")))
 				{
 					(*cmds)[i].cmd[++k] = ft_strdup(sp_split[j]);
 					malloc_err(!(*cmds)[i].cmd[k], "creating cmd list");
 				}
 			}
-			else if (!ft_strcmp(sp_split[j], ">") || !ft_strcmp(sp_split[j], ">>"))
+			else if (!ft_strcmp(sp_split[j], ">")
+				|| !ft_strcmp(sp_split[j], ">>"))
 			{
 				if (!ft_strcmp(sp_split[j], ">"))
 					(*cmds)[i].out_stat = 1;
@@ -67,7 +83,8 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 					malloc_err(!(*cmds)[i].red_out, "creating redirection vars");
 				}
 			}
-			else if (!ft_strcmp(sp_split[j], "<") || !ft_strcmp(sp_split[j], "<<"))
+			else if (!ft_strcmp(sp_split[j], "<")
+				|| !ft_strcmp(sp_split[j], "<<"))
 			{
 				if (!ft_strcmp(sp_split[j], "<"))
 					(*cmds)[i].in_stat = 1;
@@ -82,7 +99,6 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 		}
 		(*cmds)[i].cmd[++k] = NULL;
 		split_free(sp_split);
-
 		j = -1;
 		while ((*cmds)[i].cmd[++j])
 			restore_spaces(&(*cmds)[i].cmd[j]);

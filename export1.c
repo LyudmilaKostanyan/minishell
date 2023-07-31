@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   export.c                                           :+:      :+:    :+:   */
+/*   export1.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lykostan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/17 16:35:51 by lykostan          #+#    #+#             */
-/*   Updated: 2023/06/17 16:35:54 by lykostan         ###   ########.fr       */
+/*   Updated: 2023/07/31 23:56:27 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,66 +23,15 @@ void	merge_key_value(t_env *node)
 	free(key);
 }
 
-t_env	*checking_env_key(t_env *env, char *key)
+static void	*cev_help(t_env **env, t_env **tmp)
 {
-	if (key[ft_strlen(key) - 1] == '+')
-		key[ft_strlen(key) - 1] = 0;
-	while (env)
+	while (*env)
 	{
-		if (!ft_strcmp(key, env->key))
-			return (env);
-		env = env->next;
+		if (!(*env)->next)
+			*tmp = *env;
+		*env = (*env)->next;
 	}
-	return (NULL);
-}
-
-void	add_value(char *cmd, t_env **env)
-{
-	char	*tmp;
-
-	tmp = ft_strjoin((*env)->value, ft_strchr(cmd, '=') + 1);
-	malloc_err(!tmp, "add value in env variable");
-	free((*env)->value);
-	(*env)->value = tmp;
-	tmp = ft_strjoin((*env)->line, ft_strchr(cmd, '=') + 1);
-	malloc_err(!tmp, "add value in env variable");
-	free((*env)->line);
-	(*env)->line = tmp;
-}
-
-int	check_set(t_env *env, char *cmd, char *key, long long equal)
-{
-	int		plus;
-
-	plus = 0;
-	if (key[ft_strlen(key) - 1] == '+')
-		plus++;
-	env = checking_env_key(env, key);
-	if (!env)
-		return (0);
-	if (plus)
-	{
-		add_value(cmd, &env);
-		return (1);
-	}
-	if (equal > 0)
-	{
-		if (!ft_strcmp(ft_strchr(cmd, '=') + 1, env->value))
-			return (1);
-		free(env->value);
-		env->value = ft_substr(cmd, equal + 1, ft_strlen(cmd) - equal);
-	}
-	else
-	{
-		if (!ft_strcmp(cmd, env->value))
-			return (1);
-		free(env->value);
-		env->value = ft_strdup(cmd);
-	}
-	malloc_err(!env->value, "check_set : env->value");
-	free(env->line);
-	merge_key_value(env);
-	return (1);
+	return (env);
 }
 
 void	creat_env_var(t_env **env, char *cmd, char *key, long long equal)
@@ -91,12 +40,7 @@ void	creat_env_var(t_env **env, char *cmd, char *key, long long equal)
 	t_env	*tmp;
 
 	head = *env;
-	while (*env)
-	{
-		if (!(*env)->next)
-			tmp = *env;
-		*env = (*env)->next;
-	}
+	*env = cev_help(env, &tmp);
 	(*env) = malloc(sizeof(t_env));
 	malloc_err(!*env, "creat_env_var: env");
 	if (head)
