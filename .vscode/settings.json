@@ -5,6 +5,7 @@
 		"stdint.h": "c",
 		"minishell.h": "c",
 		"types.h": "c",
-		"fcntl.h": "c"
+		"fcntl.h": "c",
+		"history.h": "c"
 	}
 }

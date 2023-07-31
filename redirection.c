@@ -1,5 +1,77 @@
 #include "minishell.h"
 
+t_env	*qwe(t_vars *vars, char *line)
+{
+	char	*key;
+	t_env	*env;
+
+	if (line[ft_strlen(line) - 1] == '\n')
+		key = ft_substr(line, 1, ft_strlen(line) - 2);
+	else
+		key = ft_substr(line, 1, ft_strlen(line) - 1);
+	env = find_key(*vars, key);
+	free(key);
+	return (env);
+}
+
+int	asd(t_vars *vars, char *input_str, t_mall_size *mall_size)
+{
+	t_env	*env;
+	int		cond;
+
+	cond = 0;
+	while (*input_str)
+	{
+		if (*input_str == '$' && *(input_str + 1))
+		{
+			cond++;
+			env = qwe(vars, input_str);
+			if (env)
+			{
+				mall_size->key_len += ft_strlen(env->key) + 1;
+				mall_size->val_len += ft_strlen(env->value);
+			}
+		}
+		input_str++;
+	}
+	return (cond);
+}
+
+void	check_env_var(t_vars *vars, char **line)
+{
+	int			i;
+	int			cond;
+	char		*out_str;
+	t_env		*env;
+	t_mall_size	mall_size;
+
+	cond = 0;
+	mall_size.key_len = 0;
+	mall_size.val_len = 0;
+	asd(vars, *line, &mall_size);
+	out_str = malloc(ft_strlen(*line) - mall_size.key_len + mall_size.val_len + 2);
+	i = -1;
+	while (**line)
+	{
+		if (**line == '$')
+		{
+			cond++;
+			env = qwe(vars, *line);
+			if (env)
+				fill_out_str(line, &out_str, env, &i);
+			else
+				out_str[++i] = **line;
+		}
+		else
+			out_str[++i] = **line;
+		(*line)++;
+	}
+	if (cond)
+		out_str[++i] = '\n';
+	out_str[++i] = 0;
+	*line = out_str;
+}
+
 void	here_doc(t_vars *vars, char *end)
 {
 	char	*line;
@@ -21,6 +93,7 @@ void	here_doc(t_vars *vars, char *end)
 		}
 		else
 		{
+			check_env_var(vars, &line);
 			write(fd, line, ft_strlen(line));
 			free(line);
 		}

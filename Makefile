@@ -2,8 +2,8 @@ NAME = minishell
 CC = cc
 FLAGS = -Wall -Wextra -Werror
 f = -fsanitize=address -g
-LFLAGS = -L /goinfre/lykostan/lib/ -lreadline -L./libft -lft
-IFLAGS = -I./libft
+LFLAGS = -lreadline -Lbarev/lib -L./libft -lft
+IFLAGS = -I./libft -Ibarev/include
 FILES = $(wildcard *.c)
 
 OBJS = $(FILES:.c=.o)

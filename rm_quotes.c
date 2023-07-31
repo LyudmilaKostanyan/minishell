@@ -50,9 +50,9 @@ t_env	*key_cmp(t_vars vars, char **input_str)
 	return (env);
 }
 
-t_env	*find_same_key(t_vars vars, char *input_str)
+t_env	*find_same_key(t_vars vars, char *input_str)			//xi while
 {
-	while (*input_str)
+	while (*input_str) //ha inch heto inch
 	{
 		if (*input_str == '$' && *(input_str + 1))
 			return(key_cmp(vars, &input_str));
@@ -124,7 +124,7 @@ void	fill_out_str(char **tmp, char **out_str, t_env *env, int *i)
 		(*out_str)[++(*i)] = env->value[j];
 	(*tmp)++;
 	j = -1;
-	while (*(*tmp + 1) && **tmp == env->key[++j])
+	while (*(*tmp + 1) && **tmp == env->key[++j] && *(*tmp + 1) != '$')
 		(*tmp)++;
 	if (**tmp == '/')
 		(*out_str)[++(*i)] = **tmp;
@@ -138,11 +138,11 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	t_env	*env;
 	int		here_doc;
 
+	tmp = input_str;
+	find_main_c(vars, tmp);
 	if (!creat_out_str(vars, input_str, &out_str))
 		return (NULL);
 	i = -1;
-	tmp = input_str;
-	find_main_c(vars, tmp);
 	here_doc = 0;
 	while (*tmp)
 	{

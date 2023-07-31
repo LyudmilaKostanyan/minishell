@@ -25,6 +25,7 @@
 # define BUFFER_SIZE 42
 # endif
 
+
 # include <limits.h>
 # include <errno.h>
 # include <unistd.h>
@@ -32,13 +33,16 @@
 # include <stdlib.h>
 # include <stdint.h>
 # include <limits.h>
-# include <readline/readline.h>
-# include <readline/history.h>
+# include "readline/readline.h"
+# include "readline/history.h"
 # include <fcntl.h>
 # include <sys/wait.h>
 # include <signal.h>
 # include <sys/stat.h>
+# include <sys/ioctl.h>
 # include <libft.h>
+
+extern int	g_exit_status;
 
 typedef struct s_env
 {
@@ -98,6 +102,8 @@ int			ft_isalnum_str(char *str, char c);
 void		creat_env_var(t_env **env, char *cmd, char *key, long long equal);
 int			check_set(t_env *env, char *cmd, char *key, long long equal);
 t_env		*find_key(t_vars vars, char *key);
+t_env		*key_cmp(t_vars vars, char **input_str);
+void		fill_out_str(char **tmp, char **out_str, t_env *env, int *i);
 char		*rm_quotes(t_vars *vars, char *input_str);
 void		find_main_c(t_vars *vars, char *tmp);
 t_env		*find_same_key(t_vars vars, char *input_str);
@@ -115,7 +121,7 @@ int			env_len(t_env *env);
 void		env_to_str(t_vars *vars);
 void		creating_exec_path(t_vars *vars);
 void		path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
-void		here_doc(t_vars *vars, char *end);
+// int			here_doc(t_vars *vars, char *end);
 int			redirection(t_vars *vars, t_cmds **cmds, int i);
 int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
 void		pipes(t_vars *vars, t_cmds **cmds, int count);

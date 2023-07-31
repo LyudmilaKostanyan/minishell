@@ -12,6 +12,8 @@
 
 #include "minishell.h"
 
+int	g_exit_status = 0;
+
 t_env *creat_env_list(char **env)
 {
 	t_env *head;
@@ -129,7 +131,7 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 	while (++i < count)
 	{
 		waitpid((*cmds)[i].pid, &vars->exit_stat, 0);
-		vars->exit_stat = WEXITSTATUS(vars->exit_stat) % 256;
+		vars->exit_stat = WEXITSTATUS(vars->exit_stat);
 	}
 }
 
@@ -137,7 +139,17 @@ void	action(int signal)
 {
 	if (signal == SIGINT)
 		(void)signal;
-		// rl_replace_line("", 0);
+
+	rl_replace_line("", 0);
+	rl_done = 1;
+	// ioctl(0, TIOCSTI, "\n");
+	// rl_on_new_line();
+	// rl_redisplay();
+}
+
+int	empty()
+{
+	return 0;
 }
 
 int main(int argc, char **argv, char **env)
@@ -146,9 +158,12 @@ int main(int argc, char **argv, char **env)
 	t_cmds				*cmds;
 	struct sigaction	sig;
 
+	rl_event_hook = &empty;
+	rl_catch_signals = 0;
+
+	sigemptyset(&sig.sa_mask);
 	sig.sa_handler = &action;
 	sig.sa_flags = SA_RESTART;
-	// rl_catch_signals = 0;
 	sigaction(SIGINT, &sig, NULL);
 	sig.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sig, NULL);
@@ -164,13 +179,13 @@ int main(int argc, char **argv, char **env)
 	vars.env = creat_env_list(env);
 	while (1)
 	{
+		vars.fd_in = dup(0);
+		vars.fd_out = dup(1);
 		int count = read_input(&vars, &cmds);
 		if (count == -1)
 			continue;
 		else if (err_mes(!count, &vars, NULL, PIPE_ERR))
 			continue ;
-		vars.fd_in = dup(0);
-		vars.fd_out = dup(1);
 		if (count == 1 && (!ft_strcmp(*cmds[0].cmd, "pwd") || !ft_strcmp(*cmds[0].cmd, "cd")
 			|| !ft_strcmp(*cmds[0].cmd, "echo") || !ft_strcmp(*cmds[0].cmd, "export")
 			|| !ft_strcmp(*cmds[0].cmd, "unset") || !ft_strcmp(*cmds[0].cmd, "exit")
