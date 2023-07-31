@@ -76,5 +76,5 @@ void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 		free((*cmds)[i].ex_cmd);
 	}
 	perror(cmd);
-	exit(1);
+	exit(127);
 }

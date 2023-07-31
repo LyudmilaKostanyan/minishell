@@ -26,6 +26,7 @@
 # endif
 
 # include <limits.h>
+# include <errno.h>
 # include <unistd.h>
 # include <stdio.h>
 # include <stdlib.h>

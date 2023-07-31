@@ -136,7 +136,8 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 void	action(int signal)
 {
 	if (signal == SIGINT)
-		printf("\e[34mminishell$ \e[0m\n\e[34mminishell$ \e[0m");
+		(void)signal;
+		// rl_replace_line("", 0);
 }
 
 int main(int argc, char **argv, char **env)
@@ -147,6 +148,7 @@ int main(int argc, char **argv, char **env)
 
 	sig.sa_handler = &action;
 	sig.sa_flags = SA_RESTART;
+	// rl_catch_signals = 0;
 	sigaction(SIGINT, &sig, NULL);
 	sig.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sig, NULL);

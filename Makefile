@@ -2,7 +2,7 @@ NAME = minishell
 CC = cc
 FLAGS = -Wall -Wextra -Werror
 f = -fsanitize=address -g
-LFLAGS = -lreadline -L./libft -lft
+LFLAGS = -L /goinfre/lykostan/lib/ -lreadline -L./libft -lft
 IFLAGS = -I./libft
 FILES = $(wildcard *.c)
 

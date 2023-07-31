@@ -39,7 +39,7 @@ int	err_mes(int condition, t_vars *vars, char **cmd, char *line)
 			else
 				printf("minishell: %s: %s\n", cmd[0], TMA);
 		}
-		vars->exit_stat = 1;
+		vars->exit_stat = 1;		//error
 		return (1);
 	}
 	return (0);

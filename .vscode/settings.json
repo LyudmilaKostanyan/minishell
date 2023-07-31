@@ -4,6 +4,7 @@
 		"stdio.h": "c",
 		"stdint.h": "c",
 		"minishell.h": "c",
-		"types.h": "c"
+		"types.h": "c",
+		"fcntl.h": "c"
 	}
 }
