@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   rm_quotes.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lykostan <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 14:08:29 by lykostan          #+#    #+#             */
-/*   Updated: 2023/07/31 23:56:27 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/06/28 14:08:31 by lykostan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ t_env	*find_same_key(t_vars vars, char *input_str)			//xi while
 	while (*input_str) //ha inch heto inch
 	{
 		if (*input_str == '$' && *(input_str + 1))
-			return (key_cmp(vars, &input_str));
+			return(key_cmp(vars, &input_str));
 		input_str++;
 	}
 	return (NULL);
@@ -64,8 +64,8 @@ t_env	*find_same_key(t_vars vars, char *input_str)			//xi while
 int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size)
 {
 	t_env		*env;
-	int			q_count;
-	int			cond;
+	int		q_count;
+	int		cond;
 
 	cond = 0;
 	q_count = vars.q_count;
@@ -88,7 +88,7 @@ int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size)
 		if (*input_str == '>' || *input_str == '<')
 		{
 			if (*(input_str + 1) && *(input_str + 1) == *input_str
-				&& *(input_str + 2) && *(input_str + 2) != 32)
+				&&  *(input_str + 2) &&  *(input_str + 2) != 32)
 					mall_size->sp_count++;
 			else if (*(input_str + 1) && *(input_str + 1) != 32)
 					mall_size->sp_count++;
@@ -148,15 +148,13 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	{
 		if (*tmp != vars->main_c)
 		{
-			if (vars->main_c != '\'' && *tmp == '$'
-				&& *(tmp + 1) != '?' && !here_doc)
+			if (vars->main_c != '\'' && *tmp == '$' && *(tmp + 1) != '?' && !here_doc)
 			{
 				env = find_same_key(*vars, tmp);
 				if (env)
 					fill_out_str(&tmp, &out_str, env, &i);
 				else
-					while (*(++tmp) && *(tmp + 1)
-						&& *(tmp + 1) != '$' && *tmp != 1
+					while (*(++tmp) && *(tmp + 1) && *(tmp + 1) != '$' && *tmp != 1
 						&& *tmp != vars->main_c && *tmp != 32)
 							;
 			}
@@ -167,15 +165,14 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 				{
 					if (*tmp == '<' && *(tmp + 1) && *(tmp + 1) == *tmp)
 						here_doc++;
-					if (*(tmp + 1) && *(tmp + 1) == *tmp
+					if(*(tmp + 1) && *(tmp + 1) == *tmp
 						&& *(tmp + 2) != 32 && *(tmp + 2) != *tmp)
 					{
 						out_str[++i] = *(tmp + 1);
 						out_str[++i] = 32;
 						tmp++;
 					}
-					else if (*(tmp + 1) && *(tmp + 1) != 32
-						&& *(tmp + 1) != *tmp)
+					else if (*(tmp + 1) && *(tmp + 1) != 32 && *(tmp + 1) != *tmp)
 						out_str[++i] = 32;
 				}
 			}

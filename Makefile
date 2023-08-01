@@ -1,9 +1,12 @@
 NAME = minishell
 CC = cc
+RDLINE_RESERV = readline-8.1/
+RD_DIR = readline
+RDLINE_PATH = $(addprefix $(shell pwd)/, $(RD_DIR))
 FLAGS = -Wall -Wextra -Werror
 f = -fsanitize=address -g
-LFLAGS = -lreadline -Lbarev/lib -L./libft -lft
-IFLAGS = -I./libft -Ibarev/include
+LFLAGS = -lreadline -L$(RD_DIR)/lib -L./libft -lft
+IFLAGS = -I./libft -I$(RD_DIR)/include
 FILES = $(wildcard *.c)
 
 OBJS = $(FILES:.c=.o)
@@ -18,12 +21,18 @@ $(NAME): $(OBJS)
 
 lib:
 	make -C libft
+	mkdir $(RD_DIR)
+	@cd $(RDLINE_RESERV) && exec ./configure --prefix=$(RDLINE_PATH)
+	make -C $(RDLINE_RESERV)
+	make -C $(RDLINE_RESERV) install
 
-clear:
+clean:
 	make clean -C libft
 	rm -f $(OBJS)
+	rm -rf $(RD_DIR)
+	make -C $(RDLINE_RESERV) distclean
 
-fclean: clear
+fclean: clean
 	make fclean -C libft
 	rm -f $(NAME)
 
