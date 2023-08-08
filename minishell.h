@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lykostan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:18:14 by lykostan          #+#    #+#             */
-/*   Updated: 2023/06/14 19:18:16 by lykostan         ###   ########.fr       */
+/*   Updated: 2023/08/01 22:58:34 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,8 @@
 # define IO "redirection input/output"
 
 # ifndef BUFFER_SIZE
-# define BUFFER_SIZE 42
+#  define BUFFER_SIZE 42
 # endif
-
 
 # include <limits.h>
 # include <errno.h>
@@ -94,40 +93,44 @@ void		unset(t_vars *vars, char **cmd);
 void		exit_prog(char **cmd);
 void		stop_program(int condition, char *cmd, char *issue, int exit_stat);
 void		malloc_err(int condition, char *cmd);
-int			err_mes(int condition, t_vars *vars, char **cmd, char *line);
-long long	ft_atoll(char *str);
-void		split_free(char **split);
-char		*tolower_str(char *str);
-int			ft_isalnum_str(char *str, char c);
 void		creat_env_var(t_env **env, char *cmd, char *key, long long equal);
-int			check_set(t_env *env, char *cmd, char *key, long long equal);
-t_env		*find_key(t_vars vars, char *key);
-t_env		*key_cmp(t_vars vars, char **input_str);
 void		fill_out_str(char **tmp, char **out_str, t_env *env, int *i);
-char		*rm_quotes(t_vars *vars, char *input_str);
+void		split_free(char **split);
 void		find_main_c(t_vars *vars, char *tmp);
-t_env		*find_same_key(t_vars vars, char *input_str);
 void		quotes_handler(t_vars *vars, char **input_str);
 void		wait_quote(char **input_str, char c, int *count);
 void		restore_spaces(char **str);
-int			split_size(char **split);
-char		*get_next_line(int fd);
-int			ft_strchr_gnl(char *str, int c);
-char		*ft_strdup_gnl(char *s, int start, int j);
-char		*ft_strjoin_gnl(char *s1, char *s2);
-int			read_input(t_vars *vars, t_cmds **cmds);
-int			merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str);
-int			env_len(t_env *env);
+void		merge_key_value(t_env *node);
 void		env_to_str(t_vars *vars);
 void		creating_exec_path(t_vars *vars);
 void		path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
-// int			here_doc(t_vars *vars, char *end);
-int			redirection(t_vars *vars, t_cmds **cmds, int i);
-int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
 void		pipes(t_vars *vars, t_cmds **cmds, int count);
 void		close_pipes(t_cmds **cmds, int count);
 void		malloc_err(int condition, char *cmd);
 void		stop_program(int condition, char *cmd, char *issue, int exit_stat);
+
+char		*tolower_str(char *str);
+char		*rm_quotes(t_vars *vars, char *input_str);
+char		*get_next_line(int fd);
+char		*ft_strdup_gnl(char *s, int start, int j);
+char		*ft_strjoin_gnl(char *s1, char *s2);
+
+long long	ft_atoll(char *str);
 int			err_mes(int condition, t_vars *vars, char **cmd, char *line);
+int			ft_isalnum_str(char *str, char c);
+int			check_set(t_env *env, char *cmd, char *key, long long equal);
+int			split_size(char **split);
+int			ft_strchr_gnl(char *str, int c);
+int			read_input(t_vars *vars, t_cmds **cmds);
+int			merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str);
+int			env_len(t_env *env);
+int			redirection(t_vars *vars, t_cmds **cmds, int i);
+int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
+int			err_mes(int condition, t_vars *vars, char **cmd, char *line);
+// int			here_doc(t_vars *vars, char *end);
+
+t_env		*find_key(t_vars vars, char *key);
+t_env		*key_cmp(t_vars vars, char **input_str);
+t_env		*find_same_key(t_vars vars, char *input_str);
 
 #endif
