@@ -22,9 +22,6 @@ $(NAME): $(OBJS)
 lib:
 	make -C libft
 	mkdir $(RD_DIR)
-	# @if [ !-d $(RD_DIR) ]; then \
-	# 	mkdir $(RD_DIR) \
-	# fi
 	@cd $(RDLINE_RESERV) && exec ./configure --prefix=$(RDLINE_PATH)
 	make -C $(RDLINE_RESERV)
 	make -C $(RDLINE_RESERV) install
