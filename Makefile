@@ -1,41 +1,70 @@
 NAME = minishell
-CC = cc
-RDLINE_RESERV = readline-8.1/
+
+#
 RD_DIR = readline
+RDLINE_RESERV = readline-8.1/
 RDLINE_PATH = $(addprefix $(shell pwd)/, $(RD_DIR))
-FLAGS = -Wall -Wextra -Werror
-f = -fsanitize=address -g
-LFLAGS = -lreadline -L$(RD_DIR)/lib -L./libft -lft
+
+#
 IFLAGS = -I./libft -I$(RD_DIR)/include
-FILES = $(wildcard *.c)
+LFLAGS = -lreadline -L$(RD_DIR)/lib -L./libft -lft
 
-OBJS = $(FILES:.c=.o)
+#
+PREF_SRC = src
+PREF_OBJ = obj
 
-%.o: %.c Makefile minishell.h
-	$(CC) $(FLAGS) $(f) $(IFLAGS) -c $< -o $@
+#
+SRCS = $(addprefix $(PREF_SRC)/, builtins1.c builtins2.c errors.c \
+	export1.c export2.c get_next_line_bonus.c get_next_line_utils_bonus.c \
+	main.c path.c quotes.c read_input.c redirection.c rm_quotes.c \
+	utils1.c utils2.c)
+OBJS = $(patsubst $(PREF_SRC)/%.c, $(PREF_OBJ)/%.o, $(SRCS))
 
-all: lib $(NAME)
+#
+CC = cc
+FLAGS = -Wall -Wextra -Werror
+FSANITIZE = -fsanitize=address -g
 
+#
+all: readline $(NAME)
+
+#
 $(NAME): $(OBJS)
-	$(CC) $(f) $(OBJS) $(LFLAGS) -o $(NAME)
+	@$(CC) $(FSANITIZE) $(OBJS) $(LFLAGS) -o $(NAME)
 
+#
+$(PREF_OBJ)/%.o: $(PREF_SRC)/%.c Makefile minishell.h
+	@mkdir -p $(PREF_OBJ)
+	@$(CC) $(FLAGS) $(FSANITIZE) $(IFLAGS) -c $< -o $@
+
+#
+readline: Makefile
+	@if [ ! -d $(RD_DIR) ]; then \
+		make lib; \
+	fi
+
+#
 lib:
-	make -C libft
-	mkdir $(RD_DIR)
+	@make -C libft
+	@mkdir $(RD_DIR)
 	@cd $(RDLINE_RESERV) && exec ./configure --prefix=$(RDLINE_PATH)
-	make -C $(RDLINE_RESERV)
-	make -C $(RDLINE_RESERV) install
+	@make -C $(RDLINE_RESERV)
+	@make -C $(RDLINE_RESERV) install
 
+#
 clean:
-	make clean -C libft
-	rm -f $(OBJS)
-	rm -rf $(RD_DIR)
-	make -C $(RDLINE_RESERV) distclean
+	@make clean -C libft
+	@rm -rf $(PREF_OBJ)
+	@rm -rf $(RD_DIR)
+	@make -C $(RDLINE_RESERV) distclean
 
+#
 fclean: clean
 	make fclean -C libft
 	rm -f $(NAME)
 
+#
 re: fclean all
 
-.PHONY: all clean fclean re libs
+#
+.PHONY: all clean fclean re lib readline
