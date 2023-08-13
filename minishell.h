@@ -67,6 +67,7 @@ typedef struct s_cmds
 
 typedef struct s_vars
 {
+	char	*input_str;
 	int		exit_stat;
 	t_env	*env;
 	char	**env_var;
@@ -107,21 +108,17 @@ void		fill_out_str(char **tmp, char **out_str, t_env *env, int *i);
 char		*rm_quotes(t_vars *vars, char *input_str);
 void		find_main_c(t_vars *vars, char *tmp);
 t_env		*find_same_key(t_vars vars, char *input_str);
+int			count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size, int i);
 void		quotes_handler(t_vars *vars, char **input_str);
 void		wait_quote(char **input_str, char c, int *count);
 void		restore_spaces(char **str);
 int			split_size(char **split);
-char		*get_next_line(int fd);
-int			ft_strchr_gnl(char *str, int c);
-char		*ft_strdup_gnl(char *s, int start, int j);
-char		*ft_strjoin_gnl(char *s1, char *s2);
 int			read_input(t_vars *vars, t_cmds **cmds);
 int			merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str);
 int			env_len(t_env *env);
 void		env_to_str(t_vars *vars);
 void		creating_exec_path(t_vars *vars);
 void		path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
-// int			here_doc(t_vars *vars, char *end);
 int			redirection(t_vars *vars, t_cmds **cmds, int i);
 int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
 void		pipes(t_vars *vars, t_cmds **cmds, int count);

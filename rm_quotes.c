@@ -38,8 +38,7 @@ t_env	*key_cmp(t_vars vars, char **input_str)
 
 	keys_end = 0;
 	tmp = (*input_str)++;
-	while (*(++tmp) && *tmp != '/' && *tmp != '$' && *tmp != 1
-		&& *tmp != '\"' && *tmp != '\'' && *tmp != 32)
+	while (*(++tmp) && (ft_isalnum(*tmp) || *tmp == '_'))
 			keys_end++;
 	if (*(tmp - 1) == '/')
 		keys_end++;
@@ -50,9 +49,9 @@ t_env	*key_cmp(t_vars vars, char **input_str)
 	return (env);
 }
 
-t_env	*find_same_key(t_vars vars, char *input_str)			//xi while
+t_env	*find_same_key(t_vars vars, char *input_str)	//xi while
 {
-	while (*input_str) //ha inch heto inch
+	while (*input_str)
 	{
 		if (*input_str == '$' && *(input_str + 1))
 			return(key_cmp(vars, &input_str));
@@ -61,18 +60,21 @@ t_env	*find_same_key(t_vars vars, char *input_str)			//xi while
 	return (NULL);
 }
 
-int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size)
+int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size, int i)
 {
-	t_env		*env;
+	t_env	*env;
 	int		q_count;
 	int		cond;
 
 	cond = 0;
-	q_count = vars.q_count;
-	find_main_c(&vars, input_str);
+	if (i)
+	{
+		q_count = vars.q_count;
+		find_main_c(&vars, input_str);
+	}
 	while (*input_str)
 	{
-		if (*input_str == vars.main_c)
+		if (i && *input_str == vars.main_c)
 			if (--q_count % 2 == 0)
 				find_main_c(&vars, input_str + 1);
 		if (*input_str == '$' && *(input_str + 1) && vars.main_c != '\'')
@@ -85,7 +87,7 @@ int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size)
 				mall_size->val_len += ft_strlen(env->value);
 			}
 		}
-		if (*input_str == '>' || *input_str == '<')
+		if (i && (*input_str == '>' || *input_str == '<'))
 		{
 			if (*(input_str + 1) && *(input_str + 1) == *input_str
 				&&  *(input_str + 2) &&  *(input_str + 2) != 32)
@@ -106,7 +108,7 @@ int	creat_out_str(t_vars *vars, char *input_str, char **out_str)
 	mall_size.sp_count = 0;
 	mall_size.key_len = 0;
 	mall_size.val_len = 0;
-	cond = count_key_val(*vars, input_str, &mall_size);
+	cond = count_key_val(*vars, input_str, &mall_size, 1);
 	if (!vars->main_c && !mall_size.key_len && !cond && !mall_size.sp_count)
 		return (0);
 	*out_str = malloc(ft_strlen(input_str) + mall_size.val_len
@@ -124,10 +126,8 @@ void	fill_out_str(char **tmp, char **out_str, t_env *env, int *i)
 		(*out_str)[++(*i)] = env->value[j];
 	(*tmp)++;
 	j = -1;
-	while (*(*tmp + 1) && **tmp == env->key[++j] && *(*tmp + 1) != '$')
+	while (*(*tmp + 1) && *(*tmp + 1) == env->key[++j + 1])
 		(*tmp)++;
-	if (**tmp == '/')
-		(*out_str)[++(*i)] = **tmp;
 }
 
 char	*rm_quotes(t_vars *vars, char *input_str)

@@ -9,7 +9,6 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 	int		cmds_count;
 
 	restore_spaces(input_str);
-	add_history(*input_str);
 	count = split_size(pipe_splt);
 	free(*cmds);
 	*cmds = malloc((sizeof(t_cmds) * count) + 1);
@@ -87,6 +86,14 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 		while ((*cmds)[i].cmd[++j])
 			restore_spaces(&(*cmds)[i].cmd[j]);
 	}
+	i = -1;
+	while (++i < count && (*cmds)[i].in_stat != 2)
+		;
+	if (i == count)
+	{
+		add_history(*input_str);
+		free(*input_str);
+	}
 	split_free(pipe_splt);
 	return (count);
 }
@@ -117,36 +124,36 @@ int	check_pipes(char *input_str)
 
 int	read_input(t_vars *vars, t_cmds **cmds)
 {
-	char	*input_str;
+	// char	*input_str;
 	char	**pipe_splt;
 	char	*for_split;
 	int		count;
 
 	pipe_splt = NULL;
 	*cmds = NULL;
-	input_str = readline("\e[34mminishell$ \e[0m");
-	stop_program(!input_str, NULL, "exit", vars->exit_stat);
-	if (!*input_str)
+	vars->input_str = readline("\e[34mminishell$ \e[0m");
+	stop_program(!vars->input_str, NULL, "exit", vars->exit_stat);
+	if (!*vars->input_str)
 	{
-		free(input_str);
+		free(vars->input_str);
 		return (-1);
 	}
-	if (!check_pipes(input_str))
+	if (!check_pipes(vars->input_str))
 	{
-		add_history(input_str);
-		free(input_str);
+		add_history(vars->input_str);
+		free(vars->input_str);
 		return (0);
 	}
-	quotes_handler(vars, &input_str);
+	quotes_handler(vars, &vars->input_str);
 	split_free(pipe_splt);
-	for_split = rm_quotes(vars, input_str);
+	for_split = rm_quotes(vars, vars->input_str);
 	if (!for_split)
-		pipe_splt = ft_split(input_str, '|');
+		pipe_splt = ft_split(vars->input_str, '|');
 	else
 		pipe_splt = ft_split(for_split, '|');
 	free(for_split);
 	malloc_err(!pipe_splt, "split cmds");
-	count = merge_cmds(cmds, pipe_splt, &input_str);
-	free(input_str);
+	count = merge_cmds(cmds, pipe_splt, &vars->input_str);
+	// free(input_str);
 	return (count);
 }

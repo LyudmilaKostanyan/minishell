@@ -75,6 +75,6 @@ void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 		j++;
 		free((*cmds)[i].ex_cmd);
 	}
-	perror(cmd);
+	printf("%s: command not found\n", cmd);
 	exit(127);
 }

@@ -1,62 +1,25 @@
 #include "minishell.h"
 
-t_env	*qwe(t_vars *vars, char *line)
-{
-	char	*key;
-	t_env	*env;
-
-	if (line[ft_strlen(line) - 1] == '\n')
-		key = ft_substr(line, 1, ft_strlen(line) - 2);
-	else
-		key = ft_substr(line, 1, ft_strlen(line) - 1);
-	env = find_key(*vars, key);
-	free(key);
-	return (env);
-}
-
-int	asd(t_vars *vars, char *input_str, t_mall_size *mall_size)
-{
-	t_env	*env;
-	int		cond;
-
-	cond = 0;
-	while (*input_str)
-	{
-		if (*input_str == '$' && *(input_str + 1))
-		{
-			cond++;
-			env = qwe(vars, input_str);
-			if (env)
-			{
-				mall_size->key_len += ft_strlen(env->key) + 1;
-				mall_size->val_len += ft_strlen(env->value);
-			}
-		}
-		input_str++;
-	}
-	return (cond);
-}
-
 void	check_env_var(t_vars *vars, char **line)
 {
 	int			i;
-	int			cond;
 	char		*out_str;
+	char		*tmp;
 	t_env		*env;
 	t_mall_size	mall_size;
 
-	cond = 0;
 	mall_size.key_len = 0;
 	mall_size.val_len = 0;
-	asd(vars, *line, &mall_size);
-	out_str = malloc(ft_strlen(*line) - mall_size.key_len + mall_size.val_len + 2);
+	if (!count_key_val(*vars, *line, &mall_size, 0))
+		return ;
+	out_str = malloc(ft_strlen(*line) - mall_size.key_len + mall_size.val_len + 1);
 	i = -1;
+	tmp = *line;
 	while (**line)
 	{
 		if (**line == '$')
 		{
-			cond++;
-			env = qwe(vars, *line);
+			env = find_same_key(*vars, *line);
 			if (env)
 				fill_out_str(line, &out_str, env, &i);
 			else
@@ -66,41 +29,56 @@ void	check_env_var(t_vars *vars, char **line)
 			out_str[++i] = **line;
 		(*line)++;
 	}
-	if (cond)
-		out_str[++i] = '\n';
+	*line = tmp;
 	out_str[++i] = 0;
 	free(*line);
 	*line = out_str;
 }
 
-void	here_doc(t_vars *vars, char *end)
+void	asd(char **str1, char *str2)		//nameing
+{
+	char	*tmp;
+
+	tmp = ft_strjoin(*str1, str2);
+	malloc_err(!tmp, "here_doc");
+	if (*str1 && **str1)
+		free(*str1);
+	*str1 = tmp;
+}
+
+int	here_doc(t_vars *vars, char *end)
 {
 	char	*line;
-	char	*s;
+	int		*fds;
 	int		fd;
 
-	s = ft_strjoin(end, "\n");
-	fd = open("tmp", O_RDWR | O_CREAT | O_TRUNC, 0644);
-	if (fd < 0)
-		return ;
+	asd(&end, "\n");
+	fds = malloc(sizeof(int) * 2);
+	malloc_err(!fds, "here_doc");
+	stop_program(pipe(fds) == -1, "", IO, vars->exit_stat);
 	while (1)
 	{
-		write(vars->fd_out, "> ", 2);
-		line = get_next_line(0);
-		if (!line || !ft_strncmp(line, s, ft_strlen(line)))
+		line = readline("> ");
+		if (!line || !ft_strncmp(line, end, ft_strlen(line)))
 		{
 			free(line);
 			break ;
 		}
 		else
 		{
+			asd(&line, "\n");
+			asd(&vars->input_str, line);
 			check_env_var(vars, &line);
-			write(fd, line, ft_strlen(line));
+			write(fds[1], line, ft_strlen(line));
 			free(line);
 		}
 	}
-	close(fd);
-	free(s);
+	add_history(vars->input_str);		//????????
+	free(vars->input_str);
+	close(fds[1]);
+	fd = fds[0];
+	free(fds);
+	return (fd);
 }
 
 int	redirection(t_vars *vars, t_cmds **cmds, int i)
@@ -109,10 +87,7 @@ int	redirection(t_vars *vars, t_cmds **cmds, int i)
 		O_RDONLY), 0) == -1, vars, NULL, CD_ERR))
 			return (0);
 	else if ((*cmds)[i].in_stat == 2)
-	{
-		here_doc(vars, (*cmds)[i].red_in);
-		stop_program(dup2(open("tmp", O_RDONLY), 0) == -1, "", IO, vars->exit_stat);
-	}
+		stop_program(dup2(here_doc(vars, (*cmds)[i].red_in), 0) == -1, "", IO, vars->exit_stat);
 	if ((*cmds)[i].out_stat == 1)
 		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_TRUNC
 			| O_WRONLY, 0644), 1) == -1, "", IO, vars->exit_stat);

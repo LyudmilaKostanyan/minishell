@@ -30,7 +30,7 @@ void	cd(t_vars *vars, char **cmd)
 	t_env	*tmp;
 
 	vars->exit_stat = 1;
-	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))		//diferent
+	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))		//different
 	{
 		tmp = find_key(*vars, "HOME");
 		err_mes(!tmp, vars, cmd, "HOME not set");
@@ -64,9 +64,10 @@ void	cd(t_vars *vars, char **cmd)
 
 void	echo(t_vars *vars, char **cmd)
 {
-	int	i;
-	int	j;
-	int	cond;
+	int		i;
+	int		j;
+	int		cond;
+	char	*start;
 
 	i = 0;
 	while (cmd[++i])
@@ -83,10 +84,17 @@ void	echo(t_vars *vars, char **cmd)
 	cond = i;
 	while (cmd[i])
 	{
-		if (ft_strcmp(cmd[i], "$?"))
+		j = -1;
+		start = ft_strchr(cmd[i], '$');
+		if (!start || ft_strncmp(start, "$?", 2))
 			printf("%s", cmd[i]);
 		else
+		{
+			while (cmd[i] + ++j != start)
+				printf("%c", cmd[i][j]);
 			printf("%d", vars->exit_stat);
+			printf("%s", cmd[i] + j + 2);
+		}
 		if (cmd[i + 1])
 			printf(" ");
 		i++;
