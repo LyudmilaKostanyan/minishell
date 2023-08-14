@@ -24,7 +24,7 @@ char	*join_input(char **input_str)
 	line = readline("> ");
 	if (!line)
 	{
-		printf("%s%s", QUOTES_ERR, QUOTES_SYN_ERR); // ^D ??????????
+		printf("%s%s", QUOTES_ERR, QUOTES_SYN_ERR);
 		return (NULL);
 	}
 	tmp = ft_strjoin(*input_str, line);
@@ -50,8 +50,8 @@ void	wait_quote(char **input_str, char c, int *count)
 			(*count)++;
 			if (!ft_strchr(tmp + 1, c))
 			{
-				break ;
 				free(line);
+				break ;
 			}
 		}
 		free(line);

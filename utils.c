@@ -79,15 +79,15 @@ long long	ft_atoll(char *str)
 	}
 	while (*str == 48)
 		str++;
-	stop_program(ft_strlen(str) > 19, "export", EXIT_ERR, 255);
+	stop_program(ft_strlen(str) > 19, "exit", EXIT_ERR);
 	while (*str)
 	{
-		stop_program(*str < 48 || *str > 57, "export", EXIT_ERR, 255);
+		stop_program(*str < 48 || *str > 57, "exit", EXIT_ERR);
 		u_num = u_num * 10 + (*str++ - 48);
 	}
 	stop_program((sign == 1 && u_num > LLONG_MAX)
 		|| (sign == -1 && u_num > (unsigned long long)(LLONG_MAX) + 1),
-		"export", EXIT_ERR, 255);
+		"exit", EXIT_ERR);
 	ll_num = sign * u_num;
 	return (ll_num);
 }
@@ -97,7 +97,7 @@ void	restore_spaces(char **str)
 	int i;
 
 	i = -1;
-	while ((*str)[++i])
+	while (*str && (*str)[++i])
 		if ((*str)[i] == 1)
 			(*str)[i] = 32;
 }

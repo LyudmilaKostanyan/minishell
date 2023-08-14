@@ -20,11 +20,7 @@
 # define PIPE_ERR "syntax error near unexpected token `|'"
 # define TMA "too many arguments"
 # define IO "redirection input/output"
-
-# ifndef BUFFER_SIZE
-# define BUFFER_SIZE 42
-# endif
-
+# define TMP "Resource temporarily unavailable"
 
 # include <limits.h>
 # include <errno.h>
@@ -86,16 +82,14 @@ typedef struct s_mall_size
 	int	val_len;
 }	t_mall_size;
 
-void		pwd(t_vars *vars);
+void		pwd(void);
 void		cd(t_vars *vars, char **cmd);
-void		echo(t_vars *vars, char **cmd);
+void		echo(char **cmd);
 void		env(t_vars *vars, int cmd);
 void		export(t_vars *vars, char **cmd);
 void		unset(t_vars *vars, char **cmd);
 void		exit_prog(char **cmd);
-void		stop_program(int condition, char *cmd, char *issue, int exit_stat);
 void		malloc_err(int condition, char *cmd);
-int			err_mes(int condition, t_vars *vars, char **cmd, char *line);
 long long	ft_atoll(char *str);
 void		split_free(char **split);
 char		*tolower_str(char *str);
@@ -121,10 +115,11 @@ void		creating_exec_path(t_vars *vars);
 void		path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
 int			redirection(t_vars *vars, t_cmds **cmds, int i);
 int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
-void		pipes(t_vars *vars, t_cmds **cmds, int count);
+void		pipes(t_cmds **cmds, int count);
+int			here_doc(t_vars *vars, char *end);
 void		close_pipes(t_cmds **cmds, int count);
 void		malloc_err(int condition, char *cmd);
-void		stop_program(int condition, char *cmd, char *issue, int exit_stat);
-int			err_mes(int condition, t_vars *vars, char **cmd, char *line);
+void		stop_program(int condition, char *cmd, char *issue);
+int			err_mes(int condition, char *cmd, char *line, char *issue);
 
 #endif

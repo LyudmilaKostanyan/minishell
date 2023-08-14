@@ -58,6 +58,8 @@ void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 	char	*tmp;
 	int		j;
 
+	if (!cmd)
+		return ;
 	creating_exec_path(vars);
 	if (access(cmd, X_OK) != -1)
 	{

@@ -1,9 +1,9 @@
 NAME = minishell
 CC = cc
 FLAGS = -Wall -Wextra -Werror
-f = -fsanitize=address -g
-LFLAGS = -lreadline -L./libft -lft
-IFLAGS = -I./libft
+f = #-fsanitize=address -g
+LFLAGS = -lreadline -L./lib -L./libft -lft
+IFLAGS = -I./libft -I./include
 FILES = $(wildcard *.c)
 
 OBJS = $(FILES:.c=.o)

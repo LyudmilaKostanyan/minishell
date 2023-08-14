@@ -35,7 +35,7 @@ void	check_env_var(t_vars *vars, char **line)
 	*line = out_str;
 }
 
-void	asd(char **str1, char *str2)		//nameing
+void	join(char **str1, char *str2)		//nameing
 {
 	char	*tmp;
 
@@ -52,12 +52,14 @@ int	here_doc(t_vars *vars, char *end)
 	int		*fds;
 	int		fd;
 
-	asd(&end, "\n");
+	join(&end, "\n");
 	fds = malloc(sizeof(int) * 2);
 	malloc_err(!fds, "here_doc");
-	stop_program(pipe(fds) == -1, "", IO, vars->exit_stat);
+	stop_program(pipe(fds) == -1, "", IO);
 	while (1)
 	{
+		rl_catch_signals = 1;
+		// sig.sa_handler = SIG_IGN;
 		line = readline("> ");
 		if (!line || !ft_strncmp(line, end, ft_strlen(line)))
 		{
@@ -66,15 +68,12 @@ int	here_doc(t_vars *vars, char *end)
 		}
 		else
 		{
-			asd(&line, "\n");
-			asd(&vars->input_str, line);
+			join(&line, "\n");
 			check_env_var(vars, &line);
 			write(fds[1], line, ft_strlen(line));
 			free(line);
 		}
 	}
-	add_history(vars->input_str);		//????????
-	free(vars->input_str);
 	close(fds[1]);
 	fd = fds[0];
 	free(fds);
@@ -84,16 +83,16 @@ int	here_doc(t_vars *vars, char *end)
 int	redirection(t_vars *vars, t_cmds **cmds, int i)
 {
 	if ((*cmds)[i].in_stat == 1 && err_mes(dup2(open((*cmds)[i].red_in,		//meh
-		O_RDONLY), 0) == -1, vars, NULL, CD_ERR))
+		O_RDONLY), 0) == -1, (*cmds)[i].red_in, NULL, CD_ERR))
 			return (0);
 	else if ((*cmds)[i].in_stat == 2)
-		stop_program(dup2(here_doc(vars, (*cmds)[i].red_in), 0) == -1, "", IO, vars->exit_stat);
+		stop_program(dup2(here_doc(vars, (*cmds)[i].red_in), 0) == -1, "", IO);
 	if ((*cmds)[i].out_stat == 1)
 		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_TRUNC
-			| O_WRONLY, 0644), 1) == -1, "", IO, vars->exit_stat);
+			| O_WRONLY, 0644), 1) == -1, "", IO);
 	else if ((*cmds)[i].out_stat == 2)
 		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_APPEND
-			| O_WRONLY, 0644), 1) == -1, "", IO, vars->exit_stat);
+			| O_WRONLY, 0644), 1) == -1, "", IO);
 	return (1);
 }
 
@@ -101,23 +100,23 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 {
 	if (i == 0 && !(*cmds)[i].red_out && count != 1)
 	{
-		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO, vars->exit_stat);
+		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO);
 		close((*cmds)[i].pipe[0]);
 	}
 	else if (count -1 && i == count - 1 && !(*cmds)[i].red_in && count != 1)
 	{
-		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO, vars->exit_stat);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO);
 		close((*cmds)[i - 1].pipe[1]);
 	}
 	else if (count != 1)
 	{
-		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO, vars->exit_stat);
-		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO, vars->exit_stat);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO);
+		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO);
 	}
 	return (redirection(vars, cmds, i));
 }
 
-void	pipes(t_vars *vars, t_cmds **cmds, int count)
+void	pipes(t_cmds **cmds, int count)
 {
 	int i;
 
@@ -132,7 +131,7 @@ void	pipes(t_vars *vars, t_cmds **cmds, int count)
 				close((*cmds)[i].pipe[0]);
 				close((*cmds)[i].pipe[1]);
 			}
-			stop_program(1, "", "creat pipes", vars->exit_stat);
+			stop_program(1, "", "creat pipes");
 		}
 	}
 }

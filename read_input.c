@@ -62,7 +62,7 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 					(*cmds)[i].out_stat = 2;
 				if (sp_split[j + 1])
 				{
-					(*cmds)[i].red_out = ft_strdup(sp_split[j + 1]);		//error
+					(*cmds)[i].red_out = ft_strdup(sp_split[j + 1]);
 					malloc_err(!(*cmds)[i].red_out, "creating redirection vars");
 				}
 			}
@@ -74,7 +74,7 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 					(*cmds)[i].in_stat = 2;
 				if (sp_split[j + 1])
 				{
-					(*cmds)[i].red_in = ft_strdup(sp_split[j + 1]);		//error
+					(*cmds)[i].red_in = ft_strdup(sp_split[j + 1]);
 					malloc_err(!(*cmds)[i].red_in, "creating redirection vars");
 				}
 			}
@@ -85,14 +85,8 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 		j = -1;
 		while ((*cmds)[i].cmd[++j])
 			restore_spaces(&(*cmds)[i].cmd[j]);
-	}
-	i = -1;
-	while (++i < count && (*cmds)[i].in_stat != 2)
-		;
-	if (i == count)
-	{
-		add_history(*input_str);
-		free(*input_str);
+		restore_spaces(&(*cmds)[i].red_in);
+		restore_spaces(&(*cmds)[i].red_out);
 	}
 	split_free(pipe_splt);
 	return (count);
@@ -122,38 +116,56 @@ int	check_pipes(char *input_str)
 	return (1);
 }
 
+int	count_pipes(char *input_str)
+{
+	int	count;
+
+	count = 0;
+	while (*input_str)
+		if (*(input_str++) == '|')
+			count++;
+	return (count);
+}
+
 int	read_input(t_vars *vars, t_cmds **cmds)
 {
-	// char	*input_str;
+	char	*input_str;
 	char	**pipe_splt;
 	char	*for_split;
 	int		count;
 
 	pipe_splt = NULL;
 	*cmds = NULL;
-	vars->input_str = readline("\e[34mminishell$ \e[0m");
-	stop_program(!vars->input_str, NULL, "exit", vars->exit_stat);
-	if (!*vars->input_str)
+	input_str = readline("\e[34mminishell$ \e[0m");
+	stop_program(!input_str, NULL, "exit");
+	if (!*input_str)
 	{
-		free(vars->input_str);
+		free(input_str);
 		return (-1);
 	}
-	if (!check_pipes(vars->input_str))
+	if (!check_pipes(input_str))
 	{
-		add_history(vars->input_str);
-		free(vars->input_str);
+		add_history(input_str);
+		free(input_str);
 		return (0);
 	}
-	quotes_handler(vars, &vars->input_str);
+	if (count_pipes(input_str) > 123)		//123????????
+	{
+		add_history(input_str);
+		free(input_str);
+		return (-2);
+	}
+	quotes_handler(vars, &input_str);
 	split_free(pipe_splt);
-	for_split = rm_quotes(vars, vars->input_str);
+	for_split = rm_quotes(vars, input_str);
 	if (!for_split)
-		pipe_splt = ft_split(vars->input_str, '|');
+		pipe_splt = ft_split(input_str, '|');
 	else
 		pipe_splt = ft_split(for_split, '|');
 	free(for_split);
 	malloc_err(!pipe_splt, "split cmds");
-	count = merge_cmds(cmds, pipe_splt, &vars->input_str);
-	// free(input_str);
+	count = merge_cmds(cmds, pipe_splt, &input_str);
+	add_history(input_str);
+	free(input_str);
 	return (count);
 }

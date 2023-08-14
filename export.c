@@ -124,7 +124,7 @@ void	export(t_vars *vars, char **cmd)
 	char		*key;
 
 	i = 0;
-	vars->exit_stat = 0;
+	g_exit_status = 0;
 	if (!cmd[1])
 		env(vars, 0);
 	while (cmd[++i])
@@ -137,8 +137,8 @@ void	export(t_vars *vars, char **cmd)
 			creat_env_var(&vars->env, cmd[i], key, equal);
 		else if (ft_isdigit(*key) || !*key || !ft_isalnum_str(key, 'u'))
 		{
-			err_mes(1, vars, cmd, cmd[i]);
-			vars->exit_stat = 1;
+			err_mes(1, *cmd, cmd[i], E_U_ERR);
+			g_exit_status = 1;
 		}
 		free(key);
 	}

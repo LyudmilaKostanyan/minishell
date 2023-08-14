@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-void	pwd(t_vars *vars)
+void	pwd(void)
 {
 	char	*pwd;
 
@@ -20,7 +20,7 @@ void	pwd(t_vars *vars)
 	malloc_err(!pwd, "pwd");
 	printf("%s\n", pwd);
 	free(pwd);
-	vars->exit_stat = 0;
+	g_exit_status = 0;
 }
 
 void	cd(t_vars *vars, char **cmd)
@@ -29,18 +29,18 @@ void	cd(t_vars *vars, char **cmd)
 	char	*old_pwd;
 	t_env	*tmp;
 
-	vars->exit_stat = 1;
-	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))		//different
+	g_exit_status = 1;
+	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))
 	{
 		tmp = find_key(*vars, "HOME");
-		err_mes(!tmp, vars, cmd, "HOME not set");
+		err_mes(!tmp, *cmd, NULL, "HOME not set");
 		if (tmp)
 			chdir(tmp->value);
 	}
 	else if (!ft_strcmp(cmd[1], "-"))
 	{
 		tmp = find_key(*vars, "OLDPWD");
-		err_mes(!tmp, vars, cmd, "OLDPWD not set");		//?????????
+		err_mes(!tmp, *cmd, NULL, "OLDPWD not set");
 		if (tmp)
 			chdir(tmp->value);
 	}
@@ -50,19 +50,19 @@ void	cd(t_vars *vars, char **cmd)
 		creat_env_var(&vars->env, old_pwd, "OLDPWD", 0);
 	free(old_pwd);
 	if (cmd[1] && ft_strcmp(cmd[1], "~") && ft_strcmp(cmd[1], "-")
-		&& !err_mes(cmd[2] != NULL, vars, cmd, cmd[1])
-			&& !err_mes(chdir(cmd[1]), vars, cmd, cmd[1]))
+		&& !err_mes(chdir(cmd[1]), *cmd, cmd[1], CD_ERR)
+		&& !err_mes(cmd[2] != NULL, *cmd, cmd[1], TMA))				//petqa/petq chi
 	{
 		pwd = getcwd(NULL, 0);
 		malloc_err(!pwd, cmd[0]);
 		if (!check_set(vars->env, pwd, "PWD", 0))
 			creat_env_var(&vars->env, pwd, "PWD", 0);
 		free(pwd);
-		vars->exit_stat = 0;
+		g_exit_status = 0;
 	}
 }
 
-void	echo(t_vars *vars, char **cmd)
+void	echo(char **cmd)
 {
 	int		i;
 	int		j;
@@ -92,7 +92,7 @@ void	echo(t_vars *vars, char **cmd)
 		{
 			while (cmd[i] + ++j != start)
 				printf("%c", cmd[i][j]);
-			printf("%d", vars->exit_stat);
+			printf("%d", g_exit_status);
 			printf("%s", cmd[i] + j + 2);
 		}
 		if (cmd[i + 1])
@@ -101,7 +101,7 @@ void	echo(t_vars *vars, char **cmd)
 	}
 	if (cond == 1)
 		printf("\n");
-	vars->exit_stat = 0;
+	g_exit_status = 0;
 }
 
 void	env(t_vars *vars, int cmd)
@@ -117,7 +117,7 @@ void	env(t_vars *vars, int cmd)
 			printf("declare -x %s=\"%s\"\n", tmp->key, tmp->value);
 		tmp = tmp->next;
 	}
-	vars->exit_stat = 0;
+	g_exit_status = 0;
 }
 
 int	free_node(t_env **list, t_env *env, char *cmd)
@@ -171,13 +171,13 @@ void	unset(t_vars *vars, char **cmd)
 	int		i;
 
 	i = 0;
-	vars->exit_stat = 0;
+	g_exit_status = 0;
 	while (cmd[++i])
 	{
 		if (!ft_isdigit(*cmd[i]) && ft_isalnum_str(cmd[i], 'u'))
 			find_node(vars, cmd[i]);
 		else
-			err_mes(1, vars, cmd, cmd[i]);
+			err_mes(1, *cmd, cmd[i], E_U_ERR);
 	}
 }
 

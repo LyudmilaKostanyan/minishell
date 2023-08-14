@@ -46,13 +46,13 @@ t_env *creat_env_list(char **env)
 int check_builtins(t_vars *vars, char **cmd)
 {
 	if (!ft_strcmp(*cmd, "pwd"))
-		pwd(vars);
+		pwd();
 	else if (!ft_strcmp(*cmd, "cd"))
 		cd(vars, cmd);
 	else if (!ft_strcmp(*cmd, "env"))
 		env(vars, 1);
 	else if (!ft_strcmp(*cmd, "echo"))
-		echo(vars, cmd);
+		echo(cmd);
 	else if (!ft_strcmp(*cmd, "export"))
 		export(vars, cmd);
 	else if (!ft_strcmp(*cmd, "unset"))
@@ -102,19 +102,18 @@ void	free_cmds(t_vars *vars, t_cmds **cmds, int count)
 			free((*cmds)[i].pipe);
 	}
 	free(*cmds);
-	unlink("tmp");
 }
 
 void	processes(t_vars *vars, t_cmds **cmds, int count)
 {
 	int	i;
 
-	pipes(vars, cmds, count);
+	pipes(cmds, count);
 	i = -1;
 	while (++i < count)
 	{
 		(*cmds)[i].pid = fork();
-		stop_program((*cmds)[i].pid == -1, NULL, "Fork error", vars->exit_stat);
+		stop_program((*cmds)[i].pid == -1, NULL, "Fork error");
 		if ((*cmds)[i].pid == 0)
 		{
 			if (!redirect_pipes(vars, cmds, count, i))
@@ -123,28 +122,24 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 			path_check(vars, cmds, (*cmds)[i].cmd[0], i);
 			if (!check_builtins(vars, (*cmds)[i].cmd))
 				exit(execve((*cmds)[i].ex_cmd, (*cmds)[i].cmd, vars->env_var));
-			exit(vars->exit_stat);
+			exit(g_exit_status);
 		}
 	}
 	close_pipes(cmds, count);
 	i = -1;
 	while (++i < count)
 	{
-		waitpid((*cmds)[i].pid, &vars->exit_stat, 0);
-		vars->exit_stat = WEXITSTATUS(vars->exit_stat);
+		waitpid((*cmds)[i].pid, &g_exit_status, 0);
+		g_exit_status = WEXITSTATUS(g_exit_status);
 	}
 }
 
 void	action(int signal)
 {
 	if (signal == SIGINT)
-		(void)signal;
-
+		g_exit_status = 1;
 	rl_replace_line("", 0);
 	rl_done = 1;
-	// ioctl(0, TIOCSTI, "\n");
-	// rl_on_new_line();
-	// rl_redisplay();
 }
 
 int	empty()
@@ -160,7 +155,6 @@ int main(int argc, char **argv, char **env)
 
 	rl_event_hook = &empty;
 	rl_catch_signals = 0;
-
 	sigemptyset(&sig.sa_mask);
 	sig.sa_handler = &action;
 	sig.sa_flags = SA_RESTART;
@@ -175,18 +169,17 @@ int main(int argc, char **argv, char **env)
 		perror("No such file or directory");
 		exit(0);
 	}
-	vars.exit_stat = 0;
+	g_exit_status = 0;
 	vars.env = creat_env_list(env);
 	while (1)
 	{
 		vars.fd_in = dup(0);
 		vars.fd_out = dup(1);
 		int count = read_input(&vars, &cmds);
-		if (count == -1)
+		if (count == -1 || err_mes(!count, NULL, NULL, PIPE_ERR)
+			|| err_mes(count == -2, "fork", NULL, TMP))	//second err_mes
 			continue;
-		else if (err_mes(!count, &vars, NULL, PIPE_ERR))
-			continue ;
-		if (count == 1 && (!ft_strcmp(*cmds[0].cmd, "pwd") || !ft_strcmp(*cmds[0].cmd, "cd")
+		if (count == 1 && (!ft_strcmp(*cmds[0].cmd, "pwd") || !ft_strcmp(*cmds[0].cmd, "cd")	//!!!!!!!!
 			|| !ft_strcmp(*cmds[0].cmd, "echo") || !ft_strcmp(*cmds[0].cmd, "export")
 			|| !ft_strcmp(*cmds[0].cmd, "unset") || !ft_strcmp(*cmds[0].cmd, "exit")
 			|| !ft_strcmp(*cmds[0].cmd, "env")) && !redirect_pipes(&vars, &cmds, count, 0))
