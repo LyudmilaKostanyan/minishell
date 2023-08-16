@@ -55,7 +55,7 @@ clean:
 	@make clean -C libft
 	@rm -rf $(PREF_OBJ)
 	@rm -rf $(RD_DIR)
-	@make -C $(RDLINE_RESERV) distclean
+	# @make -C $(RDLINE_RESERV) distclean
 
 #
 fclean: clean

@@ -148,7 +148,8 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	{
 		if (*tmp != vars->main_c)
 		{
-			if (vars->main_c != '\'' && *tmp == '$' && *(tmp + 1) != '?' && !here_doc)
+			if (vars->main_c != '\'' && *tmp == '$' && (*(tmp + 1) == '_'
+				|| ft_isalpha(*(tmp + 1))) && *(tmp + 1) != '?' && !here_doc)
 			{
 				env = find_same_key(*vars, tmp);
 				if (env)

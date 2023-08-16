@@ -46,20 +46,31 @@ void	join(char **str1, char *str2)		//nameing
 	*str1 = tmp;
 }
 
+void	hd_action(int signal)
+{
+	if (signal == SIGINT)
+		g_exit_status = 1;
+	rl_catch_signals = 1;
+}
+
 int	here_doc(t_vars *vars, char *end)
 {
 	char	*line;
 	int		*fds;
-	int		fd;
+	int					fd;
+	struct sigaction	sig;
+	sigset_t			sigset;
 
+	sig.sa_handler = &hd_action;
+	sig.sa_flags = SA_RESTART;
+	sigaddset(&sigset, SIGINT);
+	sigaction(SIGINT, &sig, NULL);
 	join(&end, "\n");
 	fds = malloc(sizeof(int) * 2);
 	malloc_err(!fds, "here_doc");
 	stop_program(pipe(fds) == -1, "", IO);
 	while (1)
 	{
-		rl_catch_signals = 1;
-		// sig.sa_handler = SIG_IGN;
 		line = readline("> ");
 		if (!line || (*line && !ft_strncmp(line, end, ft_strlen(line))))
 		{
@@ -82,6 +93,7 @@ int	here_doc(t_vars *vars, char *end)
 	close(fds[1]);
 	fd = fds[0];
 	free(fds);
+	g_exit_status = 0;
 	return (fd);
 }
 
