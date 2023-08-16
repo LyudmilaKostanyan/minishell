@@ -36,17 +36,6 @@ int	err_mes(int condition, char *cmd, char *line, char *issue)
 			printf("minishell: %s: %s\n", cmd, issue);
 		else
 			printf("minishell: %s: `%s': %s\n", cmd, line, issue);
-		// if (!cmd)
-		// 	printf("minishell: %s\n", line);
-		// else if (*cmd == 'u' || *cmd == 'e')
-		// 	printf("minishell: %s: `%s': %s\n", cmd, line, E_U_ERR);
-		// else if (*cmd[0] == 'c')
-		// {
-		// 	if (!cmd[2])
-		// 		printf("minishell: %s: `%s': %s\n", cmd, line, CD_ERR);
-		// 	else
-		// 		printf("minishell: %s: %s\n", cmd, TMA);
-		// }
 		g_exit_status = 1;
 		return (1);
 	}

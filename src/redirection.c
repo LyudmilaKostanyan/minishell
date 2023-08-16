@@ -61,10 +61,15 @@ int	here_doc(t_vars *vars, char *end)
 		rl_catch_signals = 1;
 		// sig.sa_handler = SIG_IGN;
 		line = readline("> ");
-		if (!line || !ft_strncmp(line, end, ft_strlen(line)))
+		if (!line || (*line && !ft_strncmp(line, end, ft_strlen(line))))
 		{
 			free(line);
 			break ;
+		}
+		else if (!*line)
+		{
+			free(line);
+			continue ;
 		}
 		else
 		{

@@ -23,43 +23,59 @@ void	pwd(void)
 	g_exit_status = 0;
 }
 
+void	change_oldpwd(t_vars *vars, char **cmd)
+{
+	char	*old_pwd;
+	old_pwd = getcwd(NULL, 0);
+	malloc_err(!old_pwd, *cmd);
+	if (!check_set(vars->env, old_pwd, "OLDPWD", 0))
+		creat_env_var(&vars->env, old_pwd, "OLDPWD", 0);
+	free(old_pwd);
+}
+
 void	cd(t_vars *vars, char **cmd)
 {
 	char	*pwd;
-	char	*old_pwd;
 	t_env	*tmp;
 
-	g_exit_status = 1;
+	if (cmd[1] && *cmd[1] != '~' && *cmd[1] != '-' &&
+		(err_mes(access(cmd[1], F_OK) == -1, *cmd, cmd[1], CD_ERR)
+		|| err_mes(cmd[2] != NULL, *cmd, cmd[1], TMA)))
+		return ;
+	if (!ft_strcmp(cmd[1], "-"))
+	{
+		tmp = find_key(*vars, "OLDPWD");
+		err_mes(!tmp, *cmd, NULL, "OLDPWD not set");
+		pwd = ft_strdup(tmp->value);
+		malloc_err(!pwd, *cmd);
+		if (tmp)
+		{
+			change_oldpwd(vars, cmd);
+			chdir(pwd);
+		}
+		free(pwd);
+	}
+	else
+		change_oldpwd(vars, cmd);
 	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))
 	{
 		tmp = find_key(*vars, "HOME");
 		err_mes(!tmp, *cmd, NULL, "HOME not set");
 		if (tmp)
 			chdir(tmp->value);
+		if (!check_set(vars->env, tmp->value, "PWD", 0))
+			creat_env_var(&vars->env, tmp->value, "PWD", 0);
 	}
-	else if (!ft_strcmp(cmd[1], "-"))
+	else
 	{
-		tmp = find_key(*vars, "OLDPWD");
-		err_mes(!tmp, *cmd, NULL, "OLDPWD not set");
-		if (tmp)
-			chdir(tmp->value);
-	}
-	old_pwd = getcwd(NULL, 0);
-	malloc_err(!old_pwd, cmd[0]);
-	if (!check_set(vars->env, old_pwd, "OLDPWD", 0))
-		creat_env_var(&vars->env, old_pwd, "OLDPWD", 0);
-	free(old_pwd);
-	if (cmd[1] && ft_strcmp(cmd[1], "~") && ft_strcmp(cmd[1], "-")
-		&& !err_mes(chdir(cmd[1]), *cmd, cmd[1], CD_ERR)
-		&& !err_mes(cmd[2] != NULL, *cmd, cmd[1], TMA))				//petqa/petq chi
-	{
+		chdir(cmd[1]);
 		pwd = getcwd(NULL, 0);
 		malloc_err(!pwd, cmd[0]);
 		if (!check_set(vars->env, pwd, "PWD", 0))
 			creat_env_var(&vars->env, pwd, "PWD", 0);
 		free(pwd);
-		g_exit_status = 0;
 	}
+	g_exit_status = 0;
 }
 
 void	echo(char **cmd)
@@ -185,6 +201,8 @@ void	exit_prog(char **cmd)
 {
 	long long	exit_code;
 
+	if (err_mes(cmd[2] != NULL, *cmd, NULL, TMA))		// == NULL???
+		return ;
 	if (cmd[1])
 	{
 		exit_code = ft_atoll(cmd[1]);
