@@ -50,7 +50,7 @@ void	hd_action(int signal)
 {
 	if (signal == SIGINT)
 		g_exit_status = 1;
-	rl_catch_signals = 1;
+	rl_catch_signals = 0;
 }
 
 int	here_doc(t_vars *vars, char *end)

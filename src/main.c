@@ -130,7 +130,10 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 	while (++i < count)
 	{
 		waitpid((*cmds)[i].pid, &g_exit_status, 0);
-		g_exit_status = WEXITSTATUS(g_exit_status);
+        if (!WIFSIGNALED(g_exit_status))
+		    g_exit_status = WEXITSTATUS(g_exit_status);
+        else
+            g_exit_status += 128;
 	}
 }
 
