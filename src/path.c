@@ -53,18 +53,18 @@ void	creating_exec_path(t_vars *vars)
 	}
 }
 
-void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
+int	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 {
 	char	*tmp;
 	int		j;
 
 	if (!cmd)
-		return ;
+		return (1);
 	creating_exec_path(vars);
 	if (access(cmd, X_OK) != -1)
 	{
 		(*cmds)[i].ex_cmd = ft_strdup(cmd);
-		return ;
+		return (1);
 	}
 	j = 0;
 	while (vars->paths && vars->paths[j])
@@ -73,10 +73,11 @@ void	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 		(*cmds)[i].ex_cmd = ft_strjoin(tmp, cmd);
 		free(tmp);
 		if (access((*cmds)[i].ex_cmd, X_OK) != -1)
-			return ;
+			return (1);
 		j++;
 		free((*cmds)[i].ex_cmd);
 	}
 	printf("%s: command not found\n", cmd);
 	exit(127);
+	return (0);
 }

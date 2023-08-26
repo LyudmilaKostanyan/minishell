@@ -35,7 +35,7 @@ void	check_env_var(t_vars *vars, char **line)
 	*line = out_str;
 }
 
-void	join(char **str1, char *str2)		//nameing
+void	join(char **str1, char *str2)
 {
 	char	*tmp;
 
@@ -44,6 +44,7 @@ void	join(char **str1, char *str2)		//nameing
 	if (*str1 && **str1)
 		free(*str1);
 	*str1 = tmp;
+	tmp = NULL;
 }
 
 void	hd_action(int signal)
@@ -120,7 +121,7 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO);
 		close((*cmds)[i].pipe[0]);
 	}
-	else if (count -1 && i == count - 1 && !(*cmds)[i].red_in && count != 1)
+	else if (i == count - 1 && !(*cmds)[i].red_in && count != 1)
 	{
 		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO);
 		close((*cmds)[i - 1].pipe[1]);

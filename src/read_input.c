@@ -116,17 +116,6 @@ int	check_pipes(char *input_str)
 	return (1);
 }
 
-int	count_pipes(char *input_str)
-{
-	int	count;
-
-	count = 0;
-	while (*input_str)
-		if (*(input_str++) == '|')
-			count++;
-	return (count);
-}
-
 int	read_input(t_vars *vars, t_cmds **cmds)
 {
 	char	*input_str;
@@ -148,12 +137,6 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 		add_history(input_str);
 		free(input_str);
 		return (0);
-	}
-	if (count_pipes(input_str) > 123)		//123????????
-	{
-		add_history(input_str);
-		free(input_str);
-		return (-2);
 	}
 	quotes_handler(vars, &input_str);
 	split_free(pipe_splt);

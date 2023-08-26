@@ -112,7 +112,7 @@ int			merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str);
 int			env_len(t_env *env);
 void		env_to_str(t_vars *vars);
 void		creating_exec_path(t_vars *vars);
-void		path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
+int			path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
 int			redirection(t_vars *vars, t_cmds **cmds, int i);
 int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
 void		pipes(t_cmds **cmds, int count);

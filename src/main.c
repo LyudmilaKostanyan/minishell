@@ -119,8 +119,9 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 			if (!redirect_pipes(vars, cmds, count, i))
 				exit(1);
 			tolower_str(*(*cmds)[i].cmd);
-			path_check(vars, cmds, (*cmds)[i].cmd[0], i);
-			if (*(*cmds)[i].cmd && !check_builtins(vars, (*cmds)[i].cmd))
+			close_pipes(cmds, count);
+			if (*(*cmds)[i].cmd && !check_builtins(vars, (*cmds)[i].cmd)
+				&& path_check(vars, cmds, *(*cmds)[i].cmd, i))
 				exit(execve((*cmds)[i].ex_cmd, (*cmds)[i].cmd, vars->env_var));
 			exit(g_exit_status);
 		}
@@ -130,10 +131,10 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 	while (++i < count)
 	{
 		waitpid((*cmds)[i].pid, &g_exit_status, 0);
-        if (!WIFSIGNALED(g_exit_status))
-		    g_exit_status = WEXITSTATUS(g_exit_status);
-        else
-            g_exit_status += 128;
+		if (!WIFSIGNALED(g_exit_status))
+			g_exit_status = WEXITSTATUS(g_exit_status);
+		else
+			g_exit_status += 128;
 	}
 }
 
@@ -179,8 +180,7 @@ int main(int argc, char **argv, char **env)
 		vars.fd_in = dup(0);
 		vars.fd_out = dup(1);
 		int count = read_input(&vars, &cmds);
-		if (count == -1 || err_mes(!count, NULL, NULL, PIPE_ERR)
-			|| err_mes(count == -2, "fork", NULL, TMP))	//second err_mes
+		if (count == -1 || err_mes(!count, NULL, NULL, PIPE_ERR))
 			continue;
 		if (count == 1 && (!ft_strcmp(*cmds[0].cmd, "pwd") || !ft_strcmp(*cmds[0].cmd, "cd")	//!!!!!!!!
 			|| !ft_strcmp(*cmds[0].cmd, "echo") || !ft_strcmp(*cmds[0].cmd, "export")
