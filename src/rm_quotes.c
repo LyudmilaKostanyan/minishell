@@ -165,7 +165,16 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 				if ((*tmp == '>' || *tmp == '<'))
 				{
 					if (*tmp == '<' && *(tmp + 1) && *(tmp + 1) == *tmp)
+					{
 						here_doc++;
+						int	j;				//norm
+						j = 1;
+						vars->hd_stat = 0;
+						while (tmp[++j] == 32)
+							;
+						if (tmp[j] == '\'' || tmp[j] == '\"')
+							vars->hd_stat = 1;
+					}
 					if(*(tmp + 1) && *(tmp + 1) == *tmp
 						&& *(tmp + 2) != 32 && *(tmp + 2) != *tmp)
 					{

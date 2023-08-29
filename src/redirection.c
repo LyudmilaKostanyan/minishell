@@ -86,7 +86,8 @@ int	here_doc(t_vars *vars, char *end)
 		else
 		{
 			join(&line, "\n");
-			check_env_var(vars, &line);
+			if (!vars->hd_stat)
+				check_env_var(vars, &line);
 			write(fds[1], line, ft_strlen(line));
 			free(line);
 		}

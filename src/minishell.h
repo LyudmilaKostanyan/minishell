@@ -73,6 +73,7 @@ typedef struct s_vars
 	int		fd_in;
 	int		fd_out;
 	char	**paths;
+	int		hd_stat;
 }	t_vars;
 
 typedef struct s_mall_size
