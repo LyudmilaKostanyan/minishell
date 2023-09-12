@@ -153,7 +153,7 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 		pipe_splt = ft_split(for_split, '|');
 	free(for_split);
 	malloc_err(!pipe_splt, "split cmds", vars->true_env);///
-	count = merge_cmds(cmds, pipe_splt, &input_str);
+	count = merge_cmds(vars, cmds, pipe_splt, &input_str);///
 	add_history(input_str);
 	free(input_str);
 	return (count);
