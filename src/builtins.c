@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lykostan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:17:27 by lykostan          #+#    #+#             */
-/*   Updated: 2023/06/14 19:17:29 by lykostan         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:25:41 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	pwd(void)
+void	pwd(t_vars *vars)
 {
 	char	*pwd;
 
 	pwd = getcwd(NULL, 0);
-	malloc_err(!pwd, "pwd");
+	malloc_err(!pwd, "pwd", vars->true_env);///
 	printf("%s\n", pwd);
 	free(pwd);
 	g_exit_status = 0;
@@ -27,9 +27,10 @@ void	change_oldpwd(t_vars *vars, char **cmd)
 {
 	char	*old_pwd;
 	old_pwd = getcwd(NULL, 0);
-	malloc_err(!old_pwd, *cmd);
-	if (!check_set(vars->env, old_pwd, "OLDPWD", 0))
-		creat_env_var(&vars->env, old_pwd, "OLDPWD", 0);
+	malloc_err(!old_pwd, *cmd, vars->true_env);///
+	vars->equal = 0;
+	if (!check_set(vars, vars->env, old_pwd))///
+		creat_env_var(vars, &vars->env, old_pwd, "OLDPWD");///
 	free(old_pwd);
 }
 
@@ -47,7 +48,7 @@ void	cd(t_vars *vars, char **cmd)
 		tmp = find_key(*vars, "OLDPWD");
 		err_mes(!tmp, *cmd, NULL, "OLDPWD not set");
 		pwd = ft_strdup(tmp->value);
-		malloc_err(!pwd, *cmd);
+		malloc_err(!pwd, *cmd, vars->true_env);///
 		if (tmp)
 		{
 			change_oldpwd(vars, cmd);
@@ -63,14 +64,15 @@ void	cd(t_vars *vars, char **cmd)
 		err_mes(!tmp, *cmd, NULL, "HOME not set");
 		if (tmp)
 			chdir(tmp->value);
-		if (!check_set(vars->env, tmp->value, "PWD", 0))
-			creat_env_var(&vars->env, tmp->value, "PWD", 0);
+		vars->equal = 0;
+		if (!check_set(vars, vars->env, tmp->value))///
+			creat_env_var(vars, &vars->env, tmp->value, "PWD";///
 	}
 	else
 	{
 		chdir(cmd[1]);
 		pwd = getcwd(NULL, 0);
-		malloc_err(!pwd, cmd[0]);
+		malloc_err(!pwd, cmd[0], vars->true_env);///
 		if (!check_set(vars->env, pwd, "PWD", 0))
 			creat_env_var(&vars->env, pwd, "PWD", 0);
 		free(pwd);
@@ -197,7 +199,7 @@ void	unset(t_vars *vars, char **cmd)
 	}
 }
 
-void	exit_prog(char **cmd)
+void	exit_prog(t_vars *vars, char **cmd)
 {
 	long long	exit_code;
 
@@ -205,7 +207,7 @@ void	exit_prog(char **cmd)
 		return ;
 	if (cmd[1])
 	{
-		exit_code = ft_atoll(cmd[1]);
+		exit_code = ft_atoll(vars, cmd[1]); ///
 		exit(exit_code % 256);
 	}
 	else

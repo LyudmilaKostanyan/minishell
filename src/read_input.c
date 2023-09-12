@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
+int	merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, char **input_str)
 {
 	int		count;
 	int		i;
@@ -12,12 +12,12 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 	count = split_size(pipe_splt);
 	free(*cmds);
 	*cmds = malloc((sizeof(t_cmds) * count) + 1);
-	malloc_err(!*cmds, "creat cmds");
+	malloc_err(!*cmds, "creat cmds", vars->true_env);///
 	i = -1;
 	while (++i < count)
 	{
 		sp_split = ft_split(pipe_splt[i], ' ');
-		malloc_err(!sp_split, "creating cmd list");
+		malloc_err(!sp_split, "creating cmd list", vars->true_env);///
 		if (!*sp_split)
 		{
 			split_free(sp_split);
@@ -35,7 +35,7 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 					&& ft_strcmp(sp_split[j - 1], ">>") && ft_strcmp(sp_split[j - 1], "<<")))
 					cmds_count++;
 		(*cmds)[i].cmd = malloc(sizeof(char *) * (cmds_count + 1));
-		malloc_err(!(*cmds)[i].cmd, "creating cmd list");
+		malloc_err(!(*cmds)[i].cmd, "creating cmd list", vars->true_env);///
 		j = -1;
 		int	k = -1;
 		(*cmds)[i].in_stat = 0;
@@ -51,7 +51,7 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 					&& ft_strcmp(sp_split[j - 1], ">>") && ft_strcmp(sp_split[j - 1], "<<")))
 				{
 					(*cmds)[i].cmd[++k] = ft_strdup(sp_split[j]);
-					malloc_err(!(*cmds)[i].cmd[k], "creating cmd list");
+					malloc_err(!(*cmds)[i].cmd[k], "creating cmd list", vars->true_env);///
 				}
 			}
 			else if (!ft_strcmp(sp_split[j], ">") || !ft_strcmp(sp_split[j], ">>"))
@@ -66,7 +66,7 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 				if (sp_split[j + 1])
 				{
 					(*cmds)[i].red_out = ft_strdup(sp_split[j + 1]);
-					malloc_err(!(*cmds)[i].red_out, "creating redirection vars");
+					malloc_err(!(*cmds)[i].red_out, "creating redirection vars", vars->true_env);///
 				}
 			}
 			else if (!ft_strcmp(sp_split[j], "<") || !ft_strcmp(sp_split[j], "<<"))
@@ -81,7 +81,7 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 				if (sp_split[j + 1])
 				{
 					(*cmds)[i].red_in = ft_strdup(sp_split[j + 1]);
-					malloc_err(!(*cmds)[i].red_in, "creating redirection vars");
+					malloc_err(!(*cmds)[i].red_in, "creating redirection vars", vars->true_env);///
 				}
 			}
 		}
@@ -132,7 +132,7 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	pipe_splt = NULL;
 	*cmds = NULL;
 	input_str = readline("\e[34mminishell$ \e[0m");
-	stop_program(!input_str, NULL, "exit");
+	stop_program(!input_str, NULL, "exit", vars->true_env);///
 	if (!*input_str)
 	{
 		free(input_str);
@@ -152,7 +152,7 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	else
 		pipe_splt = ft_split(for_split, '|');
 	free(for_split);
-	malloc_err(!pipe_splt, "split cmds");
+	malloc_err(!pipe_splt, "split cmds", vars->true_env);///
 	count = merge_cmds(cmds, pipe_splt, &input_str);
 	add_history(input_str);
 	free(input_str);

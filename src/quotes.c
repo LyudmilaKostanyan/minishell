@@ -3,22 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   quotes.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lykostan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 14:08:19 by lykostan          #+#    #+#             */
-/*   Updated: 2023/06/28 14:08:23 by lykostan         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:12:54 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*join_input(char **input_str)
+char	*join_input(t_vars *vars, char **input_str)
 {
 	char	*line;
 	char	*tmp;
 
 	tmp = ft_strjoin(*input_str, "\n");
-	malloc_err(!tmp, "reading input");
+	malloc_err(!tmp, "reading input", vars->true_env);///
 	free(*input_str);
 	*input_str = tmp;
 	line = readline("> ");
@@ -28,7 +28,7 @@ char	*join_input(char **input_str)
 		return (NULL);
 	}
 	tmp = ft_strjoin(*input_str, line);
-	malloc_err(!tmp, "reading input");
+	malloc_err(!tmp, "reading input", vars->true_env);///
 	free(*input_str);
 	*input_str = tmp;
 	return (line);

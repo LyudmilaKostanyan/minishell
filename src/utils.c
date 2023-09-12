@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lykostan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:15:41 by lykostan          #+#    #+#             */
-/*   Updated: 2023/06/14 19:15:43 by lykostan         ###   ########.fr       */
+/*   Updated: 2023/09/12 18:55:54 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int	ft_isalnum_str(char *str, char c)
 	return (1);
 }
 
-long long	ft_atoll(char *str)
+long long	ft_atoll(t_vars *vars, char *str)
 {
 	unsigned long long	u_num;
 	long long			ll_num;
@@ -79,15 +79,15 @@ long long	ft_atoll(char *str)
 	}
 	while (*str == 48)
 		str++;
-	stop_program(ft_strlen(str) > 19, "exit", EXIT_ERR);
+	stop_program(ft_strlen(str) > 19, "exit", EXIT_ERR, vars->true_env);///
 	while (*str)
 	{
-		stop_program(*str < 48 || *str > 57, "exit", EXIT_ERR);
+		stop_program(*str < 48 || *str > 57, "exit", EXIT_ERR, vars->true_env);///
 		u_num = u_num * 10 + (*str++ - 48);
 	}
 	stop_program((sign == 1 && u_num > LLONG_MAX)
 		|| (sign == -1 && u_num > (unsigned long long)(LLONG_MAX) + 1),
-		"exit", EXIT_ERR);
+		"exit", EXIT_ERR, vars->true_env);///
 	ll_num = sign * u_num;
 	return (ll_num);
 }

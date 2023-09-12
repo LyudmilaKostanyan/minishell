@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:18:14 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 18:47:10 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:27:08 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,23 +59,24 @@ typedef struct s_cmds
 	char			*red_out;
 	int				in_stat;
 	int				out_stat;
-	struct s_vars	*vars;
 }	t_cmds;
 
 typedef struct s_vars
 {
-	char	*input_str;
-	int		exit_stat;
-	t_env	*env;
-	char	**true_env;
-	char	**env_var;
-	t_env	*set;
-	char	main_c;
-	int		q_count;
-	int		fd_in;
-	int		fd_out;
-	char	**paths;
-	int		hd_stat;
+	char		*input_str;
+	int			exit_stat;
+	t_env		*env;
+	char		**true_env;
+	char		**env_var;
+	t_env		*set;
+	char		main_c;
+	int			q_count;
+	int			fd_in;
+	int			fd_out;
+	char		**paths;
+	int			hd_stat;
+	long long	equal;
+	char		*key;
 }	t_vars;
 
 typedef struct s_mall_size
@@ -85,20 +86,20 @@ typedef struct s_mall_size
 	int	val_len;
 }	t_mall_size;
 
-void		pwd(void);
+void		pwd(t_vars *vars);
 void		cd(t_vars *vars, char **cmd);
 void		echo(char **cmd);
 void		env(t_vars *vars, int cmd);
 void		export(t_vars *vars, char **cmd);
 void		unset(t_vars *vars, char **cmd);
-void		exit_prog(char **cmd);
-void		malloc_err(int condition, char *cmd);
-long long	ft_atoll(char *str);
+void		exit_prog(t_vars *vars, char **cmd);
+void		malloc_err(int condition, char *cmd, char **env);
+long long	ft_atoll(t_vars *vars, char *str);
 void		split_free(char **split);
 char		*tolower_str(char *str);
 int			ft_isalnum_str(char *str, char c);
-void		creat_env_var(t_env **env, char *cmd, char *key, long long equal);
-int			check_set(t_env *env, char *cmd, char *key, long long equal);
+void		creat_env_var(t_vars *vars, t_env **env, char *cmd, char *key);
+int			check_set(t_vars *vars, t_env *env, char *cmd);
 t_env		*find_key(t_vars vars, char *key);
 t_env		*key_cmp(t_vars vars, char **input_str);
 void		fill_out_str(char **tmp, char **out_str, t_env *env, int *i);
@@ -111,7 +112,7 @@ void		wait_quote(char **input_str, char c, int *count);
 void		restore_spaces(char **str);
 int			split_size(char **split);
 int			read_input(t_vars *vars, t_cmds **cmds);
-int			merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str);
+int			merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, char **input_str);
 int			env_len(t_env *env);
 void		env_to_str(t_vars *vars);
 void		creating_exec_path(t_vars *vars);
@@ -121,8 +122,8 @@ int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
 void		pipes(t_cmds **cmds, int count);
 int			here_doc(t_vars *vars, char *end);
 void		close_pipes(t_cmds **cmds, int count);
-void		malloc_err(int condition, char *cmd);
-void		stop_program(int condition, char *cmd, char *issue);
+void		malloc_err(int condition, char *cmd, char **env);
+void		stop_program(int condition, char *cmd, char *issue, char **env);
 int			err_mes(int condition, char *cmd, char *line, char *issue);
 void		add_remove_shlvl(t_vars *var, int i);
 

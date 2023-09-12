@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   rm_quotes.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lykostan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 14:08:29 by lykostan          #+#    #+#             */
-/*   Updated: 2023/06/28 14:08:31 by lykostan         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:15:03 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ t_env	*key_cmp(t_vars vars, char **input_str)
 	if (*(tmp - 1) == '/')
 		keys_end++;
 	key = ft_substr(*input_str, 0, keys_end);
-	malloc_err(!key, "check $ case");
+	malloc_err(!key, "check $ case", vars.true_env);///
 	env = find_key(vars, key);
 	free(key);
 	return (env);
@@ -113,7 +113,7 @@ int	creat_out_str(t_vars *vars, char *input_str, char **out_str)
 		return (0);
 	*out_str = malloc(ft_strlen(input_str) + mall_size.val_len
 			- mall_size.key_len - vars->q_count + mall_size.sp_count + 1);
-	malloc_err(!*out_str, "rm_quotes");
+	malloc_err(!*out_str, "rm_quotes", vars->true_env);///
 	return (1);
 }
 

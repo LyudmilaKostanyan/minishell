@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:17:51 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 18:47:44 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:17:51 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 
 int	g_exit_status = 0;
 
-t_env *creat_env_list(char **env)
+t_env *creat_env_list(t_vars *vars, char **env)
 {
 	t_env *head;
 	t_env *node;
 	int equal;
 
 	head = malloc(sizeof(t_env));
-	malloc_err(!head, "env list");
+	malloc_err(!head, "env list", vars->true_env);///
 	node = head;
 	while (*env)
 	{
@@ -29,13 +29,14 @@ t_env *creat_env_list(char **env)
 		node->line = ft_strdup(*env);
 		node->key = ft_substr(*env, 0, equal);
 		node->value = ft_substr(*env, equal + 1, ft_strlen(*env) - equal);
-		malloc_err(!node->line || !node->key || !node->line, "env list");
+		malloc_err(!node->line || !node->key
+			|| !node->line, "env list", vars->true_env);///
 		if (!*(env + 1))
 			node->next = NULL;
 		else
 		{
 			node->next = malloc(sizeof(t_env));
-			malloc_err(!node->next, "env list");
+			malloc_err(!node->next, "env list", vars->true_env);///
 		}
 		node = node->next;
 		env++;
@@ -46,7 +47,7 @@ t_env *creat_env_list(char **env)
 int check_builtins(t_vars *vars, char **cmd)
 {
 	if (!ft_strcmp(*cmd, "pwd"))
-		pwd();
+		pwd(vars);
 	else if (!ft_strcmp(*cmd, "cd"))
 		cd(vars, cmd);
 	else if (!ft_strcmp(*cmd, "env"))
@@ -58,7 +59,7 @@ int check_builtins(t_vars *vars, char **cmd)
 	else if (!ft_strcmp(*cmd, "unset"))
 		unset(vars, cmd);
 	else if (!ft_strcmp(*cmd, "exit"))
-		exit_prog(cmd);
+		exit_prog(vars, cmd);
 	else
 		return (0);
 	return (1);
@@ -66,22 +67,20 @@ int check_builtins(t_vars *vars, char **cmd)
 
 int check_equal(t_vars *vars, char **cmd)
 {
-	int			i;
-	long long	equal;
-	char		*key;
-	int			cond;
+	int	i;
+	int	cond;
 
 	i = -1;
 	cond = 0;
 	while (cmd[++i])
 	{
-		equal = ft_strchr(cmd[i], '=') - cmd[i];
-		key = ft_substr(cmd[i], 0, equal);
-		malloc_err(!key, cmd[0]);
-		if (equal >= 0 && !ft_isdigit(*key) && *key && ft_isalnum_str(key, 'e') && ++cond
-			&& !check_set(vars->env, cmd[i], key, equal) && !check_set(vars->set, cmd[i], key, equal))
-			creat_env_var(&vars->set, cmd[i], key, equal);
-		free(key);
+		vars->equal = ft_strchr(cmd[i], '=') - cmd[i];
+		vars->key = ft_substr(cmd[i], 0, vars->equal);
+		malloc_err(!vars->key, cmd[0], vars->true_env);///
+		if (vars->equal >= 0 && !ft_isdigit(*vars->key) && *vars->key && ft_isalnum_str(vars->key, 'e') && ++cond
+			&& !check_set(vars->env, cmd[i], vars->key, vars->equal) && !check_set(vars->set, cmd[i], vars->key, vars->equal))
+			creat_env_var(&vars->set, cmd[i], vars->key, vars->equal);
+		free(vars->key);
 	}
 	return (cond);
 }
@@ -113,7 +112,7 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 	while (++i < count)
 	{
 		(*cmds)[i].pid = fork();
-		stop_program((*cmds)[i].pid == -1, NULL, "Fork error");
+		stop_program((*cmds)[i].pid == -1, NULL, "Fork error", vars->true_env);///
 		if ((*cmds)[i].pid == 0)
 		{
 			if (!redirect_pipes(vars, cmds, count, i))
@@ -173,7 +172,6 @@ int main(int argc, char **argv, char **env)
 	t_cmds				*cmds;
 	struct sigaction	sig;
 
-	cmds->vars = &vars;
 	rl_event_hook = &empty;
 	rl_catch_signals = 0;
 	sigemptyset(&sig.sa_mask);
@@ -186,11 +184,12 @@ int main(int argc, char **argv, char **env)
 	vars.set = NULL;
 	(void)argv;
 	vars.true_env = env;
-	//add_remove_shlvl(vars.true_env, 1);
+	add_remove_shlvl(vars.true_env, 1);
 	if (argc != 1)
 	{
 		perror("No such file or directory");
 		// here -42
+		add_remove_shlvl(vars.true_env, -42);
 		exit(0);
 	}
 	g_exit_status = 0;

@@ -1,17 +1,18 @@
 #include "minishell.h"
 
 
-void	malloc_err(int condition, char *cmd)
+void	malloc_err(int condition, char *cmd, char **env)
 {
 	if (condition)
 	{
 		printf("minishell: malloc error: %s\n", cmd);
 		//here -42
+		add_remove_shlvl(env, -42);
 		exit(1);
 	}
 }
 
-void	stop_program(int condition, char *cmd, char *issue)
+void	stop_program(int condition, char *cmd, char *issue, char **env)
 {
 	if (condition)
 	{
@@ -22,9 +23,13 @@ void	stop_program(int condition, char *cmd, char *issue)
 		else
 			printf("minishell: %s: %s\n", cmd, issue);
 		if (!ft_strcmp(cmd, "exit"))
+		{
 			//here -42
+			add_remove_shlvl(env, -42);
 			exit(255);
+		}
 		//here -42
+		add_remove_shlvl(env, -42);
 		exit(g_exit_status);
 	}
 }
