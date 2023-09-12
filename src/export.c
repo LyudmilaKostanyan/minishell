@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/17 16:35:51 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:59:58 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 20:03:58 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,22 +55,22 @@ int	check_set(t_vars *vars, t_env *env, char *cmd)
 	int		plus;
 
 	plus = 0;
-	if (key[ft_strlen(key) - 1] == '+')
+	if (vars->key[ft_strlen(vars->key) - 1] == '+')
 		plus++;
-	env = checking_env_key(env, key);
+	env = checking_env_key(env, vars->key);
 	if (!env)
 		return (0);
 	if (plus)
 	{
-		add_value(cmd, &env);
+		add_value(vars, cmd, &env);
 		return (1);
 	}
-	if (equal > 0)
+	if (vars->equal > 0)
 	{
 		if (!ft_strcmp(ft_strchr(cmd, '=') + 1, env->value))
 			return (1);
 		free(env->value);
-		env->value = ft_substr(cmd, equal + 1, ft_strlen(cmd) - equal);
+		env->value = ft_substr(cmd, vars->equal + 1, ft_strlen(cmd) - vars->equal);
 	}
 	else
 	{
@@ -81,7 +81,7 @@ int	check_set(t_vars *vars, t_env *env, char *cmd)
 	}
 	malloc_err(!env->value, "check_set : env->value", vars->true_env);///
 	free(env->line);
-	merge_key_value(env);
+	merge_key_value(vars, env);
 	return (1);
 }
 
@@ -98,7 +98,7 @@ void	creat_env_var(t_vars *vars, t_env **env, char *cmd, char *key)
 		*env = (*env)->next;
 	}
 	(*env) = malloc(sizeof(t_env));
-	malloc_err(!*env, "creat_env_var: env");
+	malloc_err(!*env, "creat_env_var: env", vars->true_env);
 	if (head)
 		tmp->next = *env;
 	if (key[ft_strlen(key) - 1] == '+')
@@ -112,7 +112,7 @@ void	creat_env_var(t_vars *vars, t_env **env, char *cmd, char *key)
 		(*env)->value = ft_strdup(cmd);
 	malloc_err(!(*env)->key || !(*env)->value, "creat_env_var: key/value",
 		vars->true_env);///
-	merge_key_value(*env);
+	merge_key_value(vars, *env);
 	(*env)->next = NULL;
 	if (head)
 		*env = head;
