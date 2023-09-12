@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:17:51 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:37:35 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:42:00 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 {
 	int	i;
 
-	pipes(cmds, count);
+	pipes(vars, cmds, count);
 	i = -1;
 	while (++i < count)
 	{

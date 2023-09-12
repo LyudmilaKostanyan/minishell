@@ -84,7 +84,7 @@ int	here_doc(t_vars *vars, char *end)
 		}
 		else
 		{
-			join(&line, "\n");
+			join(vars, &line, "\n");
 			if (!vars->hd_stat)
 				check_env_var(vars, &line);
 			write(fds[1], line, ft_strlen(line));
@@ -135,7 +135,7 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 	return (redirection(vars, cmds, i));
 }
 
-void	pipes(t_cmds **cmds, int count)
+void	pipes(t_vars *vars, t_cmds **cmds, int count)
 {
 	int i;
 
@@ -150,7 +150,7 @@ void	pipes(t_cmds **cmds, int count)
 				close((*cmds)[i].pipe[0]);
 				close((*cmds)[i].pipe[1]);
 			}
-			stop_program(1, "", "creat pipes", (*cmds)->vars->true_env);///
+			stop_program(1, "", "creat pipes", vars->true_env);///
 		}
 	}
 }
