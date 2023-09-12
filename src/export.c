@@ -1,0 +1,144 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/06/17 16:35:51 by lykostan          #+#    #+#             */
+/*   Updated: 2023/09/12 19:59:58 by tgalyaut         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+void	merge_key_value(t_vars *vars, t_env *node)
+{
+	char	*key;
+
+	key = ft_strjoin(node->key, "=");
+	malloc_err(!key, "merge_key_value", vars->true_env);///
+	node->line = ft_strjoin(key, node->value);
+	malloc_err(!node->line, "merge_key_value", vars->true_env);///
+	free(key);
+}
+
+t_env	*checking_env_key(t_env *env, char *key)
+{
+	if (key[ft_strlen(key) - 1] == '+')
+		key[ft_strlen(key) - 1] = 0;
+	while (env)
+	{
+		if (!ft_strcmp(key, env->key))
+			return (env);
+		env = env->next;
+	}
+	return (NULL);
+}
+
+static void	add_value(t_vars *vars, char *cmd, t_env **env)
+{
+	char	*tmp;
+
+	tmp = ft_strjoin((*env)->value, ft_strchr(cmd, '=') + 1);
+	malloc_err(!tmp, "add value in env variable", vars->true_env);///
+	free((*env)->value);
+	(*env)->value = tmp;
+	tmp = ft_strjoin((*env)->line, ft_strchr(cmd, '=') + 1);
+	malloc_err(!tmp, "add value in env variable", vars->true_env);///
+	free((*env)->line);
+	(*env)->line = tmp;
+}
+
+int	check_set(t_vars *vars, t_env *env, char *cmd)
+{
+	int		plus;
+
+	plus = 0;
+	if (key[ft_strlen(key) - 1] == '+')
+		plus++;
+	env = checking_env_key(env, key);
+	if (!env)
+		return (0);
+	if (plus)
+	{
+		add_value(cmd, &env);
+		return (1);
+	}
+	if (equal > 0)
+	{
+		if (!ft_strcmp(ft_strchr(cmd, '=') + 1, env->value))
+			return (1);
+		free(env->value);
+		env->value = ft_substr(cmd, equal + 1, ft_strlen(cmd) - equal);
+	}
+	else
+	{
+		if (!ft_strcmp(cmd, env->value))
+			return (1);
+		free(env->value);
+		env->value = ft_strdup(cmd);
+	}
+	malloc_err(!env->value, "check_set : env->value", vars->true_env);///
+	free(env->line);
+	merge_key_value(env);
+	return (1);
+}
+
+void	creat_env_var(t_vars *vars, t_env **env, char *cmd, char *key)
+{
+	t_env	*head;
+	t_env	*tmp;
+
+	head = *env;
+	while (*env)
+	{
+		if (!(*env)->next)
+			tmp = *env;
+		*env = (*env)->next;
+	}
+	(*env) = malloc(sizeof(t_env));
+	malloc_err(!*env, "creat_env_var: env");
+	if (head)
+		tmp->next = *env;
+	if (key[ft_strlen(key) - 1] == '+')
+		(*env)->key = ft_substr(key, 0, ft_strlen(key) - 1);
+	else
+		(*env)->key = ft_strdup(key);
+	if (vars->equal > 0)
+		(*env)->value = ft_substr(cmd, vars->equal + 1,
+				ft_strlen(cmd) - vars->equal);
+	else
+		(*env)->value = ft_strdup(cmd);
+	malloc_err(!(*env)->key || !(*env)->value, "creat_env_var: key/value",
+		vars->true_env);///
+	merge_key_value(*env);
+	(*env)->next = NULL;
+	if (head)
+		*env = head;
+}
+
+void	export(t_vars *vars, char **cmd)
+{
+	int			i;
+
+	i = 0;
+	g_exit_status = 0;
+	if (!cmd[1])
+		env(vars, 0);
+	while (cmd[++i])
+	{
+		vars->equal = ft_strchr(cmd[i], '=') - cmd[i];
+		vars->key = ft_substr(cmd[i], 0, vars->equal);
+		malloc_err(!vars->key, cmd[0], vars->true_env);///
+		if (!ft_isdigit(*vars->key) && *vars->key && ft_isalnum_str(vars->key, 'e') && vars->equal >= 0
+			&& !check_set(vars, vars->env, cmd[i]))
+			creat_env_var(vars, &vars->env, cmd[i], vars->key);
+		else if (ft_isdigit(*vars->key) || !*vars->key || !ft_isalnum_str(vars->key, 'u'))
+		{
+			err_mes(1, *cmd, cmd[i], E_U_ERR);
+			g_exit_status = 1;
+		}
+		free(vars->key);
+	}
+}
