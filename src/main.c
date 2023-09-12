@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:17:51 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:17:51 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:37:35 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,8 @@ int check_equal(t_vars *vars, char **cmd)
 		vars->key = ft_substr(cmd[i], 0, vars->equal);
 		malloc_err(!vars->key, cmd[0], vars->true_env);///
 		if (vars->equal >= 0 && !ft_isdigit(*vars->key) && *vars->key && ft_isalnum_str(vars->key, 'e') && ++cond
-			&& !check_set(vars->env, cmd[i], vars->key, vars->equal) && !check_set(vars->set, cmd[i], vars->key, vars->equal))
-			creat_env_var(&vars->set, cmd[i], vars->key, vars->equal);
+			&& !check_set(vars, vars->env, cmd[i]) && !check_set(vars, vars->set, cmd[i]))
+			creat_env_var(vars, &vars->set, cmd[i], vars->key);
 		free(vars->key);
 	}
 	return (cond);
@@ -193,7 +193,7 @@ int main(int argc, char **argv, char **env)
 		exit(0);
 	}
 	g_exit_status = 0;
-	vars.env = creat_env_list(env);
+	vars.env = creat_env_list(&vars, env);
 	while (1)
 	{
 		vars.fd_in = dup(0);
