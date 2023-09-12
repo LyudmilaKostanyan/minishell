@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 14:08:19 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:12:54 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:38:50 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,14 @@ char	*join_input(t_vars *vars, char **input_str)
 	return (line);
 }
 
-void	wait_quote(char **input_str, char c, int *count)
+static void	wait_quote(t_vars *vars, char **input_str, char c, int *count)
 {
 	char	*line;
 	char	*tmp;
 
 	while (1)
 	{
-		line = join_input(input_str);
+		line = join_input(vars, input_str);///
 		if (!line)
 			break ;
 		tmp = ft_strchr(line, c);
@@ -93,7 +93,7 @@ void	quotes_handler(t_vars *vars, char **input_str)
 	if (!vars->q_count)
 		return ;
 	if (vars->q_count % 2 != 0)
-		wait_quote(input_str, vars->main_c, &vars->q_count);
+		wait_quote(vars, input_str, vars->main_c, &vars->q_count);
 	count = vars->q_count;
 	i = -1;
 	while ((*input_str)[++i])
