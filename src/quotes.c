@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 14:08:19 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:38:50 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:39:23 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	*join_input(t_vars *vars, char **input_str)
 	return (line);
 }
 
-static void	wait_quote(t_vars *vars, char **input_str, char c, int *count)
+void	wait_quote(t_vars *vars, char **input_str, char c, int *count)
 {
 	char	*line;
 	char	*tmp;

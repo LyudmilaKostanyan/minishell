@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:18:14 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:35:06 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:39:39 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void		find_main_c(t_vars *vars, char *tmp);
 t_env		*find_same_key(t_vars vars, char *input_str);
 int			count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size, int i);
 void		quotes_handler(t_vars *vars, char **input_str);
-void		wait_quote(char **input_str, char c, int *count);
+void		wait_quote(t_vars *vars, char **input_str, char c, int *count);
 void		restore_spaces(char **str);
 int			split_size(char **split);
 int			read_input(t_vars *vars, t_cmds **cmds);
