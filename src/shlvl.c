@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 17:16:34 by tgalyaut          #+#    #+#             */
-/*   Updated: 2023/09/12 18:35:45 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:34:10 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static int	ft_setlvl(const char *name, char **env, char *str)
 	return (-1);
 }
 
-void	add_remove_shlvl(t_vars *var, int i)
+void	add_remove_shlvl(char **env, int i)
 {
 	char	*shlvl;
 	char	*newlvl;
@@ -41,7 +41,7 @@ void	add_remove_shlvl(t_vars *var, int i)
 	shlvl = getenv("SHLVL");
 	newlvl = NULL;
 	if (shlvl == NULL)
-		ft_setlvl("SHLVL", var.env, "1");
+		ft_setlvl("SHLVL", env, "1");
 	else if (i == 1)
 	{
 		lvl = ft_atoi(shlvl);
@@ -54,5 +54,5 @@ void	add_remove_shlvl(t_vars *var, int i)
 		--lvl;
 		newlvl = ft_itoa(lvl);
 	}
-	ft_setlvl("SHLVL", var.env, newlvl);
+	ft_setlvl("SHLVL", env, newlvl);
 }
