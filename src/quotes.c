@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/28 14:08:19 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:39:23 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:40:13 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ void	quotes_handler(t_vars *vars, char **input_str)
 			if (!count)
 				continue ;
 			if (count % 2 != 0)
-				wait_quote(input_str, vars->main_c, &count);
+				wait_quote(vars, input_str, vars->main_c, &count);
 			vars->q_count += count;
 		}
 	}
