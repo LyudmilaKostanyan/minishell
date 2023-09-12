@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:18:14 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:39:39 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:42:40 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ void		creating_exec_path(t_vars *vars);
 int			path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
 int			redirection(t_vars *vars, t_cmds **cmds, int i);
 int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
-void		pipes(t_cmds **cmds, int count);
+void		pipes(t_vars *vars, t_cmds **cmds, int count);
 int			here_doc(t_vars *vars, char *end);
 void		close_pipes(t_cmds **cmds, int count);
 void		malloc_err(int condition, char *cmd, char **env);
