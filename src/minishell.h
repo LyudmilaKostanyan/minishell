@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lykostan <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:18:14 by lykostan          #+#    #+#             */
-/*   Updated: 2023/06/14 19:18:16 by lykostan         ###   ########.fr       */
+/*   Updated: 2023/09/12 18:38:23 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ typedef struct s_vars
 	char	*input_str;
 	int		exit_stat;
 	t_env	*env;
+	char	**true_env;
 	char	**env_var;
 	t_env	*set;
 	char	main_c;
@@ -122,5 +123,6 @@ void		close_pipes(t_cmds **cmds, int count);
 void		malloc_err(int condition, char *cmd);
 void		stop_program(int condition, char *cmd, char *issue);
 int			err_mes(int condition, char *cmd, char *line, char *issue);
+void		add_remove_shlvl(t_vars *var, int i);
 
 #endif
