@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:17:27 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:25:41 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:32:29 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,15 +66,15 @@ void	cd(t_vars *vars, char **cmd)
 			chdir(tmp->value);
 		vars->equal = 0;
 		if (!check_set(vars, vars->env, tmp->value))///
-			creat_env_var(vars, &vars->env, tmp->value, "PWD";///
+			creat_env_var(vars, &vars->env, tmp->value, "PWD");///
 	}
 	else
 	{
 		chdir(cmd[1]);
 		pwd = getcwd(NULL, 0);
 		malloc_err(!pwd, cmd[0], vars->true_env);///
-		if (!check_set(vars->env, pwd, "PWD", 0))
-			creat_env_var(&vars->env, pwd, "PWD", 0);
+		if (!check_set(vars, vars->env, pwd))
+			creat_env_var(vars, &vars->env, pwd, "PWD");
 		free(pwd);
 	}
 	g_exit_status = 0;
