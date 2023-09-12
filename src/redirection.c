@@ -66,14 +66,13 @@ int	here_doc(t_vars *vars, char *end)
 	sig.sa_flags = SA_RESTART;
 	sigaddset(&sigset, SIGINT);
 	sigaction(SIGINT, &sig, NULL);
-	join(&end, "\n");
 	fds = malloc(sizeof(int) * 2);
 	malloc_err(!fds, "here_doc");
 	stop_program(pipe(fds) == -1, "", IO);
 	while (1)
 	{
 		line = readline("> ");
-		if (!line || (*line && !ft_strncmp(line, end, ft_strlen(line))))
+		if (!line || (*line && !ft_strcmp(line, end)))
 		{
 			free(line);
 			break ;

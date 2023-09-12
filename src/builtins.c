@@ -201,7 +201,7 @@ void	exit_prog(char **cmd)
 {
 	long long	exit_code;
 
-	if (err_mes(cmd[2] != NULL, *cmd, NULL, TMA))		// == NULL???
+	if (err_mes(cmd[1] && cmd[2] != NULL, *cmd, NULL, TMA))		// == NULL???
 		return ;
 	if (cmd[1])
 	{

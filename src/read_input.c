@@ -56,9 +56,12 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 			}
 			else if (!ft_strcmp(sp_split[j], ">") || !ft_strcmp(sp_split[j], ">>"))
 			{
-				if (!ft_strcmp(sp_split[j], ">"))
+				if (!sp_split[j + 1] || !ft_strncmp(sp_split[j + 1], ">", 1) || !ft_strncmp(sp_split[j + 1], ">>", 2)
+					|| !ft_strncmp(sp_split[j + 1], "<", 1) || !ft_strncmp(sp_split[j + 1], "<<", 2))
+					(*cmds)[i].out_stat = -1;
+				else if (!ft_strcmp(sp_split[j], ">") && (*cmds)[i].out_stat != -1)
 					(*cmds)[i].out_stat = 1;
-				else
+				else if ((*cmds)[i].out_stat != -1)
 					(*cmds)[i].out_stat = 2;
 				if (sp_split[j + 1])
 				{
@@ -68,9 +71,12 @@ int	merge_cmds(t_cmds **cmds, char **pipe_splt, char **input_str)
 			}
 			else if (!ft_strcmp(sp_split[j], "<") || !ft_strcmp(sp_split[j], "<<"))
 			{
-				if (!ft_strcmp(sp_split[j], "<"))
+				if (!sp_split[j + 1] || !ft_strncmp(sp_split[j + 1], ">", 1) || !ft_strncmp(sp_split[j + 1], ">>", 2)
+					|| !ft_strncmp(sp_split[j + 1], "<", 1) || !ft_strncmp(sp_split[j + 1], "<<", 2))
+					(*cmds)[i].in_stat = -1;
+				else if (!ft_strcmp(sp_split[j], "<") && (*cmds)[i].in_stat != -1)
 					(*cmds)[i].in_stat = 1;
-				else
+				else if ((*cmds)[i].in_stat != -1)
 					(*cmds)[i].in_stat = 2;
 				if (sp_split[j + 1])
 				{

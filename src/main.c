@@ -151,6 +151,22 @@ int	empty()
 	return 0;
 }
 
+int	check_redirection(t_cmds *cmds, int count)
+{
+	int	i;
+	
+	i = -1;
+	while (++i < count)
+	{
+		if (err_mes(cmds[i].in_stat == -1 || cmds[i].out_stat == -1, NULL, NULL, "syntax error"))
+		{
+			g_exit_status = 258;
+			return (0);
+		}
+	}
+	return (1);
+}
+
 int main(int argc, char **argv, char **env)
 {
 	t_vars				vars;
@@ -180,8 +196,11 @@ int main(int argc, char **argv, char **env)
 		vars.fd_in = dup(0);
 		vars.fd_out = dup(1);
 		int count = read_input(&vars, &cmds);
-		if (count == -1 || err_mes(!count, NULL, NULL, PIPE_ERR))
-			continue;
+		if (count == -1 || err_mes(!count, NULL, NULL, PIPE_ERR) || !check_redirection(cmds, count))
+		{
+			free_cmds(&vars, &cmds, count);
+			continue ;
+		}
 		if (count == 1 && (!ft_strcmp(*cmds[0].cmd, "pwd") || !ft_strcmp(*cmds[0].cmd, "cd")	//!!!!!!!!
 			|| !ft_strcmp(*cmds[0].cmd, "echo") || !ft_strcmp(*cmds[0].cmd, "export")
 			|| !ft_strcmp(*cmds[0].cmd, "unset") || !ft_strcmp(*cmds[0].cmd, "exit")
