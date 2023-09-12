@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:18:14 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:27:08 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 19:35:06 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,6 @@ void		close_pipes(t_cmds **cmds, int count);
 void		malloc_err(int condition, char *cmd, char **env);
 void		stop_program(int condition, char *cmd, char *issue, char **env);
 int			err_mes(int condition, char *cmd, char *line, char *issue);
-void		add_remove_shlvl(t_vars *var, int i);
+void		add_remove_shlvl(char **env, int i);
 
 #endif
