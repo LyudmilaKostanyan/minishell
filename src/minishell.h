@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:18:14 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 18:38:23 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 18:47:10 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,15 +50,16 @@ typedef struct s_env
 
 typedef struct s_cmds
 {
-	char	**cmd;
-	char	*ex_cmd;
-	char	**path;
-	pid_t	pid;
-	int		*pipe;
-	char	*red_in;
-	char	*red_out;
-	int		in_stat;
-	int		out_stat;
+	char			**cmd;
+	char			*ex_cmd;
+	char			**path;
+	pid_t			pid;
+	int				*pipe;
+	char			*red_in;
+	char			*red_out;
+	int				in_stat;
+	int				out_stat;
+	struct s_vars	*vars;
 }	t_cmds;
 
 typedef struct s_vars

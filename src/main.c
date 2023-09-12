@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:17:51 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 18:41:56 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/12 18:47:44 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,7 @@ int main(int argc, char **argv, char **env)
 	t_cmds				*cmds;
 	struct sigaction	sig;
 
+	cmds->vars = &vars;
 	rl_event_hook = &empty;
 	rl_catch_signals = 0;
 	sigemptyset(&sig.sa_mask);
