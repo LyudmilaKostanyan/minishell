@@ -18,7 +18,7 @@ char	*join_input(t_vars *vars, char **input_str)
 	char	*tmp;
 
 	tmp = ft_strjoin(*input_str, "\n");
-	malloc_err(!tmp, "reading input", vars->true_env);///
+	malloc_err(!tmp, "reading input", vars->true_env);
 	free(*input_str);
 	*input_str = tmp;
 	line = readline("> ");
@@ -28,7 +28,7 @@ char	*join_input(t_vars *vars, char **input_str)
 		return (NULL);
 	}
 	tmp = ft_strjoin(*input_str, line);
-	malloc_err(!tmp, "reading input", vars->true_env);///
+	malloc_err(!tmp, "reading input", vars->true_env);
 	free(*input_str);
 	*input_str = tmp;
 	return (line);
@@ -41,7 +41,7 @@ int	wait_quote(t_vars *vars, char **input_str, char c, int *count)
 
 	while (1)
 	{
-		line = join_input(vars, input_str);///
+		line = join_input(vars, input_str);
 		if (!line)
 			return (0);
 		tmp = ft_strchr(line, c);
@@ -59,17 +59,6 @@ int	wait_quote(t_vars *vars, char **input_str, char c, int *count)
 	return (1);
 }
 
-void	find_main_c(t_vars *vars, char *tmp)
-{
-	while (*tmp)
-	{
-		if (*tmp == '\'' || *tmp == '\"')
-			break ;
-		tmp++;
-	}
-	vars->main_c = *tmp;
-}
-
 int	quotes_counter(t_vars *vars, char *input_str)
 {
 	int		count;
@@ -83,6 +72,31 @@ int	quotes_counter(t_vars *vars, char *input_str)
 		input_str++;
 	}
 	return (count);
+}
+
+int	rm_spaces(t_vars *vars, char **input_str, int *count, int *i)
+{
+	if ((*input_str)[*i] == vars->main_c)
+	{
+		while ((*input_str)[*i] && (*input_str)[*i + 1] && count)
+		{
+			if ((*input_str)[*i] == vars->main_c)
+				(*count)--;
+			if ((*input_str)[*i] == 32 && *count % 2 != 0)
+				(*input_str)[*i] = 1;
+			(*i)++;
+		}
+	}
+	if ((*input_str)[*i] && !*count)
+	{
+		*count = quotes_counter(vars, *input_str + *i);
+		if (!*count)
+			return (1);
+		if (*count % 2 != 0)
+			wait_quote(vars, input_str, vars->main_c, count);
+		vars->q_count += *count;
+	}
+	return (0);
 }
 
 int	quotes_handler(t_vars *vars, char **input_str)
@@ -99,27 +113,7 @@ int	quotes_handler(t_vars *vars, char **input_str)
 	count = vars->q_count;
 	i = -1;
 	while ((*input_str)[++i])
-	{
-		if ((*input_str)[i] == vars->main_c)
-		{
-			while ((*input_str)[i] && (*input_str)[i + 1] && count)
-			{
-				if ((*input_str)[i] == vars->main_c)
-					count--;
-				if ((*input_str)[i] == 32 && count % 2 != 0)
-					(*input_str)[i] = 1;
-				i++;
-			}
-		}
-		if ((*input_str)[i] && !count)
-		{
-			count = quotes_counter(vars, *input_str + i);
-			if (!count)
-				continue ;
-			if (count % 2 != 0)
-				wait_quote(vars, input_str, vars->main_c, &count);
-			vars->q_count += count;
-		}
-	}
+		if (rm_spaces(vars, input_str, &count, &i))
+			continue ;
 	return (1);
 }

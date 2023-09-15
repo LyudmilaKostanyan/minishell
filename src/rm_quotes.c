@@ -12,6 +12,17 @@
 
 #include "minishell.h"
 
+void	find_main_c(t_vars *vars, char *tmp)
+{
+	while (*tmp)
+	{
+		if (*tmp == '\'' || *tmp == '\"')
+			break ;
+		tmp++;
+	}
+	vars->main_c = *tmp;
+}
+
 t_env	*find_key(t_vars vars, char *key)
 {
 	while (vars.env)

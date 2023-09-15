@@ -14,14 +14,14 @@
 
 int	g_exit_status = 0;
 
-t_env *creat_env_list(t_vars *vars, char **env)
+t_env	*creat_env_list(t_vars *vars, char **env)
 {
-	t_env *head;
-	t_env *node;
-	int equal;
+	t_env	*head;
+	t_env	*node;
+	int		equal;
 
 	head = malloc(sizeof(t_env));
-	malloc_err(!head, "env list", vars->true_env);///
+	malloc_err(!head, "env list", vars->true_env);
 	node = head;
 	while (*env)
 	{
@@ -30,13 +30,13 @@ t_env *creat_env_list(t_vars *vars, char **env)
 		node->key = ft_substr(*env, 0, equal);
 		node->value = ft_substr(*env, equal + 1, ft_strlen(*env) - equal);
 		malloc_err(!node->line || !node->key
-			|| !node->line, "env list", vars->true_env);///
+			|| !node->line, "env list", vars->true_env);
 		if (!*(env + 1))
 			node->next = NULL;
 		else
 		{
 			node->next = malloc(sizeof(t_env));
-			malloc_err(!node->next, "env list", vars->true_env);///
+			malloc_err(!node->next, "env list", vars->true_env);
 		}
 		node = node->next;
 		env++;
@@ -44,7 +44,7 @@ t_env *creat_env_list(t_vars *vars, char **env)
 	return (head);
 }
 
-int check_builtins(t_vars *vars, char **cmd)
+int	check_builtins(t_vars *vars, char **cmd)
 {
 	if (!ft_strcmp(*cmd, "pwd"))
 		pwd(vars);
@@ -65,7 +65,7 @@ int check_builtins(t_vars *vars, char **cmd)
 	return (1);
 }
 
-int check_equal(t_vars *vars, char **cmd)
+int	check_equal(t_vars *vars, char **cmd)
 {
 	int	i;
 	int	cond;
@@ -76,9 +76,11 @@ int check_equal(t_vars *vars, char **cmd)
 	{
 		vars->equal = ft_strchr(cmd[i], '=') - cmd[i];
 		vars->key = ft_substr(cmd[i], 0, vars->equal);
-		malloc_err(!vars->key, cmd[0], vars->true_env);///
-		if (vars->equal >= 0 && !ft_isdigit(*vars->key) && *vars->key && ft_isalnum_str(vars->key, 'e') && ++cond
-			&& !check_set(vars, vars->env, cmd[i], vars->key) && !check_set(vars, vars->set, cmd[i], vars->key))
+		malloc_err(!vars->key, cmd[0], vars->true_env);
+		if (vars->equal >= 0 && !ft_isdigit(*vars->key) && *vars->key
+			&& ft_isalnum_str(vars->key, 'e') && ++cond
+			&& !check_set(vars, vars->env, cmd[i], vars->key)
+			&& !check_set(vars, vars->set, cmd[i], vars->key))
 			creat_env_var(vars, &vars->set, cmd[i], vars->key);
 		free(vars->key);
 	}
@@ -112,7 +114,7 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 	while (++i < count)
 	{
 		(*cmds)[i].pid = fork();
-		stop_program((*cmds)[i].pid == -1, NULL, "Fork error", vars->true_env);///
+		stop_program((*cmds)[i].pid == -1, NULL, "Fork error", vars->true_env);
 		if ((*cmds)[i].pid == 0)
 		{
 			if (!redirect_pipes(vars, cmds, count, i))
@@ -145,19 +147,20 @@ void	action(int signal)
 	rl_done = 1;
 }
 
-int	empty()
+int	empty(void)
 {
-	return 0;
+	return (0);
 }
 
 int	check_redirection(t_cmds *cmds, int count)
 {
 	int	i;
-	
+
 	i = -1;
 	while (++i < count)
 	{
-		if (err_mes(cmds[i].in_stat == -1 || cmds[i].out_stat == -1, NULL, NULL, "syntax error"))
+		if (err_mes(cmds[i].in_stat == -1
+				|| cmds[i].out_stat == -1, NULL, NULL, "syntax error"))
 		{
 			g_exit_status = 258;
 			return (0);
@@ -166,7 +169,7 @@ int	check_redirection(t_cmds *cmds, int count)
 	return (1);
 }
 
-int main(int argc, char **argv, char **env)
+int	main(int argc, char **argv, char **env)
 {
 	t_vars				vars;
 	t_cmds				*cmds;
@@ -188,7 +191,6 @@ int main(int argc, char **argv, char **env)
 	if (argc != 1)
 	{
 		perror("No such file or directory");
-		// here -42
 		add_remove_shlvl(vars.true_env, -42);
 		exit(0);
 	}
@@ -198,21 +200,24 @@ int main(int argc, char **argv, char **env)
 	{
 		vars.fd_in = dup(0);
 		vars.fd_out = dup(1);
-		int count = read_input(&vars, &cmds);
-		if (count == -1 || err_mes(!count, NULL, NULL, PIPE_ERR) || !check_redirection(cmds, count))
+		int	count = read_input(&vars, &cmds);
+		if (count == -1 || err_mes(!count, NULL, NULL, PIPE_ERR)
+			|| !check_redirection(cmds, count))
 		{
 			free_cmds(&vars, &cmds, count);
 			continue ;
 		}
-		if (count == 1 && (!ft_strcmp(*cmds[0].cmd, "pwd") || !ft_strcmp(*cmds[0].cmd, "cd")	//!!!!!!!!
-			|| !ft_strcmp(*cmds[0].cmd, "echo") || !ft_strcmp(*cmds[0].cmd, "export")
-			|| !ft_strcmp(*cmds[0].cmd, "unset") || !ft_strcmp(*cmds[0].cmd, "exit")
-			|| !ft_strcmp(*cmds[0].cmd, "env")) && !redirect_pipes(&vars, &cmds, count, 0))
+		if (count == 1 && (!ft_strcmp(*cmds[0].cmd, "pwd")	//!!!!!!!!
+				|| !ft_strcmp(*cmds[0].cmd, "cd") || !ft_strcmp(*cmds[0].cmd, "echo")
+				|| !ft_strcmp(*cmds[0].cmd, "export") || !ft_strcmp(*cmds[0].cmd, "unset")
+				|| !ft_strcmp(*cmds[0].cmd, "exit") || !ft_strcmp(*cmds[0].cmd, "env"))
+				&& !redirect_pipes(&vars, &cmds, count, 0))
 		{
 			free_cmds(&vars, &cmds, count);
 			continue ;
 		}
-		if (!(count == 1 && check_builtins(&vars, cmds[0].cmd)) && !check_equal(&vars, cmds[0].cmd))
+		if (!(count == 1 && check_builtins(&vars, cmds[0].cmd))
+			&& !check_equal(&vars, cmds[0].cmd))
 			processes(&vars, &cmds, count);
 		free_cmds(&vars, &cmds, count);
 	}
