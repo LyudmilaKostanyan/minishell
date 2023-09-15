@@ -50,14 +50,14 @@ static void	add_value(t_vars *vars, char *cmd, t_env **env)
 	(*env)->line = tmp;
 }
 
-int	check_set(t_vars *vars, t_env *env, char *cmd)
+int	check_set(t_vars *vars, t_env *env, char *cmd, char *key)
 {
 	int		plus;
 
 	plus = 0;
-	if (vars->key[ft_strlen(vars->key) - 1] == '+')
+	if (key[ft_strlen(key) - 1] == '+')
 		plus++;
-	env = checking_env_key(env, vars->key);
+	env = checking_env_key(env, key);
 	if (!env)
 		return (0);
 	if (plus)
@@ -132,7 +132,7 @@ void	export(t_vars *vars, char **cmd)
 		vars->key = ft_substr(cmd[i], 0, vars->equal);
 		malloc_err(!vars->key, cmd[0], vars->true_env);///
 		if (!ft_isdigit(*vars->key) && *vars->key && ft_isalnum_str(vars->key, 'e') && vars->equal >= 0
-			&& !check_set(vars, vars->env, cmd[i]))
+			&& !check_set(vars, vars->env, cmd[i], vars->key))
 			creat_env_var(vars, &vars->env, cmd[i], vars->key);
 		else if (ft_isdigit(*vars->key) || !*vars->key || !ft_isalnum_str(vars->key, 'u'))
 		{

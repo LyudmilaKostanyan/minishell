@@ -78,7 +78,7 @@ int check_equal(t_vars *vars, char **cmd)
 		vars->key = ft_substr(cmd[i], 0, vars->equal);
 		malloc_err(!vars->key, cmd[0], vars->true_env);///
 		if (vars->equal >= 0 && !ft_isdigit(*vars->key) && *vars->key && ft_isalnum_str(vars->key, 'e') && ++cond
-			&& !check_set(vars, vars->env, cmd[i]) && !check_set(vars, vars->set, cmd[i]))
+			&& !check_set(vars, vars->env, cmd[i], vars->key) && !check_set(vars, vars->set, cmd[i], vars->key))
 			creat_env_var(vars, &vars->set, cmd[i], vars->key);
 		free(vars->key);
 	}

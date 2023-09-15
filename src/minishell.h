@@ -99,7 +99,7 @@ void		split_free(char **split);
 char		*tolower_str(char *str);
 int			ft_isalnum_str(char *str, char c);
 void		creat_env_var(t_vars *vars, t_env **env, char *cmd, char *key);
-int			check_set(t_vars *vars, t_env *env, char *cmd);
+int			check_set(t_vars *vars, t_env *env, char *cmd, char *key);
 t_env		*find_key(t_vars vars, char *key);
 t_env		*key_cmp(t_vars vars, char **input_str);
 void		fill_out_str(char **tmp, char **out_str, t_env *env, int *i);
@@ -126,5 +126,6 @@ void		malloc_err(int condition, char *cmd, char **env);
 void		stop_program(int condition, char *cmd, char *issue, char **env);
 int			err_mes(int condition, char *cmd, char *line, char *issue);
 void		add_remove_shlvl(char **env, int i);
+void		find_node(t_vars *vars, char *cmd);
 
 #endif
