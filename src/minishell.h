@@ -6,7 +6,7 @@
 /*   By: tgalyaut <tgalyaut@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 19:18:14 by lykostan          #+#    #+#             */
-/*   Updated: 2023/09/12 19:44:40 by tgalyaut         ###   ########.fr       */
+/*   Updated: 2023/09/15 18:50:31 by tgalyaut         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void		stop_program(int condition, char *cmd, char *issue, char **env);
 int			err_mes(int condition, char *cmd, char *line, char *issue);
 void		add_remove_shlvl(char **env, int i);
 void		find_node(t_vars *vars, char *cmd);
-int	add_value(t_vars *vars, char *cmd, t_env **env);
+int			add_value(t_vars *vars, char *cmd, t_env **env);
 t_env		*checking_env_key(t_env *env, char *key);
 void		merge_key_value(t_vars *vars, t_env *node);
 int			count_key_val(t_vars vars, char *input_str,
