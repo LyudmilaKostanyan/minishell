@@ -13,7 +13,7 @@ void	check_env_var(t_vars *vars, char **line)
 	if (!count_key_val(*vars, *line, &mall_size, 0))
 		return ;
 	out_str = malloc(ft_strlen(*line) - mall_size.key_len
-		+ mall_size.val_len + 1);
+			+ mall_size.val_len + 1);
 	i = -1;
 	tmp = *line;
 	while (**line)
@@ -48,28 +48,15 @@ static void	join(t_vars *vars, char **str1, char *str2)
 	tmp = NULL;
 }
 
-void	hd_action(int signal)
-{
-	if (signal == SIGINT)
-		g_exit_status = 1;
-	rl_catch_signals = 0;
-}
-
 int	here_doc(t_vars *vars, char *end)
 {
 	char	*line;
 	int		*fds;
-	int					fd;
-	struct sigaction	sig;
-	sigset_t			sigset;
+	int		fd;
 
-	sig.sa_handler = &hd_action;
-	sig.sa_flags = SA_RESTART;
-	sigaddset(&sigset, SIGINT);
-	sigaction(SIGINT, &sig, NULL);
 	fds = malloc(sizeof(int) * 2);
 	malloc_err(!fds, "here_doc", vars->true_env);
-	stop_program(pipe(fds) == -1, "", IO, vars->true_env); 
+	stop_program(pipe(fds) == -1, "", IO, vars->true_env);
 	while (1)
 	{
 		line = readline("> ");
@@ -103,16 +90,16 @@ int	redirection(t_vars *vars, t_cmds **cmds, int i)
 {
 	if ((*cmds)[i].in_stat == 1 && err_mes(dup2(open((*cmds)[i].red_in,
 		O_RDONLY), 0) == -1, (*cmds)[i].red_in, NULL, CD_ERR))
-			return (0);
+		return (0);
 	else if ((*cmds)[i].in_stat == 2)
 		stop_program(dup2(here_doc(vars, (*cmds)[i].red_in), 0) == -1, "",
 			IO, vars->true_env);
 	if ((*cmds)[i].out_stat == 1)
 		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_TRUNC
-			| O_WRONLY, 0644), 1) == -1, "", IO, vars->true_env);
+				| O_WRONLY, 0644), 1) == -1, "", IO, vars->true_env);
 	else if ((*cmds)[i].out_stat == 2)
 		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_APPEND
-			| O_WRONLY, 0644), 1) == -1, "", IO, vars->true_env);
+				| O_WRONLY, 0644), 1) == -1, "", IO, vars->true_env);
 	return (1);
 }
 
@@ -120,18 +107,22 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 {
 	if (i == 0 && !(*cmds)[i].red_out && count != 1)
 	{
-		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO, vars->true_env);
+		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1,
+			"", IO, vars->true_env);
 		close((*cmds)[i].pipe[0]);
 	}
 	else if (i == count - 1 && !(*cmds)[i].red_in && count != 1)
 	{
-		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO, vars->true_env);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1,
+			"", IO, vars->true_env);
 		close((*cmds)[i - 1].pipe[1]);
 	}
 	else if (count != 1)
 	{
-		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1, "", IO, vars->true_env);
-		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1, "", IO, vars->true_env);
+		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1,
+			"", IO, vars->true_env);
+		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1,
+			"", IO, vars->true_env);
 	}
 	return (redirection(vars, cmds, i));
 }

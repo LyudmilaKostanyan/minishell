@@ -23,6 +23,16 @@ void	find_main_c(t_vars *vars, char *tmp)
 	vars->main_c = *tmp;
 }
 
+void	restore_spaces(char **str)
+{
+	int	i;
+
+	i = -1;
+	while (*str && (*str)[++i])
+		if ((*str)[i] == 1)
+			(*str)[i] = 32;
+}
+
 t_env	*find_key(t_vars vars, char *key)
 {
 	while (vars.env)

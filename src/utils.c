@@ -91,13 +91,3 @@ long long	ft_atoll(t_vars *vars, char *str)
 	ll_num = sign * u_num;
 	return (ll_num);
 }
-
-void	restore_spaces(char **str)
-{
-	int	i;
-
-	i = -1;
-	while (*str && (*str)[++i])
-		if ((*str)[i] == 1)
-			(*str)[i] = 32;
-}
