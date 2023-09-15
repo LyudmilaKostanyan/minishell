@@ -117,7 +117,7 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 			"", IO, vars->true_env);
 		close((*cmds)[i - 1].pipe[1]);
 	}
-	else if (count != 1)
+	else if (count != 1 && !(*cmds)[i].red_in)
 	{
 		stop_program(dup2((*cmds)[i - 1].pipe[0], 0) == -1,
 			"", IO, vars->true_env);
