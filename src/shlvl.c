@@ -26,6 +26,7 @@ static int	ft_setlvl(const char *name, char **env, char *str)
 	{
 		line = ft_substr(temp[i], 0, 6);
 		temp[i] = ft_strjoin(line, str);
+		free(line);
 		free(str);
 		return (0);
 	}

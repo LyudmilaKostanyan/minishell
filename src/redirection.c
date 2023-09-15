@@ -1,19 +1,27 @@
 #include "minishell.h"
 
+int	check_help(t_vars *vars, char **line, char **out_str)
+{
+	t_mall_size	mall_size;
+
+	mall_size.key_len = 0;
+	mall_size.val_len = 0;
+	if (!count_key_val(*vars, *line, &mall_size, 0))
+		return (1);
+	*out_str = malloc(ft_strlen(*line)
+			- mall_size.key_len + mall_size.val_len + 1);
+	return (0);
+}
+
 void	check_env_var(t_vars *vars, char **line)
 {
 	int			i;
 	char		*out_str;
 	char		*tmp;
 	t_env		*env;
-	t_mall_size	mall_size;
 
-	mall_size.key_len = 0;
-	mall_size.val_len = 0;
-	if (!count_key_val(*vars, *line, &mall_size, 0))
+	if (check_help(vars, line, &out_str))
 		return ;
-	out_str = malloc(ft_strlen(*line) - mall_size.key_len
-			+ mall_size.val_len + 1);
 	i = -1;
 	tmp = *line;
 	while (**line)
@@ -30,9 +38,8 @@ void	check_env_var(t_vars *vars, char **line)
 			out_str[++i] = **line;
 		(*line)++;
 	}
-	*line = tmp;
 	out_str[++i] = 0;
-	free(*line);
+	free(tmp);
 	*line = out_str;
 }
 
@@ -96,10 +103,10 @@ int	redirection(t_vars *vars, t_cmds **cmds, int i)
 			IO, vars->true_env);
 	if ((*cmds)[i].out_stat == 1)
 		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_TRUNC
-				| O_WRONLY, 0644), 1) == -1, "", IO, vars->true_env);
+					| O_WRONLY, 0644), 1) == -1, "", IO, vars->true_env);
 	else if ((*cmds)[i].out_stat == 2)
 		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_APPEND
-				| O_WRONLY, 0644), 1) == -1, "", IO, vars->true_env);
+					| O_WRONLY, 0644), 1) == -1, "", IO, vars->true_env);
 	return (1);
 }
 
@@ -129,7 +136,7 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 
 void	pipes(t_vars *vars, t_cmds **cmds, int count)
 {
-	int i;
+	int	i;
 
 	i = -1;
 	while (++i < count - 1)
