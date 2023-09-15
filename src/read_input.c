@@ -144,7 +144,12 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 		free(input_str);
 		return (0);
 	}
-	quotes_handler(vars, &input_str);
+	if (!quotes_handler(vars, &input_str))
+	{
+		add_history(input_str);
+		free(input_str);
+		return (-1);
+	}
 	split_free(pipe_splt);
 	for_split = rm_quotes(vars, input_str);
 	if (!for_split)

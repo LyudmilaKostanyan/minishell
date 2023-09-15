@@ -13,8 +13,8 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 # define EXIT_ERR "numeric argument required"
-# define QUOTES_ERR "bash: unexpected EOF while looking for matching `\"\'\n"
-# define QUOTES_SYN_ERR "bash: syntax error: unexpected end of file\n"
+# define QUOTES_ERR "minishell: unexpected EOF while looking for matching `\"\'\n"
+# define QUOTES_SYN_ERR "minishell: syntax error: unexpected end of file\n"
 # define CD_ERR "No such file or directory"
 # define E_U_ERR "not a valid identifier"
 # define PIPE_ERR "syntax error near unexpected token `|'"
@@ -107,8 +107,8 @@ char		*rm_quotes(t_vars *vars, char *input_str);
 void		find_main_c(t_vars *vars, char *tmp);
 t_env		*find_same_key(t_vars vars, char *input_str);
 int			count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size, int i);
-void		quotes_handler(t_vars *vars, char **input_str);
-void		wait_quote(t_vars *vars, char **input_str, char c, int *count);
+int			quotes_handler(t_vars *vars, char **input_str);
+int			wait_quote(t_vars *vars, char **input_str, char c, int *count);
 void		restore_spaces(char **str);
 int			split_size(char **split);
 int			read_input(t_vars *vars, t_cmds **cmds);

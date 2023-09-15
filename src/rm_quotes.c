@@ -65,8 +65,10 @@ int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size, int i)
 	t_env	*env;
 	int		q_count;
 	int		cond;
+	int		main_c;
 
 	cond = 0;
+	main_c = 0;
 	if (i)
 	{
 		q_count = vars.q_count;
@@ -74,10 +76,13 @@ int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size, int i)
 	}
 	while (*input_str)
 	{
-		if (i && *input_str == vars.main_c)
-			if (--q_count % 2 == 0)
+		if (*input_str == vars.main_c && q_count % 2 == 0)
+			main_c = vars.main_c;
+		else if (*input_str == vars.main_c && q_count % 2 != 0)
+			main_c = 0;
+		if (i && *input_str == vars.main_c && --q_count % 2 == 0)			//i - ????
 				find_main_c(&vars, input_str + 1);
-		if (*input_str == '$' && *(input_str + 1) && vars.main_c != '\'')
+		if (*input_str == '$' && *(input_str + 1) && main_c != '\'')
 		{
 			cond++;
 			env = key_cmp(vars, &input_str);
@@ -137,6 +142,7 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	char	*tmp;
 	t_env	*env;
 	int		here_doc;
+	char	main_c;
 
 	tmp = input_str;
 	find_main_c(vars, tmp);
@@ -144,11 +150,22 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 		return (NULL);
 	i = -1;
 	here_doc = 0;
+	main_c = 0;
 	while (*tmp)
 	{
-		if (*tmp != vars->main_c)
+		if (*tmp == vars->main_c)
 		{
-			if (vars->main_c != '\'' && *tmp == '$' && (*(tmp + 1) == '_'
+			if (--vars->q_count % 2 == 0)
+			{
+				find_main_c(vars, tmp + 1);
+				main_c = 0;
+			}
+			else
+				main_c = vars->main_c;
+		}
+		else
+		{
+			if (main_c != '\'' && *tmp == '$' && (*(tmp + 1) == '_'
 				|| ft_isalpha(*(tmp + 1))) && *(tmp + 1) != '?' && !here_doc)
 			{
 				env = find_same_key(*vars, tmp);
@@ -156,7 +173,7 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 					fill_out_str(&tmp, &out_str, env, &i);
 				else
 					while (*(++tmp) && *(tmp + 1) && *(tmp + 1) != '$' && *tmp != 1
-						&& *tmp != vars->main_c && *tmp != 32)
+						&& *tmp != main_c && *tmp != 32)
 							;
 			}
 			else
@@ -187,9 +204,6 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 				}
 			}
 		}
-		else
-			if (--vars->q_count % 2 == 0)
-				find_main_c(vars, tmp + 1);
 		tmp++;
 	}
 	out_str[++i] = 0;

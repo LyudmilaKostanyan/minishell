@@ -34,7 +34,7 @@ char	*join_input(t_vars *vars, char **input_str)
 	return (line);
 }
 
-void	wait_quote(t_vars *vars, char **input_str, char c, int *count)
+int	wait_quote(t_vars *vars, char **input_str, char c, int *count)
 {
 	char	*line;
 	char	*tmp;
@@ -43,7 +43,7 @@ void	wait_quote(t_vars *vars, char **input_str, char c, int *count)
 	{
 		line = join_input(vars, input_str);///
 		if (!line)
-			break ;
+			return (0);
 		tmp = ft_strchr(line, c);
 		if (tmp)
 		{
@@ -56,6 +56,7 @@ void	wait_quote(t_vars *vars, char **input_str, char c, int *count)
 		}
 		free(line);
 	}
+	return (1);
 }
 
 void	find_main_c(t_vars *vars, char *tmp)
@@ -84,16 +85,17 @@ int	quotes_counter(t_vars *vars, char *input_str)
 	return (count);
 }
 
-void	quotes_handler(t_vars *vars, char **input_str)
+int	quotes_handler(t_vars *vars, char **input_str)
 {
 	int		i;
 	int		count;
 
 	vars->q_count = quotes_counter(vars, *input_str);
 	if (!vars->q_count)
-		return ;
+		return (1);
 	if (vars->q_count % 2 != 0)
-		wait_quote(vars, input_str, vars->main_c, &vars->q_count);
+		if (!wait_quote(vars, input_str, vars->main_c, &vars->q_count))
+			return (0);
 	count = vars->q_count;
 	i = -1;
 	while ((*input_str)[++i])
@@ -119,4 +121,5 @@ void	quotes_handler(t_vars *vars, char **input_str)
 			vars->q_count += count;
 		}
 	}
+	return (1);
 }
