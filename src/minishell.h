@@ -21,6 +21,8 @@
 # define TMA "too many arguments"
 # define IO "redirection input/output"
 # define TMP "Resource temporarily unavailable"
+# define CRV "creating redirection vars"
+# define CCL "creating cmd list"
 
 # include <limits.h>
 # include <errno.h>
@@ -130,7 +132,6 @@ t_env		*checking_env_key(t_env *env, char *key);
 void		merge_key_value(t_vars *vars, t_env *node);
 int			count_key_val(t_vars vars, char *input_str,
 				t_mall_size *mall_size, int i);
-int			merge_cmds(t_vars *vars, t_cmds **cmds,
-				char **pipe_splt, char **input_str);
+int	merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count);
 
 #endif
