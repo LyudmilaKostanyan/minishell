@@ -19,6 +19,9 @@ int	redirection(t_vars *vars, t_cmds **cmds, int i)
 
 int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 {
+	int	cond;
+
+	cond = redirection(vars, cmds, i);
 	if (i == 0 && !(*cmds)[i].red_out && count != 1)
 	{
 		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1,
@@ -38,7 +41,7 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1,
 			"", IO, vars->true_env);
 	}
-	return (redirection(vars, cmds, i));
+	return (cond);
 }
 
 void	pipes(t_vars *vars, t_cmds **cmds, int count)
