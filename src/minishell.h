@@ -110,16 +110,20 @@ void		stop_program(int condition, char *cmd, char *issue, char **env);
 void		add_remove_shlvl(char **env, int i);
 void		find_node(t_vars *vars, char *cmd);
 void		merge_key_value(t_vars *vars, t_env *node);
+void		free_cmds(t_vars *vars, t_cmds **cmds, int count);
+void		action(int signal);
 
 char		*tolower_str(char *str);
 char		*rm_quotes(t_vars *vars, char *input_str);
 
-t_env		*find_key(t_vars vars, char *key);
 t_env		*key_cmp(t_vars vars, char **input_str);
+t_env		*find_key(t_vars vars, char *key);
 t_env		*find_same_key(t_vars vars, char *input_str);
 t_env		*checking_env_key(t_env *env, char *key);
+t_env		*creat_env_list(t_vars *vars, char **env);
 
 long long	ft_atoll(t_vars *vars, char *str);
+int			empty(void);
 int			ft_isalnum_str(char *str, char c);
 int			check_set(t_vars *vars, t_env *env, char *cmd, char *key);
 int			quotes_handler(t_vars *vars, char **input_str);
@@ -137,5 +141,8 @@ int			count_key_val(t_vars vars, char *input_str,
 				t_mall_size *mall_size, int i);
 int			merge_cmds(t_vars *vars, t_cmds **cmds,
 				char **pipe_splt, int count);
+int			check_redirection(t_cmds *cmds, int count);
+int			check_builtins(t_vars *vars, char **cmd);
+int			check_equal(t_vars *vars, char **cmd);
 
 #endif

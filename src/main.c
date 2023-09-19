@@ -14,96 +14,6 @@
 
 int	g_exit_status = 0;
 
-t_env	*creat_env_list(t_vars *vars, char **env)
-{
-	t_env	*head;
-	t_env	*node;
-	int		equal;
-
-	head = malloc(sizeof(t_env));
-	malloc_err(!head, "env list", vars->true_env);
-	node = head;
-	while (*env)
-	{
-		equal = ft_strchr(*env, '=') - *env;
-		node->line = ft_strdup(*env);
-		node->key = ft_substr(*env, 0, equal);
-		node->value = ft_substr(*env, equal + 1, ft_strlen(*env) - equal);
-		malloc_err(!node->line || !node->key, "env list", vars->true_env);
-		if (!*(env + 1))
-			node->next = NULL;
-		else
-		{
-			node->next = malloc(sizeof(t_env));
-			malloc_err(!node->next, "env list", vars->true_env);
-		}
-		node = node->next;
-		env++;
-	}
-	return (head);
-}
-
-int	check_builtins(t_vars *vars, char **cmd)
-{
-	if (!ft_strcmp(*cmd, "pwd"))
-		pwd(vars);
-	else if (!ft_strcmp(*cmd, "cd"))
-		cd(vars, cmd);
-	else if (!ft_strcmp(*cmd, "env"))
-		env(vars, 1);
-	else if (!ft_strcmp(*cmd, "echo"))
-		echo(cmd);
-	else if (!ft_strcmp(*cmd, "export"))
-		export(vars, cmd);
-	else if (!ft_strcmp(*cmd, "unset"))
-		unset(vars, cmd);
-	else if (!ft_strcmp(*cmd, "exit"))
-		exit_prog(vars, cmd);
-	else
-		return (0);
-	return (1);
-}
-
-int	check_equal(t_vars *vars, char **cmd)
-{
-	int	i;
-	int	cond;
-
-	i = -1;
-	cond = 0;
-	while (cmd[++i])
-	{
-		vars->equal = ft_strchr(cmd[i], '=') - cmd[i];
-		vars->key = ft_substr(cmd[i], 0, vars->equal);
-		malloc_err(!vars->key, cmd[0], vars->true_env);
-		if (vars->equal >= 0 && !ft_isdigit(*vars->key) && *vars->key
-			&& ft_isalnum_str(vars->key, 'e') && ++cond
-			&& !check_set(vars, vars->env, cmd[i], vars->key)
-			&& !check_set(vars, vars->set, cmd[i], vars->key))
-			creat_env_var(vars, &vars->set, cmd[i], vars->key);
-		free(vars->key);
-	}
-	return (cond);
-}
-
-void	free_cmds(t_vars *vars, t_cmds **cmds, int count)
-{
-	int	i;
-
-	dup2(vars->fd_in, 0);
-	dup2(vars->fd_out, 1);
-	i = -1;
-	while (++i < count)
-	{
-		split_free((*cmds)[i].cmd);
-		free((*cmds)[i].red_in);
-		free((*cmds)[i].red_out);
-		if (i != count - 1)
-			free((*cmds)[i].pipe);
-	}
-	free(*cmds);
-}
-
 static void	processes_help(t_vars *vars, t_cmds **cmds, int count)
 {
 	int	i;
@@ -145,34 +55,12 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 	}
 }
 
-void	action(int signal)
+static int	strcmp_help(const char *command)
 {
-	if (signal == SIGINT)
-		g_exit_status = 1;
-	rl_replace_line("", 0);
-	rl_done = 1;
-}
-
-int	empty(void)
-{
-	return (0);
-}
-
-int	check_redirection(t_cmds *cmds, int count)
-{
-	int	i;
-
-	i = -1;
-	while (++i < count)
-	{
-		if (err_mes(cmds[i].in_stat == -1
-				|| cmds[i].out_stat == -1, NULL, NULL, "syntax error"))
-		{
-			g_exit_status = 258;
-			return (0);
-		}
-	}
-	return (1);
+	return ((!ft_strcmp(command, "pwd")
+			|| !ft_strcmp(command, "cd") || !ft_strcmp(command, "echo")
+			|| !ft_strcmp(command, "export") || !ft_strcmp(command, "unset")
+			|| !ft_strcmp(command, "exit") || !ft_strcmp(command, "env")));
 }
 
 static void	main_help(t_vars vars, t_cmds *cmds, char **env)
@@ -191,10 +79,7 @@ static void	main_help(t_vars vars, t_cmds *cmds, char **env)
 			free_cmds(&vars, &cmds, count);
 			continue ;
 		}
-		if (count == 1 && (!ft_strcmp(*cmds[0].cmd, "pwd")	//!!!!!!!!
-				|| !ft_strcmp(*cmds[0].cmd, "cd") || !ft_strcmp(*cmds[0].cmd, "echo")
-				|| !ft_strcmp(*cmds[0].cmd, "export") || !ft_strcmp(*cmds[0].cmd, "unset")
-				|| !ft_strcmp(*cmds[0].cmd, "exit") || !ft_strcmp(*cmds[0].cmd, "env"))
+		if (count == 1 && strcmp_help(*cmds[0].cmd)
 			&& !redirect_pipes(&vars, &cmds, count, 0))
 		{
 			free_cmds(&vars, &cmds, count);
