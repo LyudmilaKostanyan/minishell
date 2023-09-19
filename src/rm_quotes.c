@@ -81,12 +81,33 @@ t_env	*find_same_key(t_vars vars, char *input_str)	//xi while
 	return (NULL);
 }
 
-int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size, int i)
+int	asd(t_vars vars, char *input_str, t_mall_size *mall_size)
 {
 	t_env	*env;
+
+	env = key_cmp(vars, &input_str);
+	if (env)
+	{
+		mall_size->key_len += ft_strlen(env->key) + 1;
+		mall_size->val_len += ft_strlen(env->value);
+	}
+	return (1);
+}
+
+void	qwe(char *input_str, t_mall_size *mall_size)
+{
+	if (*(input_str + 1) && *(input_str + 1) == *input_str
+		&& *(input_str + 2) && *(input_str + 2) != 32)
+		mall_size->sp_count++;
+	else if (*(input_str + 1) && *(input_str + 1) != 32)
+		mall_size->sp_count++;
+}
+
+int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size, int i)
+{
 	int		q_count;
-	int		cond;
 	int		main_c;
+	int		cond;
 
 	cond = 0;
 	main_c = 0;
@@ -104,23 +125,9 @@ int	count_key_val(t_vars vars, char *input_str, t_mall_size *mall_size, int i)
 		if (i && *input_str == vars.main_c && --q_count % 2 == 0)
 			find_main_c(&vars, input_str + 1);
 		if (*input_str == '$' && *(input_str + 1) && main_c != '\'')
-		{
-			cond++;
-			env = key_cmp(vars, &input_str);
-			if (env)
-			{
-				mall_size->key_len += ft_strlen(env->key) + 1;
-				mall_size->val_len += ft_strlen(env->value);
-			}
-		}
+			cond = asd(vars, input_str, mall_size);
 		if (i && (*input_str == '>' || *input_str == '<'))
-		{
-			if (*(input_str + 1) && *(input_str + 1) == *input_str
-				&& *(input_str + 2) && *(input_str + 2) != 32)
-				mall_size->sp_count++;
-			else if (*(input_str + 1) && *(input_str + 1) != 32)
-				mall_size->sp_count++;
-		}
+			qwe(input_str, mall_size);
 		input_str++;
 	}
 	return (cond);
