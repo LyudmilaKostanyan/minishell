@@ -65,7 +65,7 @@ typedef struct s_cmds
 
 typedef struct s_vars
 {
-	char		*input_str;
+	char		*out_str;
 	int			exit_stat;
 	t_env		*env;
 	char		**true_env;

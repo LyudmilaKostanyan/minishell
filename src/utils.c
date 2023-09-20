@@ -39,7 +39,7 @@ char	*tolower_str(char *str)
 
 	i = -1;
 	while (str && str[++i])
-			str[i] = ft_tolower(str[i]);
+		str[i] = ft_tolower(str[i]);
 	return (str);
 }
 
