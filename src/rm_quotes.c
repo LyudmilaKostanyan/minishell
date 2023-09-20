@@ -163,6 +163,36 @@ void	fill_out_str(char **tmp, char **out_str, t_env *env, int *i)
 		(*tmp)++;
 }
 
+void	rm_here_doc(t_vars *vars, int *here_doc, char *tmp)
+{
+	int	j;
+
+	if (*tmp == '<' && *(tmp + 1) && *(tmp + 1) == *tmp)
+	{
+		here_doc++;
+		j = 1;
+		vars->hd_stat = 0;
+		while (tmp[++j] == 32)
+			;
+		if (tmp[j] == '\'' || tmp[j] == '\"')
+			vars->hd_stat = 1;
+	}
+}
+
+void	rm_here_doc2(char **out_str, char *tmp, int *i)
+{
+	if (*(tmp + 1) && *(tmp + 1) == *tmp
+		&& *(tmp + 2) != 32 && *(tmp + 2) != *tmp)
+	{
+		*out_str[++(*i)] = *(tmp + 1);
+		*out_str[++(*i)] = 32;
+		tmp++;
+	}
+	else if (*(tmp + 1) && *(tmp + 1) != 32
+		&& *(tmp + 1) != *tmp)
+		*out_str[++(*i)] = 32;
+}
+
 char	*rm_quotes(t_vars *vars, char *input_str)
 {
 	char	*out_str;
@@ -209,27 +239,8 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 				out_str[++i] = *tmp;
 				if ((*tmp == '>' || *tmp == '<'))
 				{
-					if (*tmp == '<' && *(tmp + 1) && *(tmp + 1) == *tmp)
-					{
-						here_doc++;
-						int	j;
-						j = 1;
-						vars->hd_stat = 0;
-						while (tmp[++j] == 32)
-							;
-						if (tmp[j] == '\'' || tmp[j] == '\"')
-							vars->hd_stat = 1;
-					}
-					if (*(tmp + 1) && *(tmp + 1) == *tmp
-						&& *(tmp + 2) != 32 && *(tmp + 2) != *tmp)
-					{
-						out_str[++i] = *(tmp + 1);
-						out_str[++i] = 32;
-						tmp++;
-					}
-					else if (*(tmp + 1) && *(tmp + 1) != 32
-						&& *(tmp + 1) != *tmp)
-						out_str[++i] = 32;
+					rm_here_doc(vars, &here_doc, tmp);
+					rm_here_doc2(&out_str, tmp, &i);
 				}
 			}
 		}
