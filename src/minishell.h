@@ -64,20 +64,21 @@ typedef struct s_cmds
 
 typedef struct s_vars
 {
-	char		*out_str;
-	int			exit_stat;
-	t_env		*env;
-	char		**true_env;
-	char		**env_var;
-	t_env		*set;
-	char		main_c;
-	int			q_count;
-	int			fd_in;
-	int			fd_out;
-	char		**paths;
-	int			hd_stat;
-	long long	equal;
-	char		*key;
+	char				*out_str;
+	int					exit_stat;
+	t_env				*env;
+	char				**true_env;
+	char				**env_var;
+	t_env				*set;
+	char				main_c;
+	int					q_count;
+	int					fd_in;
+	int					fd_out;
+	char				**paths;
+	int					hd_stat;
+	long long			equal;
+	char				*key;
+	struct sigaction	sig;
 }	t_vars;
 
 typedef struct s_mall_size

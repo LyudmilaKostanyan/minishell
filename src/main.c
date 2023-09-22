@@ -96,16 +96,15 @@ int	main(int argc, char **argv, char **env)
 {
 	t_vars				vars;
 	t_cmds				*cmds;
-	struct sigaction	sig;
 
 	rl_event_hook = &empty;
 	rl_catch_signals = 0;
-	sigemptyset(&sig.sa_mask);
-	sig.sa_handler = &action;
-	sig.sa_flags = SA_RESTART;
-	sigaction(SIGINT, &sig, NULL);
-	sig.sa_handler = SIG_IGN;
-	sigaction(SIGQUIT, &sig, NULL);
+	sigemptyset(&vars.sig.sa_mask);
+	vars.sig.sa_handler = &action;
+	vars.sig.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &vars.sig, NULL);
+	vars.sig.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &vars.sig, NULL);
 	cmds = NULL;
 	vars.set = NULL;
 	(void)argv;

@@ -72,6 +72,8 @@ int	hd_while(t_vars *vars, char *end, int fd)
 	char	*line;
 
 	line = readline("> ");
+	if (g_exit_status)
+		return (0);
 	if (!line || (*line && !ft_strcmp(line, end)))
 	{
 		free(line);
@@ -98,16 +100,16 @@ int	here_doc(t_vars *vars, char *end)
 	int					*fds;
 	int					fd;
 	int					cond;
-	struct sigaction	sig;
 
-	sig.sa_handler = SIG_DFL;
-	sig.sa_flags = SA_RESTART;
-	sigaction(SIGINT, &sig, NULL);
+	g_exit_status = 0;
 	fds = malloc(sizeof(int) * 2);
 	malloc_err(!fds, "here_doc", vars->true_env);
 	stop_program(pipe(fds) == -1, "", IO, vars->true_env);
 	while (1)
 	{
+		vars->sig.sa_handler = &sig_handler;
+		vars->sig.sa_flags = SA_RESTART;
+		sigaction(SIGINT, &vars->sig, NULL);
 		cond = hd_while(vars, end, fds[1]);
 		if (!cond)
 			break ;
