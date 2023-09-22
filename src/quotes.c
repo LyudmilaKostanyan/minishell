@@ -12,53 +12,6 @@
 
 #include "minishell.h"
 
-char	*join_input(t_vars *vars, char **input_str)
-{
-	char	*line;
-	char	*tmp;
-
-	tmp = ft_strjoin(*input_str, "\n");
-	malloc_err(!tmp, "reading input", vars->true_env);
-	free(*input_str);
-	*input_str = tmp;
-	line = readline("> ");
-	if (!line)
-	{
-		printf("%s%s", QUOTES_ERR, QUOTES_SYN_ERR);
-		return (NULL);
-	}
-	tmp = ft_strjoin(*input_str, line);
-	malloc_err(!tmp, "reading input", vars->true_env);
-	free(*input_str);
-	*input_str = tmp;
-	return (line);
-}
-
-int	wait_quote(t_vars *vars, char **input_str, char c, int *count)
-{
-	char	*line;
-	char	*tmp;
-
-	while (1)
-	{
-		line = join_input(vars, input_str);
-		if (!line)
-			return (0);
-		tmp = ft_strchr(line, c);
-		if (tmp)
-		{
-			(*count)++;
-			if (!ft_strchr(tmp + 1, c))
-			{
-				free(line);
-				break ;
-			}
-		}
-		free(line);
-	}
-	return (1);
-}
-
 int	quotes_counter(t_vars *vars, char *input_str)
 {
 	int		count;
@@ -92,8 +45,6 @@ int	rm_spaces(t_vars *vars, char **input_str, int *count, int *i)
 		*count = quotes_counter(vars, *input_str + *i);
 		if (!*count)
 			return (1);
-		if (*count % 2 != 0)
-			wait_quote(vars, input_str, vars->main_c, count);
 		vars->q_count += *count;
 	}
 	return (0);
@@ -107,9 +58,8 @@ int	quotes_handler(t_vars *vars, char **input_str)
 	vars->q_count = quotes_counter(vars, *input_str);
 	if (!vars->q_count)
 		return (1);
-	if (vars->q_count % 2 != 0)
-		if (!wait_quote(vars, input_str, vars->main_c, &vars->q_count))
-			return (0);
+	if (err_mes(vars->q_count % 2 != 0, NULL, NULL, QUOTES_ERR))
+		return (0);
 	count = vars->q_count;
 	i = -1;
 	while ((*input_str)[++i])

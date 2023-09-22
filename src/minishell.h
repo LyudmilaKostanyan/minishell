@@ -13,8 +13,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 # define EXIT_ERR "numeric argument required"
-# define QUOTES_ERR "minishell: unexpected EOF while looking for matching `\"\'\n"
-# define QUOTES_SYN_ERR "minishell: syntax error: unexpected end of file\n"
+# define QUOTES_ERR "input correct number of quotes"
 # define CD_ERR "No such file or directory"
 # define E_U_ERR "not a valid identifier"
 # define PIPE_ERR "syntax error near unexpected token `|'"
@@ -126,7 +125,6 @@ long long	ft_atoll(t_vars *vars, char *str);
 int			empty(void);
 int			ft_isalnum_str(char *str, char c);
 int			check_set(t_vars *vars, t_env *env, char *cmd, char *key);
-int			quotes_handler(t_vars *vars, char **input_str);
 int			wait_quote(t_vars *vars, char **input_str, char c, int *count);
 int			split_size(char **split);
 int			read_input(t_vars *vars, t_cmds **cmds);
@@ -144,5 +142,6 @@ int			merge_cmds(t_vars *vars, t_cmds **cmds,
 int			check_redirection(t_cmds *cmds, int count);
 int			check_builtins(t_vars *vars, char **cmd);
 int			check_equal(t_vars *vars, char **cmd);
+int			quotes_handler(t_vars *vars, char **input_str);
 
 #endif
