@@ -12,18 +12,19 @@
 
 #include "minishell.h"
 
-int	check_set_elfi(char *cmd, char **env_value, char *new_value)
+int	check_set_elfi(char *cmd, char **env_value, char **new_value)
 {
 	if (!ft_strcmp(cmd, *env_value))
 		return (1);
 	free(*env_value);
-	*env_value = new_value;
+	*env_value = *new_value;
 	return (0);
 }
 
 int	check_set(t_vars *vars, t_env *env, char *cmd, char *key)
 {
 	int		plus;
+	char	*tmp;
 
 	plus = 0;
 	if (key[ft_strlen(key) - 1] == '+')
@@ -35,13 +36,16 @@ int	check_set(t_vars *vars, t_env *env, char *cmd, char *key)
 		return (add_value(vars, cmd, &env));
 	if (vars->equal > 0)
 	{
-		if (check_set_elfi(ft_strchr(cmd, '=') + 1, &env->value,
-				ft_substr(cmd, vars->equal + 1, ft_strlen(cmd) - vars->equal)))
+		tmp = ft_substr(cmd, vars->equal + 1, ft_strlen(cmd) - vars->equal);
+		if (check_set_elfi(ft_strchr(cmd, '=') + 1, &env->value, &tmp))
 			return (1);
 	}
 	else
-		if (check_set_elfi(cmd, &env->value, ft_strdup(cmd)))
+	{
+		tmp = ft_strdup(cmd);
+		if (check_set_elfi(cmd, &env->value, &tmp))
 			return (1);
+	}
 	malloc_err(!env->value, "check_set : env->value", vars->true_env);
 	free(env->line);
 	merge_key_value(vars, env);
