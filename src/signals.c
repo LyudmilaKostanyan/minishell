@@ -24,3 +24,9 @@ int	empty(void)
 {
 	return (0);
 }
+
+void	sig_handler(int sig)
+{
+	(void)sig;
+	g_exit_status = 1;
+}

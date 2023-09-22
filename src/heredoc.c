@@ -95,10 +95,14 @@ int	hd_while(t_vars *vars, char *end, int fd)
 
 int	here_doc(t_vars *vars, char *end)
 {
-	int		*fds;
-	int		fd;
-	int		cond;
+	int					*fds;
+	int					fd;
+	int					cond;
+	struct sigaction	sig;
 
+	sig.sa_handler = SIG_DFL;
+	sig.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &sig, NULL);
 	fds = malloc(sizeof(int) * 2);
 	malloc_err(!fds, "here_doc", vars->true_env);
 	stop_program(pipe(fds) == -1, "", IO, vars->true_env);

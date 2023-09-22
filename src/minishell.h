@@ -143,5 +143,6 @@ int			check_redirection(t_cmds *cmds, int count);
 int			check_builtins(t_vars *vars, char **cmd);
 int			check_equal(t_vars *vars, char **cmd);
 int			quotes_handler(t_vars *vars, char **input_str);
+void		sig_handler(int sig);
 
 #endif
