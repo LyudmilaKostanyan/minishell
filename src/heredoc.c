@@ -119,6 +119,5 @@ int	here_doc(t_vars *vars, char *end)
 	close(fds[1]);
 	fd = fds[0];
 	free(fds);
-	g_exit_status = 0;
 	return (fd);
 }
