@@ -22,6 +22,7 @@
 # define TMP "Resource temporarily unavailable"
 # define CRV "creating redirection vars"
 # define CCL "creating cmd list"
+# define PD "Permission denied"
 
 # include <limits.h>
 # include <errno.h>

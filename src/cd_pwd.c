@@ -54,7 +54,7 @@ int	cd_check_args(t_vars *vars, char **cmd)
 		if (tmp)
 		{
 			change_oldpwd(vars, cmd);
-			chdir(pwd);
+			err_mes(chdir(pwd) == -1, "cd", pwd, PD);
 		}
 		free(pwd);
 	}
@@ -76,13 +76,13 @@ void	cd(t_vars *vars, char **cmd)
 		tmp = find_key(*vars, "HOME");
 		err_mes(!tmp, *cmd, NULL, "HOME not set");
 		if (tmp)
-			chdir(tmp->value);
+			err_mes(chdir(tmp->value) == -1, "cd", tmp->value, PD);
 		if (!check_set(vars, vars->env, tmp->value, "PWD"))
 			creat_env_var(vars, &vars->env, tmp->value, "PWD");
 	}
 	else
 	{
-		chdir(cmd[1]);
+		err_mes(chdir(cmd[1]) == -1, "cd", cmd[1], PD);
 		pwd = getcwd(NULL, 0);
 		malloc_err(!pwd, cmd[0], vars->true_env);
 		if (!check_set(vars, vars->env, pwd, "PWD"))
