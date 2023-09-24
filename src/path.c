@@ -52,6 +52,7 @@ void	creating_exec_path(t_vars *vars)
 	int		i;
 	char	*tmp;
 
+	vars->paths = NULL;
 	env_to_str(vars);
 	i = -1;
 	while (vars->env_var[++i])
@@ -82,14 +83,17 @@ int	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 	while (vars->paths && vars->paths[j])
 	{
 		tmp = ft_strjoin(vars->paths[j], "/");
+		malloc_err(!tmp, "path_check", vars->true_env);
 		(*cmds)[i].ex_cmd = ft_strjoin(tmp, cmd);
+		malloc_err(!(*cmds)[i].ex_cmd, "path_check", vars->true_env);
 		free(tmp);
 		if (access((*cmds)[i].ex_cmd, X_OK) != -1)
 			return (1);
 		j++;
 		free((*cmds)[i].ex_cmd);
 	}
-	printf("%s: command not found\n", cmd);
+	err_mes(1, cmd, NULL, "command not found");
+	// write(vars->fd_out, "command not found\n", 18);
 	exit(127);
 	return (0);
 }

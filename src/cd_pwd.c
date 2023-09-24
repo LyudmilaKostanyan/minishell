@@ -57,6 +57,7 @@ int	cd_check_args(t_vars *vars, char **cmd)
 			err_mes(chdir(pwd) == -1, "cd", pwd, PD);
 		}
 		free(pwd);
+		return (0);
 	}
 	else
 		change_oldpwd(vars, cmd);
