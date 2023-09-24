@@ -42,14 +42,14 @@ int	cd_check_args(t_vars *vars, char **cmd)
 	t_env	*tmp;
 
 	if (cmd[1] && *cmd[1] != '~' && *cmd[1] != '-'
-		&& (err_mes(access(cmd[1], F_OK) == -1, join_err(vars, *cmd, cmd[1]),
-				CD_ERR, vars) || err_mes(cmd[2] != NULL,
-				join_err(vars, *cmd, cmd[1]), TMA, vars)))
+		&& (err_mes(access(cmd[1], F_OK) == -1,
+				join_err(vars, *cmd, cmd[1]), CD_ERR, vars)))
 		return (0);
 	if (!ft_strcmp(cmd[1], "-"))
 	{
 		tmp = find_key(*vars, "OLDPWD");
-		err_mes(!tmp, join_err(vars, *cmd, NULL), "OLDPWD not set", vars);
+		if (err_mes(!tmp, join_err(vars, *cmd, NULL), "OLDPWD not set", vars))
+			return (0);
 		pwd = ft_strdup(tmp->value);
 		malloc_err(!pwd, *cmd, vars);
 		if (tmp)
