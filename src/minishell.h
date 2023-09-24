@@ -81,6 +81,7 @@ typedef struct s_vars
 	char				*key;
 	struct sigaction	sig;
 	int					here_doc;
+	char				*hd_end;
 }	t_vars;
 
 typedef struct s_mall_size

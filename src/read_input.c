@@ -75,6 +75,8 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 
 	pipe_splt = NULL;
 	*cmds = NULL;
+	vars->hd_end = NULL;
+	vars->here_doc = 0;
 	input_str = readline("\e[34mminishell$ \e[0m");
 	cond = check_input(vars, input_str, &pipe_splt, &for_splt);
 	if (!cond || cond == -1)
