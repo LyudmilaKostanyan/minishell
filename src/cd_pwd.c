@@ -42,19 +42,20 @@ int	cd_check_args(t_vars *vars, char **cmd)
 	t_env	*tmp;
 
 	if (cmd[1] && *cmd[1] != '~' && *cmd[1] != '-'
-		&& (err_mes(access(cmd[1], F_OK) == -1, *cmd, cmd[1], CD_ERR)
-			|| err_mes(cmd[2] != NULL, *cmd, cmd[1], TMA)))
+		&& (err_mes(access(cmd[1], F_OK) == -1, join_err(vars, *cmd, cmd[1]),
+				CD_ERR, vars) || err_mes(cmd[2] != NULL,
+				join_err(vars, *cmd, cmd[1]), TMA, vars)))
 		return (0);
 	if (!ft_strcmp(cmd[1], "-"))
 	{
 		tmp = find_key(*vars, "OLDPWD");
-		err_mes(!tmp, *cmd, NULL, "OLDPWD not set");
+		err_mes(!tmp, join_err(vars, *cmd, NULL), "OLDPWD not set", vars);
 		pwd = ft_strdup(tmp->value);
 		malloc_err(!pwd, *cmd, vars);
 		if (tmp)
 		{
 			change_oldpwd(vars, cmd);
-			err_mes(chdir(pwd) == -1, "cd", pwd, PD);
+			err_mes(chdir(pwd) == -1, join_err(vars, "cd", pwd), PD, vars);
 		}
 		free(pwd);
 		return (0);
@@ -75,15 +76,15 @@ void	cd(t_vars *vars, char **cmd)
 	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))
 	{
 		tmp = find_key(*vars, "HOME");
-		err_mes(!tmp, *cmd, NULL, "HOME not set");
+		err_mes(!tmp, join_err(vars, *cmd, NULL), "HOME not set", vars);
 		if (tmp)
-			err_mes(chdir(tmp->value) == -1, "cd", tmp->value, PD);
+			err_mes(chdir(tmp->value) == -1, join_err(vars, "cd", tmp->value), PD, vars);
 		if (!check_set(vars, vars->env, tmp->value, "PWD"))
 			creat_env_var(vars, &vars->env, tmp->value, "PWD");
 	}
 	else
 	{
-		err_mes(chdir(cmd[1]) == -1, "cd", cmd[1], PD);
+		err_mes(chdir(cmd[1]) == -1, join_err(vars, "cd", cmd[1]), PD, vars);
 		pwd = getcwd(NULL, 0);
 		malloc_err(!pwd, cmd[0], vars);
 		if (!check_set(vars, vars->env, pwd, "PWD"))

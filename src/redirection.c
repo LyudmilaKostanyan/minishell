@@ -15,7 +15,8 @@
 int	redirection(t_vars *vars, t_cmds **cmds, int i)
 {
 	if ((*cmds)[i].in_stat == 1 && err_mes(dup2(open((*cmds)[i].red_in,
-		O_RDONLY), 0) == -1, (*cmds)[i].red_in, NULL, CD_ERR))
+		O_RDONLY), 0) == -1, join_err(vars, (*cmds)[i].red_in, NULL),
+			CD_ERR, vars))
 		return (0);
 	else if ((*cmds)[i].in_stat == 2)
 		stop_program(dup2(here_doc(vars, (*cmds)[i].red_in), 0) == -1, "",

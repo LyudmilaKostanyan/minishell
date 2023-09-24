@@ -134,16 +134,17 @@ int			path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i);
 int			redirection(t_vars *vars, t_cmds **cmds, int i);
 int			redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i);
 int			here_doc(t_vars *vars, char *end);
-int			err_mes(int condition, char *cmd, char *line, char *issue);
+int			err_mes(int condition, char *cmd_line, char *issue, t_vars *vars);
 int			add_value(t_vars *vars, char *cmd, t_env **env);
 int			count_key_val(t_vars vars, char *input_str,
 				t_mall_size *mall_size, int i);
 int			merge_cmds(t_vars *vars, t_cmds **cmds,
 				char **pipe_splt, int count);
-int			check_redirection(t_cmds *cmds, int count);
+int			check_redirection(t_vars *vars, t_cmds *cmds, int count);
 int			check_builtins(t_vars *vars, char **cmd);
 int			check_equal(t_vars *vars, char **cmd);
 int			quotes_handler(t_vars *vars, char **input_str);
 void		sig_handler(int sig);
+char		*join_err(t_vars *vars, char *cmd, char *line);
 
 #endif

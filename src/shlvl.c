@@ -57,3 +57,27 @@ void	add_remove_shlvl(char **env, int i)
 	}
 	ft_setlvl("SHLVL", env, newlvl);
 }
+
+char	*join_err(t_vars *vars, char *cmd, char *line)
+{
+	char	*str;
+	char	*tmp;
+
+	if (!line)
+		str = ft_strdup(cmd);
+	else
+	{
+		tmp = ft_strjoin(cmd, ": `");
+		malloc_err(!tmp, "join_err", vars);
+		str = tmp;
+		tmp = ft_strjoin(str, line);
+		malloc_err(!tmp, "join_err", vars);
+		free(str);
+		str = tmp;
+		tmp = ft_strjoin(str, "'");
+		free(str);
+		str = tmp;
+	}
+	malloc_err(!str, "join_err", vars);
+	return (str);
+}

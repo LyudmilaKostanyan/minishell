@@ -58,7 +58,7 @@ int	quotes_handler(t_vars *vars, char **input_str)
 	vars->q_count = quotes_counter(vars, *input_str);
 	if (!vars->q_count)
 		return (1);
-	if (err_mes(vars->q_count % 2 != 0, NULL, NULL, QUOTES_ERR))
+	if (err_mes(vars->q_count % 2 != 0, NULL, QUOTES_ERR, vars))
 		return (0);
 	count = vars->q_count;
 	i = -1;

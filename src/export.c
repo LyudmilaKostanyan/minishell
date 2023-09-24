@@ -115,7 +115,7 @@ void	export(t_vars *vars, char **cmd)
 		else if (ft_isdigit(*vars->key) || !*vars->key
 			|| !ft_isalnum_str(vars->key, 'u'))
 		{
-			err_mes(1, *cmd, cmd[i], E_U_ERR);
+			err_mes(1, join_err(vars, *cmd, cmd[i]), E_U_ERR, vars);
 			g_exit_status = 1;
 		}
 		free(vars->key);

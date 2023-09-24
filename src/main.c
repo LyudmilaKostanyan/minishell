@@ -76,8 +76,8 @@ static void	main_help(t_vars vars, t_cmds *cmds, char **env)
 		vars.fd_in = dup(0);
 		vars.fd_out = dup(1);
 		count = read_input(&vars, &cmds);
-		if (count == -1 || err_mes(!count, NULL, NULL, PIPE_ERR)
-			|| !check_redirection(cmds, count))
+		if (count == -1 || err_mes(!count, NULL, PIPE_ERR, &vars)
+			|| !check_redirection(&vars, cmds, count))
 		{
 			free_cmds(&vars, &cmds, count);
 			continue ;

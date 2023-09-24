@@ -88,7 +88,7 @@ void	unset(t_vars *vars, char **cmd)
 		if (!ft_isdigit(*cmd[i]) && ft_isalnum_str(cmd[i], 'u'))
 			find_node(vars, cmd[i]);
 		else
-			err_mes(1, *cmd, cmd[i], E_U_ERR);
+			err_mes(1, join_err(vars, *cmd, cmd[i]), E_U_ERR, vars);
 	}
 }
 
@@ -96,7 +96,8 @@ void	exit_prog(t_vars *vars, char **cmd)
 {
 	long long	exit_code;
 
-	if (err_mes(cmd[1] && cmd[2] != NULL, *cmd, NULL, TMA))
+	if (err_mes(cmd[1] && cmd[2] != NULL,
+			join_err(vars, *cmd, NULL), TMA, vars))
 		return ;
 	if (cmd[1])
 	{

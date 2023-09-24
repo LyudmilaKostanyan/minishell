@@ -99,7 +99,7 @@ int	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 		(*cmds)[i].ex_cmd = ft_strdup(cmd);
 		return (1);
 	}
-	err_mes(1, cmd, NULL, "command not found");
+	err_mes(1, join_err(vars, cmd, NULL), "command not found", vars);
 	exit(127);
 	return (0);
 }

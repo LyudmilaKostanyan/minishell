@@ -29,6 +29,7 @@
 		"type_traits": "c",
 		"__node_handle": "c",
 		"chrono": "c",
-		"optional": "c"
+		"optional": "c",
+		"ostream": "c"
 	}
 }

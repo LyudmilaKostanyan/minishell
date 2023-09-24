@@ -102,7 +102,7 @@ void	free_cmds(t_vars *vars, t_cmds **cmds, int count)
 	free(*cmds);
 }
 
-int	check_redirection(t_cmds *cmds, int count)
+int	check_redirection(t_vars *vars, t_cmds *cmds, int count)
 {
 	int	i;
 
@@ -110,7 +110,7 @@ int	check_redirection(t_cmds *cmds, int count)
 	while (++i < count)
 	{
 		if (err_mes(cmds[i].in_stat == -1
-				|| cmds[i].out_stat == -1, NULL, NULL, "syntax error"))
+				|| cmds[i].out_stat == -1, NULL, "syntax error", vars))
 		{
 			g_exit_status = 258;
 			return (0);
