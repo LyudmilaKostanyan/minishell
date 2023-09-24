@@ -65,22 +65,32 @@ int	cd_check_args(t_vars *vars, char **cmd)
 	return (1);
 }
 
+int	cd_help(t_vars *vars, char **cmd)
+{
+	t_env	*tmp;
+
+	tmp = find_key(*vars, "HOME");
+	if (err_mes(!tmp, join_err(vars, *cmd, NULL), "HOME not set", vars))
+		return (0);
+	if (tmp)
+		err_mes(chdir(tmp->value) == -1,
+			join_err(vars, "cd", tmp->value), PD, vars);
+	if (!check_set(vars, vars->env, tmp->value, "PWD"))
+		creat_env_var(vars, &vars->env, tmp->value, "PWD");
+	return (1);
+}
+
 void	cd(t_vars *vars, char **cmd)
 {
 	char	*pwd;
-	t_env	*tmp;
 
 	if (!cd_check_args(vars, cmd))
 		return ;
 	vars->equal = 0;
 	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))
 	{
-		tmp = find_key(*vars, "HOME");
-		err_mes(!tmp, join_err(vars, *cmd, NULL), "HOME not set", vars);
-		if (tmp)
-			err_mes(chdir(tmp->value) == -1, join_err(vars, "cd", tmp->value), PD, vars);
-		if (!check_set(vars, vars->env, tmp->value, "PWD"))
-			creat_env_var(vars, &vars->env, tmp->value, "PWD");
+		if (!cd_help(vars, cmd))
+			return ;
 	}
 	else
 	{
