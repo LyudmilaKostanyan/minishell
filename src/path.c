@@ -66,34 +66,40 @@ void	creating_exec_path(t_vars *vars)
 	}
 }
 
-int	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
+static int	path_check_help(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 {
-	char	*tmp;
 	int		j;
+	char	*tmp;
 
-	if (!cmd)
-		return (1);
-	creating_exec_path(vars);
-	if (access(cmd, X_OK) != -1)
-	{
-		(*cmds)[i].ex_cmd = ft_strdup(cmd);
-		return (1);
-	}
 	j = 0;
 	while (vars->paths && vars->paths[j])
 	{
 		tmp = ft_strjoin(vars->paths[j], "/");
-		malloc_err(!tmp, "path_check", vars->true_env);
+		malloc_err(!tmp, "path_check", vars);
 		(*cmds)[i].ex_cmd = ft_strjoin(tmp, cmd);
-		malloc_err(!(*cmds)[i].ex_cmd, "path_check", vars->true_env);
+		malloc_err(!(*cmds)[i].ex_cmd, "path_check", vars);
 		free(tmp);
 		if (access((*cmds)[i].ex_cmd, X_OK) != -1)
 			return (1);
 		j++;
 		free((*cmds)[i].ex_cmd);
 	}
+	return (0);
+}
+
+int	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
+{
+	if (!cmd)
+		return (1);
+	creating_exec_path(vars);
+	if (path_check_help(vars, cmds, cmd, i))
+		return (1);
+	if (access(cmd, X_OK) != -1)
+	{
+		(*cmds)[i].ex_cmd = ft_strdup(cmd);
+		return (1);
+	}
 	err_mes(1, cmd, NULL, "command not found");
-	// write(vars->fd_out, "command not found\n", 18);
 	exit(127);
 	return (0);
 }

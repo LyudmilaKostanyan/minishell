@@ -19,7 +19,7 @@ t_env	*creat_env_list(t_vars *vars, char **env)
 	int		equal;
 
 	head = malloc(sizeof(t_env));
-	malloc_err(!head, "env list", vars->true_env);
+	malloc_err(!head, "env list", vars);
 	node = head;
 	while (*env)
 	{
@@ -27,13 +27,13 @@ t_env	*creat_env_list(t_vars *vars, char **env)
 		node->line = ft_strdup(*env);
 		node->key = ft_substr(*env, 0, equal);
 		node->value = ft_substr(*env, equal + 1, ft_strlen(*env) - equal);
-		malloc_err(!node->line || !node->key, "env list", vars->true_env);
+		malloc_err(!node->line || !node->key, "env list", vars);
 		if (!*(env + 1))
 			node->next = NULL;
 		else
 		{
 			node->next = malloc(sizeof(t_env));
-			malloc_err(!node->next, "env list", vars->true_env);
+			malloc_err(!node->next, "env list", vars);
 		}
 		node = node->next;
 		env++;
@@ -73,7 +73,7 @@ int	check_equal(t_vars *vars, char **cmd)
 	{
 		vars->equal = ft_strchr(cmd[i], '=') - cmd[i];
 		vars->key = ft_substr(cmd[i], 0, vars->equal);
-		malloc_err(!vars->key, cmd[0], vars->true_env);
+		malloc_err(!vars->key, cmd[0], vars);
 		if (vars->equal >= 0 && !ft_isdigit(*vars->key) && *vars->key
 			&& ft_isalnum_str(vars->key, 'e') && ++cond
 			&& !check_set(vars, vars->env, cmd[i], vars->key)

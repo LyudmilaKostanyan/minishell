@@ -19,7 +19,7 @@ char	**splt_by_spaces(t_vars *vars, t_cmds **cmds, char **pipe_splt, int i)
 	int		cmds_count;
 
 	sp_split = ft_split(pipe_splt[i], ' ');
-	malloc_err(!sp_split, "creating cmd list", vars->true_env);
+	malloc_err(!sp_split, "creating cmd list", vars);
 	if (!*sp_split)
 	{
 		split_free(sp_split);
@@ -36,7 +36,7 @@ char	**splt_by_spaces(t_vars *vars, t_cmds **cmds, char **pipe_splt, int i)
 						">>") && ft_strcmp(sp_split[j - 1], "<<")))
 				cmds_count++;
 	(*cmds)[i].cmd = malloc(sizeof(char *) * (cmds_count + 1));
-	malloc_err(!(*cmds)[i].cmd, "creating cmd list", vars->true_env);
+	malloc_err(!(*cmds)[i].cmd, "creating cmd list", vars);
 	return (sp_split);
 }
 
@@ -102,13 +102,13 @@ void	redirections_init(t_vars *vars, t_cmds **cmds, char **sp_split, int i)
 					&& ft_strcmp(sp_split[j - 1], "<<")))
 			{
 				(*cmds)[i].cmd[++k] = ft_strdup(sp_split[j]);
-				malloc_err(!(*cmds)[i].cmd[k], CCL, vars->true_env);
+				malloc_err(!(*cmds)[i].cmd[k], CCL, vars);
 			}
 		}
 		if (!red_in(cmds, sp_split, i, j))
-			malloc_err(!(*cmds)[i].red_in, CRV, vars->true_env);
+			malloc_err(!(*cmds)[i].red_in, CRV, vars);
 		if (!red_out(cmds, sp_split, i, j))
-			malloc_err(!(*cmds)[i].red_out, CRV, vars->true_env);
+			malloc_err(!(*cmds)[i].red_out, CRV, vars);
 	}
 	(*cmds)[i].cmd[++k] = NULL;
 }

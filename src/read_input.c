@@ -38,7 +38,7 @@ int	check_pipes(char *input_str)
 
 int	check_input(t_vars *vars, char *input_str, char ***p_splt, char **for_splt)
 {
-	stop_program(!input_str, NULL, "exit", vars->true_env);
+	stop_program(!input_str, NULL, "exit", vars);
 	if (!*input_str)
 	{
 		free(input_str);
@@ -80,12 +80,12 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	if (!cond || cond == -1)
 		return (cond);
 	free(for_splt);
-	malloc_err(!pipe_splt, "split cmds", vars->true_env);
+	malloc_err(!pipe_splt, "split cmds", vars);
 	restore_spaces(&input_str);
 	count = split_size(pipe_splt);
 	free(*cmds);
 	*cmds = malloc((sizeof(t_cmds) * count) + 1);
-	malloc_err(!*cmds, "creat cmds", vars->true_env);
+	malloc_err(!*cmds, "creat cmds", vars);
 	count = merge_cmds(vars, cmds, pipe_splt, count);
 	add_history(input_str);
 	free(input_str);

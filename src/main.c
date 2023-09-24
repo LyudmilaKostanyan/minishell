@@ -22,7 +22,7 @@ static void	processes_help(t_vars *vars, t_cmds **cmds, int count)
 	while (++i < count)
 	{
 		(*cmds)[i].pid = fork();
-		stop_program((*cmds)[i].pid == -1, NULL, "Fork error", vars->true_env);
+		stop_program((*cmds)[i].pid == -1, NULL, "Fork error", vars);
 		if ((*cmds)[i].pid == 0)
 		{
 			if (!redirect_pipes(vars, cmds, count, i))

@@ -25,7 +25,7 @@ int	creat_out_str(t_vars *vars, char *input_str, char **out_str)
 		return (0);
 	*out_str = malloc(ft_strlen(input_str) + mall_size.val_len
 			- mall_size.key_len - vars->q_count + mall_size.sp_count + 1);
-	malloc_err(!*out_str, "rm_quotes", vars->true_env);
+	malloc_err(!*out_str, "rm_quotes", vars);
 	return (1);
 }
 

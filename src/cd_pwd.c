@@ -17,7 +17,7 @@ void	pwd(t_vars *vars)
 	char	*pwd;
 
 	pwd = getcwd(NULL, 0);
-	malloc_err(!pwd, "pwd", vars->true_env);
+	malloc_err(!pwd, "pwd", vars);
 	printf("%s\n", pwd);
 	free(pwd);
 	g_exit_status = 0;
@@ -28,7 +28,7 @@ void	change_oldpwd(t_vars *vars, char **cmd)
 	char	*old_pwd;
 
 	old_pwd = getcwd(NULL, 0);
-	malloc_err(!old_pwd, *cmd, vars->true_env);
+	malloc_err(!old_pwd, *cmd, vars);
 	vars->equal = 0;
 	vars->key = "OLDPWD";
 	if (!check_set(vars, vars->env, old_pwd, "OLDPWD"))
@@ -50,7 +50,7 @@ int	cd_check_args(t_vars *vars, char **cmd)
 		tmp = find_key(*vars, "OLDPWD");
 		err_mes(!tmp, *cmd, NULL, "OLDPWD not set");
 		pwd = ft_strdup(tmp->value);
-		malloc_err(!pwd, *cmd, vars->true_env);
+		malloc_err(!pwd, *cmd, vars);
 		if (tmp)
 		{
 			change_oldpwd(vars, cmd);
@@ -85,7 +85,7 @@ void	cd(t_vars *vars, char **cmd)
 	{
 		err_mes(chdir(cmd[1]) == -1, "cd", cmd[1], PD);
 		pwd = getcwd(NULL, 0);
-		malloc_err(!pwd, cmd[0], vars->true_env);
+		malloc_err(!pwd, cmd[0], vars);
 		if (!check_set(vars, vars->env, pwd, "PWD"))
 			creat_env_var(vars, &vars->env, pwd, "PWD");
 		free(pwd);

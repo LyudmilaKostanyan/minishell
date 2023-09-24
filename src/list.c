@@ -89,7 +89,7 @@ t_env	*key_cmp(t_vars vars, char **input_str)
 	if (*(tmp - 1) == '/')
 		keys_end++;
 	key = ft_substr(*input_str, 0, keys_end);
-	malloc_err(!key, "check $ case", vars.true_env);
+	malloc_err(!key, "check $ case", &vars);
 	env = find_key(vars, key);
 	free(key);
 	return (env);

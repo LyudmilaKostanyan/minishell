@@ -12,8 +12,10 @@
 
 #include "minishell.h"
 
-int	check_set_elfi(char *cmd, char **env_value, char *new_value)
+static int
+	check_set_elfi(char *cmd, char **env_value, char *new_value, t_vars *vars)
 {
+	malloc_err(!new_value, "new_value", vars);
 	if (!ft_strcmp(cmd, *env_value))
 	{
 		free(new_value);
@@ -39,13 +41,14 @@ int	check_set(t_vars *vars, t_env *env, char *cmd, char *key)
 	if (vars->equal > 0)
 	{
 		if (check_set_elfi(ft_strchr(cmd, '=') + 1, &env->value,
-				ft_substr(cmd, vars->equal + 1, ft_strlen(cmd) - vars->equal)))
+				ft_substr(cmd, vars->equal + 1,
+					ft_strlen(cmd) - vars->equal), vars))
 			return (1);
 	}
 	else
-		if (check_set_elfi(cmd, &env->value, ft_strdup(cmd)))
+		if (check_set_elfi(cmd, &env->value, ft_strdup(cmd), vars))
 			return (1);
-	malloc_err(!env->value, "check_set : env->value", vars->true_env);
+	malloc_err(!env->value, "check_set : env->value", vars);
 	free(env->line);
 	merge_key_value(vars, env);
 	return (1);
@@ -62,7 +65,7 @@ t_env	*init_node(t_vars *vars, t_env **env)
 		*env = (*env)->next;
 	}
 	(*env) = malloc(sizeof(t_env));
-	malloc_err(!*env, "creat_env_var: env", vars->true_env);
+	malloc_err(!*env, "creat_env_var: env", vars);
 	return (tmp);
 }
 
@@ -85,7 +88,7 @@ void	creat_env_var(t_vars *vars, t_env **env, char *cmd, char *key)
 	else
 		(*env)->value = ft_strdup(cmd);
 	malloc_err(!(*env)->key || !(*env)->value, "creat_env_var: key/value",
-		vars->true_env);
+		vars);
 	merge_key_value(vars, *env);
 	(*env)->next = NULL;
 	if (head)
@@ -104,7 +107,7 @@ void	export(t_vars *vars, char **cmd)
 	{
 		vars->equal = ft_strchr(cmd[i], '=') - cmd[i];
 		vars->key = ft_substr(cmd[i], 0, vars->equal);
-		malloc_err(!vars->key, cmd[0], vars->true_env);
+		malloc_err(!vars->key, cmd[0], vars);
 		if (!ft_isdigit(*vars->key) && *vars->key
 			&& ft_isalnum_str(vars->key, 'e') && vars->equal >= 0
 			&& !check_set(vars, vars->env, cmd[i], vars->key))

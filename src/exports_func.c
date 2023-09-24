@@ -17,9 +17,9 @@ void	merge_key_value(t_vars *vars, t_env *node)
 	char	*key;
 
 	key = ft_strjoin(node->key, "=");
-	malloc_err(!key, "merge_key_value", vars->true_env);
+	malloc_err(!key, "merge_key_value", vars);
 	node->line = ft_strjoin(key, node->value);
-	malloc_err(!node->line, "merge_key_value", vars->true_env);
+	malloc_err(!node->line, "merge_key_value", vars);
 	free(key);
 }
 
@@ -41,11 +41,11 @@ int	add_value(t_vars *vars, char *cmd, t_env **env)
 	char	*tmp;
 
 	tmp = ft_strjoin((*env)->value, ft_strchr(cmd, '=') + 1);
-	malloc_err(!tmp, "add value in env variable", vars->true_env);
+	malloc_err(!tmp, "add value in env variable", vars);
 	free((*env)->value);
 	(*env)->value = tmp;
 	tmp = ft_strjoin((*env)->line, ft_strchr(cmd, '=') + 1);
-	malloc_err(!tmp, "add value in env variable", vars->true_env);
+	malloc_err(!tmp, "add value in env variable", vars);
 	free((*env)->line);
 	(*env)->line = tmp;
 	return (1);

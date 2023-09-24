@@ -60,7 +60,7 @@ static void	join(t_vars *vars, char **str1, char *str2)
 	char	*tmp;
 
 	tmp = ft_strjoin(*str1, str2);
-	malloc_err(!tmp, "here_doc", vars->true_env);
+	malloc_err(!tmp, "here_doc", vars);
 	if (*str1 && **str1)
 		free(*str1);
 	*str1 = tmp;
@@ -103,8 +103,8 @@ int	here_doc(t_vars *vars, char *end)
 
 	g_exit_status = 0;
 	fds = malloc(sizeof(int) * 2);
-	malloc_err(!fds, "here_doc", vars->true_env);
-	stop_program(pipe(fds) == -1, "", IO, vars->true_env);
+	malloc_err(!fds, "here_doc", vars);
+	stop_program(pipe(fds) == -1, "", IO, vars);
 	while (1)
 	{
 		vars->sig.sa_handler = &sig_handler;

@@ -79,15 +79,15 @@ long long	ft_atoll(t_vars *vars, char *str)
 	}
 	while (*str == 48)
 		str++;
-	stop_program(ft_strlen(str) > 19, "exit", EXIT_ERR, vars->true_env);
+	stop_program(ft_strlen(str) > 19, "exit", EXIT_ERR, vars);
 	while (*str)
 	{
-		stop_program(*str < 48 || *str > 57, "exit", EXIT_ERR, vars->true_env);
+		stop_program(*str < 48 || *str > 57, "exit", EXIT_ERR, vars);
 		u_num = u_num * 10 + (*str++ - 48);
 	}
 	stop_program((sign == 1 && u_num > LLONG_MAX)
 		|| (sign == -1 && u_num > (unsigned long long)(LLONG_MAX) + 1),
-		"exit", EXIT_ERR, vars->true_env);
+		"exit", EXIT_ERR, vars);
 	ll_num = sign * u_num;
 	return (ll_num);
 }
