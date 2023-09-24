@@ -21,10 +21,10 @@ bonus: $(BONUS_OBJ)
 	@ar -rcs $(NAME) $(BONUS_OBJ)
 
 clean:
-	rm -f *.o
+	@rm -f *.o
 
 fclean: clean
-	rm -f libft.a
+	@rm -f libft.a
 
 re: fclean all
 

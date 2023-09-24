@@ -63,8 +63,8 @@
 
 # #
 # fclean: clean
-# 	make fclean -C libft
-# 	rm -f $(NAME)
+# 	@make fclean -C libft
+# 	@rm -f $(NAME)
 
 # #
 # re: fclean all
@@ -100,7 +100,7 @@ OBJS = $(patsubst $(PREF_SRC)/%.c, $(PREF_OBJ)/%.o, $(SRCS))
 #
 CC = cc
 FLAGS = -Wall -Wextra -Werror
-FSANITIZE = #-fsanitize=address -g
+FSANITIZE = -fsanitize=address -g
 
 #
 all: readline $(NAME)
@@ -130,19 +130,24 @@ lib:
 	@make -C $(RDLINE_RESERV) install
 
 #
-clean:
+clean: dist
 	@make clean -C libft
 	@rm -rf $(PREF_OBJ)
 	@rm -rf $(RD_DIR)
-	@make -C $(RDLINE_RESERV) distclean
 
 #
 fclean: clean
-	make fclean -C libft
-	rm -f $(NAME)
+	@make fclean -C libft
+	@rm -f $(NAME)
+
+#
+dist:
+	@if [ -d $(RD_DIR) ]; then \
+	 	make -C $(RDLINE_RESERV) distclean; \
+	fi
 
 #
 re: fclean all
 
 #
-.PHONY: all clean fclean re lib readline
+.PHONY: all clean fclean re lib readline dist
