@@ -80,6 +80,7 @@ typedef struct s_vars
 	long long			equal;
 	char				*key;
 	struct sigaction	sig;
+	int					here_doc;
 }	t_vars;
 
 typedef struct s_mall_size

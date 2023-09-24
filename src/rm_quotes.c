@@ -42,15 +42,13 @@ void	fill_out_str(char **tmp, char **out_str, t_env *env, int *i)
 		(*tmp)++;
 }
 
-int	rm_q_if(t_vars *vars, char **tmp, int *i)
+void	rm_q_if(t_vars *vars, char **tmp, int *i)
 {
-	int	here_doc;
 	int	j;
 
-	here_doc = 0;
 	if (**tmp == '<' && *(*tmp + 1) && *(*tmp + 1) == **tmp)
 	{
-		here_doc++;
+		vars->here_doc++;
 		j = 1;
 		vars->hd_stat = 0;
 		while ((*tmp)[++j] == 32)
@@ -68,17 +66,14 @@ int	rm_q_if(t_vars *vars, char **tmp, int *i)
 	else if (*(*tmp + 1) && *(*tmp + 1) != 32
 		&& *(*tmp + 1) != **tmp)
 		vars->out_str[++(*i)] = 32;
-	return (here_doc);
 }
 
 void	rm_q_else(t_vars *vars, char **tmp, int *i, char main_c)
 {
-	t_env	*env;
-	int		here_doc;
+	t_env		*env;
 
-	here_doc = 0;
 	if (main_c != '\'' && **tmp == '$' && (*(*tmp + 1) == '_'
-			|| ft_isalpha(*(*tmp + 1))) && *(*tmp + 1) != '?' && !here_doc)
+			|| ft_isalpha(*(*tmp + 1))) && *(*tmp + 1) != '?' && !vars->here_doc)
 	{
 		env = find_same_key(*vars, *tmp);
 		if (env)
@@ -92,7 +87,7 @@ void	rm_q_else(t_vars *vars, char **tmp, int *i, char main_c)
 	{
 		vars->out_str[++(*i)] = **tmp;
 		if ((**tmp == '>' || **tmp == '<'))
-			here_doc += rm_q_if(vars, tmp, i);
+			rm_q_if(vars, tmp, i);
 	}
 }
 
@@ -105,6 +100,7 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	if (!creat_out_str(vars, input_str, &vars->out_str))
 		return (NULL);
 	i = -1;
+	vars->here_doc = 0;
 	while (*input_str)
 	{
 		if (*input_str == vars->main_c)
