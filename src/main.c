@@ -30,7 +30,6 @@ static void	processes_help(t_vars *vars, t_cmds **cmds, int count)
 			tolower_str(*(*cmds)[i].cmd);
 			close_pipes(cmds, count);
 			vars->sig.sa_handler = SIG_DFL;
-			vars->sig.sa_flags = SA_RESTART;
 			sigaction(SIGQUIT, &vars->sig, NULL);
 			if (*(*cmds)[i].cmd && !check_builtins(vars, (*cmds)[i].cmd)
 				&& path_check(vars, cmds, *(*cmds)[i].cmd, i))

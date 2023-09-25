@@ -108,7 +108,6 @@ int	here_doc(t_vars *vars, char *end)
 	while (1)
 	{
 		vars->sig.sa_handler = &sig_handler;
-		vars->sig.sa_flags = SA_RESTART;
 		sigaction(SIGINT, &vars->sig, NULL);
 		cond = hd_while(vars, end, fds[1]);
 		if (!cond)
