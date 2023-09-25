@@ -65,6 +65,7 @@ void	pipes(t_vars *vars, t_cmds **cmds, int count)
 	while (++i < count - 1)
 	{
 		(*cmds)[i].pipe = malloc(sizeof(int) * 2);
+		malloc_err(!(*cmds)[i].pipe, "creating pipes", vars);
 		if (!(*cmds)[i].pipe || pipe((*cmds)[i].pipe) == -1)
 		{
 			while (--i >= 0)

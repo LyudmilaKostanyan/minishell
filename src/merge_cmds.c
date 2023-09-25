@@ -129,6 +129,7 @@ int	merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
 		(*cmds)[i].out_stat = 0;
 		(*cmds)[i].red_in = NULL;
 		(*cmds)[i].red_out = NULL;
+		(*cmds)[i].pipe = NULL;
 		redirections_init(vars, cmds, sp_split, i);
 		split_free(sp_split);
 		j = -1;

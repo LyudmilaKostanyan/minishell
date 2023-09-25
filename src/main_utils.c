@@ -96,7 +96,7 @@ void	free_cmds(t_vars *vars, t_cmds **cmds, int count)
 		split_free((*cmds)[i].cmd);
 		free((*cmds)[i].red_in);
 		free((*cmds)[i].red_out);
-		if (i != count - 1)
+		if (i < count - 1 && (*cmds)[i].pipe)
 			free((*cmds)[i].pipe);
 	}
 	free(*cmds);
