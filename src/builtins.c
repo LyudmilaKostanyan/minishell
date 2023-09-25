@@ -35,24 +35,13 @@ int	echo_check_args(char **cmd)
 void	echo(char **cmd)
 {
 	int		i;
-	int		j;
 	int		cond;
-	char	*start;
 
 	i = echo_check_args(cmd) - 1;
 	cond = i + 1;
 	while (cmd[++i])
 	{
-		j = -1;
-		start = ft_strchr(cmd[i], '$');
-		if (!start || ft_strncmp(start, "$?", 2))
-			printf("%s", cmd[i]);
-		else
-		{
-			while (cmd[i] + ++j != start)
-				printf("%c", cmd[i][j]);
-			printf("%d%s", g_exit_status, cmd[i] + j + 2);
-		}
+		printf("%s", cmd[i]);
 		if (cmd[i + 1])
 			printf(" ");
 	}

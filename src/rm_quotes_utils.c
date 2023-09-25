@@ -37,6 +37,11 @@ int	key_value_len(t_vars vars, char *input_str, t_mall_size *mall_size)
 {
 	t_env	*env;
 
+	if (*(input_str + 1) == '?')
+	{
+		mall_size->exit_stat_len += ft_intlen(g_exit_status) - 2;
+		return (1);
+	}
 	env = key_cmp(vars, &input_str);
 	if (env)
 	{
@@ -54,6 +59,15 @@ void	space_count(char *input_str, t_mall_size *mall_size, int i)
 			&& *(input_str + 2) && *(input_str + 2) != 32)
 			mall_size->sp_count++;
 		else if (*(input_str + 1) && *(input_str + 1) != 32)
+			mall_size->sp_count++;
+	}
+	if (i && *(input_str + 1) && (*(input_str + 1) == '>'
+		|| *(input_str + 1) == '<'))
+	{
+		if (*input_str != 32 && *(input_str + 2)
+			&& *(input_str + 2) == *(input_str + 1))
+			mall_size->sp_count++;
+		else if (*input_str != 32)
 			mall_size->sp_count++;
 	}
 }

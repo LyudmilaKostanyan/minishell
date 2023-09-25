@@ -81,3 +81,18 @@ char	*join_err(t_vars *vars, char *cmd, char *line)
 	malloc_err(!str, "join_err", vars);
 	return (str);
 }
+
+int	ft_intlen(int n)
+{
+	long	nb;
+	int		len;
+
+	len = 0;
+	nb = n;
+	if (nb < 0)
+		nb = -nb;
+	if (nb > 9)
+		len += ft_intlen(nb / 10);
+	len++;
+	return (len);
+}

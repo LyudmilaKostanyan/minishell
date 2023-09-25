@@ -12,36 +12,6 @@
 
 #include "minishell.h"
 
-int	creat_out_str(t_vars *vars, char *input_str, char **out_str)
-{
-	t_mall_size	mall_size;
-	int			cond;
-
-	mall_size.sp_count = 0;
-	mall_size.key_len = 0;
-	mall_size.val_len = 0;
-	cond = count_key_val(*vars, input_str, &mall_size, 1);
-	if (!vars->main_c && !mall_size.key_len && !cond && !mall_size.sp_count)
-		return (0);
-	*out_str = malloc(ft_strlen(input_str) + mall_size.val_len
-			- mall_size.key_len - vars->q_count + mall_size.sp_count + 1);
-	malloc_err(!*out_str, "rm_quotes", vars);
-	return (1);
-}
-
-void	fill_out_str(char **tmp, char **out_str, t_env *env, int *i)
-{
-	int	j;
-
-	j = -1;
-	while (env->value[++j])
-		(*out_str)[++(*i)] = env->value[j];
-	(*tmp)++;
-	j = -1;
-	while (*(*tmp + 1) && *(*tmp + 1) == env->key[++j + 1])
-		(*tmp)++;
-}
-
 void	rm_q_if(t_vars *vars, char **tmp, int *i)
 {
 	int		j;
@@ -69,16 +39,48 @@ void	rm_q_if(t_vars *vars, char **tmp, int *i)
 		vars->out_str[++(*i)] = 32;
 }
 
+void	replace_exit_stat(t_vars *vars, char **tmp, int *i)
+{
+	size_t	j;
+	char	*exit_stat_num;
+
+	j = -1;
+	exit_stat_num = ft_itoa(g_exit_status);
+	while (++j < ft_strlen(exit_stat_num))
+		vars->out_str[++(*i)] = exit_stat_num[j];
+	free(exit_stat_num);
+	(*tmp) += 1;
+}
+
+void	rm_q_elseelse(t_vars *vars, char **tmp, int *i)
+{
+	vars->out_str[++(*i)] = **tmp;
+	if (*(*tmp + 1) && **tmp != 32
+		&& (*(*tmp + 1) == '>' || *(*tmp + 1) == '<'))
+	{
+		vars->out_str[++(*i)] = 32;
+		vars->out_str[++(*i)] = **tmp;
+		(*tmp)++;
+	}
+	if ((**tmp == '>' || **tmp == '<'))
+		rm_q_if(vars, tmp, i);
+}
+
 void	rm_q_else(t_vars *vars, char **tmp, int *i, char main_c)
 {
 	t_env	*env;
 
 	if (*tmp == vars->hd_end)
 		vars->here_doc = 0;
-	if (main_c != '\'' && **tmp == '$'
-		&& (*(*tmp + 1) == '_' || ft_isalpha(*(*tmp + 1)))
-		&& *(*tmp + 1) != '?' && !vars->here_doc)
+	if (main_c != '\'' && **tmp == '$' && *(*tmp + 1)
+		&& (*(*tmp + 1) == '_' || ft_isalpha(*(*tmp + 1))
+			|| *(*tmp + 1) == '?') && !vars->here_doc)
 	{
+		if (*(*tmp + 1) == '?')
+		{
+			replace_exit_stat(vars, tmp, i);
+			return ;
+		}
 		env = find_same_key(*vars, *tmp);
 		if (env)
 			fill_out_str(tmp, &vars->out_str, env, i);
@@ -88,11 +90,7 @@ void	rm_q_else(t_vars *vars, char **tmp, int *i, char main_c)
 					;
 	}
 	else
-	{
-		vars->out_str[++(*i)] = **tmp;
-		if ((**tmp == '>' || **tmp == '<'))
-			rm_q_if(vars, tmp, i);
-	}
+		rm_q_elseelse(vars, tmp, i);
 }
 
 char	*rm_quotes(t_vars *vars, char *input_str)

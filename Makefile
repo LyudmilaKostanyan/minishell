@@ -94,7 +94,7 @@ PREF_OBJ = obj
 SRCS = $(addprefix $(PREF_SRC)/, builtins.c errors.c export.c\
 	main.c path.c quotes.c read_input.c redirection.c rm_quotes.c\
 	shlvl.c utils.c list.c cd_pwd.c exports_func.c heredoc.c merge_cmds.c\
-	main_utils.c signals.c rm_quotes_utils.c)
+	main_utils.c signals.c rm_quotes_utils.c rm_quotes_utils2.c)
 OBJS = $(patsubst $(PREF_SRC)/%.c, $(PREF_OBJ)/%.o, $(SRCS))
 
 #

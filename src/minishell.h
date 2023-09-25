@@ -89,6 +89,7 @@ typedef struct s_mall_size
 	int	sp_count;
 	int	key_len;
 	int	val_len;
+	int	exit_stat_len;
 }	t_mall_size;
 
 void		pwd(t_vars *vars);
@@ -114,9 +115,12 @@ void		find_node(t_vars *vars, char *cmd);
 void		merge_key_value(t_vars *vars, t_env *node);
 void		free_cmds(t_vars *vars, t_cmds **cmds, int count);
 void		action(int signal);
+void		sig_handler(int sig);
+void		fill_out_str(char **tmp, char **out_str, t_env *env, int *i);
 
 char		*tolower_str(char *str);
 char		*rm_quotes(t_vars *vars, char *input_str);
+char		*join_err(t_vars *vars, char *cmd, char *line);
 
 t_env		*key_cmp(t_vars vars, char **input_str);
 t_env		*find_key(t_vars vars, char *key);
@@ -146,7 +150,7 @@ int			check_redirection(t_vars *vars, t_cmds *cmds, int count);
 int			check_builtins(t_vars *vars, char **cmd);
 int			check_equal(t_vars *vars, char **cmd);
 int			quotes_handler(t_vars *vars, char **input_str);
-void		sig_handler(int sig);
-char		*join_err(t_vars *vars, char *cmd, char *line);
+int			ft_intlen(int n);
+int			creat_out_str(t_vars *vars, char *input_str, char **out_str);
 
 #endif
