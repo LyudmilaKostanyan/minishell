@@ -106,7 +106,7 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	{
 		if (*input_str == vars->main_c)
 		{
-			if (--vars->q_count % 2 == 0)
+			if (--vars->q_count % 2 == 1)
 			{
 				find_main_c(vars, input_str + 1);
 				main_c = 0;
