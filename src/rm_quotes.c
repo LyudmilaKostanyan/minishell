@@ -55,11 +55,11 @@ void	replace_exit_stat(t_vars *vars, char **tmp, int *i)
 void	rm_q_elseelse(t_vars *vars, char **tmp, int *i)
 {
 	vars->out_str[++(*i)] = **tmp;
-	if (*(*tmp + 1) && **tmp != 32
+	if (*(*tmp + 1) && **tmp != 32 && **tmp != '>' && **tmp != '<'
 		&& (*(*tmp + 1) == '>' || *(*tmp + 1) == '<'))
 	{
 		vars->out_str[++(*i)] = 32;
-		vars->out_str[++(*i)] = **tmp;
+		vars->out_str[++(*i)] = *(*tmp + 1);
 		(*tmp)++;
 	}
 	if ((**tmp == '>' || **tmp == '<'))

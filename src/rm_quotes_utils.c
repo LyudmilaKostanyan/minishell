@@ -62,7 +62,7 @@ void	space_count(char *input_str, t_mall_size *mall_size, int i)
 			mall_size->sp_count++;
 	}
 	if (i && *(input_str + 1) && (*(input_str + 1) == '>'
-		|| *(input_str + 1) == '<'))
+			|| *(input_str + 1) == '<'))
 	{
 		if (*input_str != 32 && *(input_str + 2)
 			&& *(input_str + 2) == *(input_str + 1))

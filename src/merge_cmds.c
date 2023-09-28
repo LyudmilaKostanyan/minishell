@@ -53,8 +53,9 @@ int	red_in(t_cmds **cmds, char **sp_split, int i, int j)
 			(*cmds)[i].in_stat = 1;
 		else if ((*cmds)[i].in_stat != -1)
 			(*cmds)[i].in_stat = 2;
-		if (sp_split[j + 1] && !(*cmds)[i].red_in)
+		if (sp_split[j + 1])
 		{
+			free((*cmds)[i].red_in);
 			(*cmds)[i].red_in = ft_strdup(sp_split[j + 1]);
 			return (0);
 		}
@@ -75,8 +76,9 @@ int	red_out(t_cmds **cmds, char **sp_split, int i, int j)
 			(*cmds)[i].out_stat = 1;
 		else if ((*cmds)[i].out_stat != -1)
 			(*cmds)[i].out_stat = 2;
-		if (sp_split[j + 1] && !(*cmds)[i].red_out)
+		if (sp_split[j + 1])
 		{
+			free((*cmds)[i].red_out);
 			(*cmds)[i].red_out = ft_strdup(sp_split[j + 1]);
 			return (0);
 		}
