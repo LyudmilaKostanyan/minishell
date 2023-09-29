@@ -12,58 +12,51 @@
 
 #include "minishell.h"
 
-int	quotes_counter(t_vars *vars, char *input_str)
+void	quotes_counter_help(char input_str, int *count, char *main_c, int *stat)
 {
-	int		count;
-
-	find_main_c(vars, input_str);
-	count = 0;
-	while (*input_str)
+	if (input_str == '\'' || input_str == '\"')
 	{
-		if (*input_str == vars->main_c)
-			count++;
-		input_str++;
+		if (!*stat)
+		{
+			(*stat)++;
+			(*count)++;
+			*main_c = input_str;
+		}
+		else if (*main_c == input_str)
+		{
+			*stat = 0;
+			(*count)++;
+			*main_c = 0;
+		}
+	}
+}
+
+int	quotes_counter(char **input_str)
+{
+	int		i;
+	char	main_c;
+	int		count;
+	int		stat;
+
+	count = 0;
+	stat = 0;
+	main_c = 0;
+	i = -1;
+	while ((*input_str)[++i])
+	{
+		quotes_counter_help((*input_str)[i], &count, &main_c, &stat);
+		if (main_c && (*input_str)[i] == 32)
+			(*input_str)[i] = 1;
 	}
 	return (count);
 }
 
-int	rm_spaces(t_vars *vars, char **input_str, int *count, int *i)
-{
-	if ((*input_str)[*i] == vars->main_c)
-	{
-		while ((*input_str)[*i] && (*input_str)[*i + 1] && count)
-		{
-			if ((*input_str)[*i] == vars->main_c)
-				(*count)--;
-			if ((*input_str)[*i] == 32 && *count % 2 != 0)
-				(*input_str)[*i] = 1;
-			(*i)++;
-		}
-	}
-	if ((*input_str)[*i] && !*count)
-	{
-		*count = quotes_counter(vars, *input_str + *i);
-		if (!*count)
-			return (1);
-		vars->q_count += *count;
-	}
-	return (0);
-}
-
 int	quotes_handler(t_vars *vars, char **input_str)
 {
-	int		i;
-	int		count;
-
-	vars->q_count = quotes_counter(vars, *input_str);
+	vars->q_count = quotes_counter(input_str);
 	if (!vars->q_count)
 		return (1);
 	if (err_mes(vars->q_count % 2 != 0, NULL, QUOTES_ERR, vars))
 		return (0);
-	count = vars->q_count;
-	i = -1;
-	while ((*input_str)[++i])
-		if (rm_spaces(vars, input_str, &count, &i))
-			continue ;
 	return (1);
 }
