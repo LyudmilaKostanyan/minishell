@@ -36,7 +36,7 @@ int	check_pipes(char *input_str)
 	return (1);
 }
 
-int	check_input(t_vars *vars, char *input_str, char ***p_splt, char **for_splt)
+static int	check_input(t_vars *vars, char *input_str, char ***p_splt)
 {
 	stop_program(!input_str, NULL, "exit", vars);
 	if (!*input_str)
@@ -57,31 +57,37 @@ int	check_input(t_vars *vars, char *input_str, char ***p_splt, char **for_splt)
 		return (-1);
 	}
 	split_free(*p_splt);
-	*for_splt = rm_quotes(vars, input_str);
-	if (!*for_splt)
+	rm_quotes(vars, input_str);
+	if (!vars->out_str)
 		*p_splt = ft_split(input_str, '|');
 	else
-		*p_splt = ft_split(*for_splt, '|');
+		*p_splt = ft_split(vars->out_str, '|');
 	return (1);
+}
+
+static void	init_ri(t_vars *vars, t_cmds **cmds)
+{
+	*cmds = NULL;
+	vars->hd_end = NULL;
+	vars->here_doc = 0;
+	vars->out_str = NULL;
 }
 
 int	read_input(t_vars *vars, t_cmds **cmds)
 {
 	char	*input_str;
 	char	**pipe_splt;
-	char	*for_splt;
 	int		count;
 	int		cond;
 
 	pipe_splt = NULL;
-	*cmds = NULL;
-	vars->hd_end = NULL;
-	vars->here_doc = 0;
+	init_ri(vars, cmds);
 	input_str = readline("\e[34mminishell$ \e[0m");
-	cond = check_input(vars, input_str, &pipe_splt, &for_splt);
+	cond = check_input(vars, input_str, &pipe_splt);
 	if (!cond || cond == -1)
 		return (cond);
-	free(for_splt);
+	if (vars->out_str)
+		free(vars->out_str);
 	malloc_err(!pipe_splt, "split cmds", vars);
 	restore_spaces(&input_str);
 	count = split_size(pipe_splt);

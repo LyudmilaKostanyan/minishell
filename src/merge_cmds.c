@@ -12,7 +12,26 @@
 
 #include "minishell.h"
 
-int	red_in(t_cmds *cmds, char **sp_split, int j)
+int	red_if(char **red_in_out, t_vars *vars, int stat)
+{
+	int	fd;
+	int	timur;
+
+	timur = 1;
+	if (*red_in_out)
+	{
+		if (stat)
+			fd = open(*red_in_out, O_CREAT | O_WRONLY, 0644);
+		else
+			fd = open(*red_in_out, O_WRONLY, 0644);
+		if (err_mes(fd == -1, join_err(vars, *red_in_out, NULL), PD, vars))
+			timur = 0;
+		close(fd);
+	}
+	return (timur);
+}
+
+int	red_in(t_cmds *cmds, char **sp_split, int j, t_vars *vars)
 {
 	if (!ft_strcmp(sp_split[j], "<") || !ft_strcmp(sp_split[j], "<<"))
 	{
@@ -27,24 +46,14 @@ int	red_in(t_cmds *cmds, char **sp_split, int j)
 			cmds->in_stat = 2;
 		if (sp_split[j + 1])
 		{
+			if (!red_if(&cmds->red_in, vars, 0))
+				return (0);
 			free(cmds->red_in);
 			cmds->red_in = ft_strdup(sp_split[j + 1]);
-			return (0);
+			malloc_err(!cmds->red_in, CRV, vars);
 		}
 	}
 	return (1);
-}
-
-void	red_out_if(t_cmds *cmds, t_vars *vars)
-{
-	int	t;
-
-	if (cmds->red_out)
-	{
-		t = open(cmds->red_out, O_CREAT | O_WRONLY, 0644);
-		err_mes(t == -1, join_err(vars, cmds->red_out, NULL), PD, vars);
-		close(t);
-	}
 }
 
 int	red_out(t_cmds *cmds, char **sp_split, int j, t_vars *vars)
@@ -62,16 +71,17 @@ int	red_out(t_cmds *cmds, char **sp_split, int j, t_vars *vars)
 			cmds->out_stat = 2;
 		if (sp_split[j + 1])
 		{
-			red_out_if(cmds, vars);
+			if (!red_if(&cmds->red_out, vars, 1))
+				return (0);
 			free(cmds->red_out);
 			cmds->red_out = ft_strdup(sp_split[j + 1]);
-			return (0);
+			malloc_err(!cmds->red_out, CRV, vars);
 		}
 	}
 	return (1);
 }
 
-void	redirections_init(t_vars *vars, t_cmds **cmds, char **sp_split, int i)
+int	redirections_init(t_vars *vars, t_cmds **cmds, char **sp_split, int i)
 {
 	int	k;
 	int	j;
@@ -92,12 +102,12 @@ void	redirections_init(t_vars *vars, t_cmds **cmds, char **sp_split, int i)
 				malloc_err(!(*cmds)[i].cmd[k], CCL, vars);
 			}
 		}
-		if (!red_in((*cmds) + i, sp_split, j))
-			malloc_err(!(*cmds)[i].red_in, CRV, vars);
-		if (!red_out((*cmds) + i, sp_split, j, vars))
-			malloc_err(!(*cmds)[i].red_out, CRV, vars);
+		if (!red_in((*cmds) + i, sp_split, j, vars)
+			|| !red_out((*cmds) + i, sp_split, j, vars))
+			return (0);
 	}
 	(*cmds)[i].cmd[++k] = NULL;
+	return (1);
 }
 
 int	merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
@@ -109,15 +119,14 @@ int	merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
 	i = -1;
 	while (++i < count)
 	{
-		sp_split = splt_by_spaces(vars, cmds, pipe_splt, i);
-		if (!sp_split)
-			return (-1);
 		(*cmds)[i].in_stat = 0;
 		(*cmds)[i].out_stat = 0;
 		(*cmds)[i].red_in = NULL;
 		(*cmds)[i].red_out = NULL;
 		(*cmds)[i].pipe = NULL;
-		redirections_init(vars, cmds, sp_split, i);
+		sp_split = splt_by_spaces(vars, cmds, pipe_splt, i);
+		if (!redirections_init(vars, cmds, sp_split, i) || !sp_split)
+			return (-1);
 		split_free(sp_split);
 		j = -1;
 		while ((*cmds)[i].cmd[++j])

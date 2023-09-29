@@ -100,15 +100,16 @@ void	rm_q_else(t_vars *vars, char **tmp, int *i, char main_c)
 		rm_q_elseelse(vars, tmp, i, main_c);
 }
 
-char	*rm_quotes(t_vars *vars, char *input_str)
+void	rm_quotes(t_vars *vars, char *input_str)
 {
 	int		i;
 	char	main_c;
 
 	find_main_c(vars, input_str);
 	if (!creat_out_str(vars, input_str, &vars->out_str))
-		return (NULL);
+		return ;
 	i = -1;
+	main_c = 0;
 	while (*input_str)
 	{
 		if (*input_str == vars->main_c)
@@ -126,5 +127,4 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 		input_str++;
 	}
 	vars->out_str[++i] = 0;
-	return (vars->out_str);
 }

@@ -116,9 +116,9 @@ void		merge_key_value(t_vars *vars, t_env *node);
 void		free_cmds(t_vars *vars, t_cmds **cmds, int count);
 void		action(int signal);
 void		sig_handler(int sig);
+void		rm_quotes(t_vars *vars, char *input_str);
 
 char		*tolower_str(char *str);
-char		*rm_quotes(t_vars *vars, char *input_str);
 char		*join_err(t_vars *vars, char *cmd, char *line);
 char		**splt_by_spaces(t_vars *vars, t_cmds **cmds,
 				char **pipe_splt, int i);
