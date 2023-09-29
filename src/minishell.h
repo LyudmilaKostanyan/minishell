@@ -120,6 +120,8 @@ void		sig_handler(int sig);
 char		*tolower_str(char *str);
 char		*rm_quotes(t_vars *vars, char *input_str);
 char		*join_err(t_vars *vars, char *cmd, char *line);
+char		**splt_by_spaces(t_vars *vars, t_cmds **cmds,
+				char **pipe_splt, int i);
 
 t_env		*key_cmp(t_vars vars, char **input_str);
 t_env		*find_key(t_vars vars, char *key);

@@ -12,35 +12,7 @@
 
 #include "minishell.h"
 
-char	**splt_by_spaces(t_vars *vars, t_cmds **cmds, char **pipe_splt, int i)
-{
-	char	**sp_split;
-	int		j;
-	int		cmds_count;
-
-	sp_split = ft_split(pipe_splt[i], ' ');
-	malloc_err(!sp_split, "creating cmd list", vars);
-	if (!*sp_split)
-	{
-		split_free(sp_split);
-		split_free(pipe_splt);
-		return (NULL);
-	}
-	j = -1;
-	cmds_count = 0;
-	while (sp_split[++j])
-		if (ft_strcmp(sp_split[j], ">") && ft_strcmp(sp_split[j], "<")
-			&& ft_strcmp(sp_split[j], ">>") && ft_strcmp(sp_split[j], "<<"))
-			if (j == 0 || (ft_strcmp(sp_split[j - 1], ">") && ft_strcmp(
-						sp_split[j - 1], "<") && ft_strcmp(sp_split[j - 1],
-						">>") && ft_strcmp(sp_split[j - 1], "<<")))
-				cmds_count++;
-	(*cmds)[i].cmd = malloc(sizeof(char *) * (cmds_count + 1));
-	malloc_err(!(*cmds)[i].cmd, "creating cmd list", vars);
-	return (sp_split);
-}
-
-int	red_in(t_cmds **cmds, char **sp_split, int i, int j)
+int	red_in(t_cmds *cmds, char **sp_split, int j)
 {
 	if (!ft_strcmp(sp_split[j], "<") || !ft_strcmp(sp_split[j], "<<"))
 	{
@@ -48,22 +20,34 @@ int	red_in(t_cmds **cmds, char **sp_split, int i, int j)
 			|| !ft_strncmp(sp_split[j + 1], ">>", 2)
 			|| !ft_strncmp(sp_split[j + 1], "<", 1)
 			|| !ft_strncmp(sp_split[j + 1], "<<", 2))
-			(*cmds)[i].in_stat = -1;
-		else if (!ft_strcmp(sp_split[j], "<") && (*cmds)[i].in_stat != -1)
-			(*cmds)[i].in_stat = 1;
-		else if ((*cmds)[i].in_stat != -1)
-			(*cmds)[i].in_stat = 2;
+			cmds->in_stat = -1;
+		else if (!ft_strcmp(sp_split[j], "<") && cmds->in_stat != -1)
+			cmds->in_stat = 1;
+		else if (cmds->in_stat != -1)
+			cmds->in_stat = 2;
 		if (sp_split[j + 1])
 		{
-			free((*cmds)[i].red_in);
-			(*cmds)[i].red_in = ft_strdup(sp_split[j + 1]);
+			free(cmds->red_in);
+			cmds->red_in = ft_strdup(sp_split[j + 1]);
 			return (0);
 		}
 	}
 	return (1);
 }
 
-int	red_out(t_cmds **cmds, char **sp_split, int i, int j)
+void	red_out_if(t_cmds *cmds, t_vars *vars)
+{
+	int	t;
+
+	if (cmds->red_out)
+	{
+		t = open(cmds->red_out, O_CREAT | O_WRONLY, 0644);
+		err_mes(t == -1, join_err(vars, cmds->red_out, NULL), PD, vars);
+		close(t);
+	}
+}
+
+int	red_out(t_cmds *cmds, char **sp_split, int j, t_vars *vars)
 {
 	if (!ft_strcmp(sp_split[j], ">") || !ft_strcmp(sp_split[j], ">>"))
 	{
@@ -71,15 +55,16 @@ int	red_out(t_cmds **cmds, char **sp_split, int i, int j)
 			|| !ft_strncmp(sp_split[j + 1], ">>", 2)
 			|| !ft_strncmp(sp_split[j + 1], "<", 1)
 			|| !ft_strncmp(sp_split[j + 1], "<<", 2))
-			(*cmds)[i].out_stat = -1;
-		else if (!ft_strcmp(sp_split[j], ">") && (*cmds)[i].out_stat != -1)
-			(*cmds)[i].out_stat = 1;
-		else if ((*cmds)[i].out_stat != -1)
-			(*cmds)[i].out_stat = 2;
+			cmds->out_stat = -1;
+		else if (!ft_strcmp(sp_split[j], ">") && cmds->out_stat != -1)
+			cmds->out_stat = 1;
+		else if (cmds->out_stat != -1)
+			cmds->out_stat = 2;
 		if (sp_split[j + 1])
 		{
-			free((*cmds)[i].red_out);
-			(*cmds)[i].red_out = ft_strdup(sp_split[j + 1]);
+			red_out_if(cmds, vars);
+			free(cmds->red_out);
+			cmds->red_out = ft_strdup(sp_split[j + 1]);
 			return (0);
 		}
 	}
@@ -107,9 +92,9 @@ void	redirections_init(t_vars *vars, t_cmds **cmds, char **sp_split, int i)
 				malloc_err(!(*cmds)[i].cmd[k], CCL, vars);
 			}
 		}
-		if (!red_in(cmds, sp_split, i, j))
+		if (!red_in((*cmds) + i, sp_split, j))
 			malloc_err(!(*cmds)[i].red_in, CRV, vars);
-		if (!red_out(cmds, sp_split, i, j))
+		if (!red_out((*cmds) + i, sp_split, j, vars))
 			malloc_err(!(*cmds)[i].red_out, CRV, vars);
 	}
 	(*cmds)[i].cmd[++k] = NULL;

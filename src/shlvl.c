@@ -96,3 +96,31 @@ int	ft_intlen(int n)
 	len++;
 	return (len);
 }
+
+char	**splt_by_spaces(t_vars *vars, t_cmds **cmds, char **pipe_splt, int i)
+{
+	char	**sp_split;
+	int		j;
+	int		cmds_count;
+
+	sp_split = ft_split(pipe_splt[i], ' ');
+	malloc_err(!sp_split, "creating cmd list", vars);
+	if (!*sp_split)
+	{
+		split_free(sp_split);
+		split_free(pipe_splt);
+		return (NULL);
+	}
+	j = -1;
+	cmds_count = 0;
+	while (sp_split[++j])
+		if (ft_strcmp(sp_split[j], ">") && ft_strcmp(sp_split[j], "<")
+			&& ft_strcmp(sp_split[j], ">>") && ft_strcmp(sp_split[j], "<<"))
+			if (j == 0 || (ft_strcmp(sp_split[j - 1], ">") && ft_strcmp(
+						sp_split[j - 1], "<") && ft_strcmp(sp_split[j - 1],
+						">>") && ft_strcmp(sp_split[j - 1], "<<")))
+				cmds_count++;
+	(*cmds)[i].cmd = malloc(sizeof(char *) * (cmds_count + 1));
+	malloc_err(!(*cmds)[i].cmd, "creating cmd list", vars);
+	return (sp_split);
+}
