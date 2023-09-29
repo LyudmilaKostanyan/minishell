@@ -24,7 +24,7 @@ void	rm_q_if(t_vars *vars, char **tmp, int *i, char main_c)
 		while ((*tmp)[j] && (*tmp)[j] != 32 && (*tmp)[j] != main_c)
 			j++;
 		vars->hd_end = *tmp + j + 1;
-		if ((*tmp)[j] == '\'' || (*tmp)[j] == '\"')
+		if ((*tmp)[j - 1] == '\'' || (*tmp)[j - 1] == '\"')
 			vars->hd_stat = 1;
 	}
 	if (*(*tmp + 1) && *(*tmp + 1) == **tmp
