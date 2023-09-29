@@ -116,7 +116,6 @@ void		merge_key_value(t_vars *vars, t_env *node);
 void		free_cmds(t_vars *vars, t_cmds **cmds, int count);
 void		action(int signal);
 void		sig_handler(int sig);
-void		fill_out_str(char **tmp, char **out_str, t_env *env, int *i);
 
 char		*tolower_str(char *str);
 char		*rm_quotes(t_vars *vars, char *input_str);

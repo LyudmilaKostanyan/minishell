@@ -24,6 +24,9 @@ int	creat_out_str(t_vars *vars, char *input_str, char **out_str)
 	cond = count_key_val(*vars, input_str, &mall_size, 1);
 	if (!vars->main_c && !mall_size.key_len && !cond && !mall_size.sp_count)
 		return (0);
+	printf("%lu\n", ft_strlen(input_str) + mall_size.val_len
+			- mall_size.key_len - vars->q_count
+			+ mall_size.exit_stat_len + mall_size.sp_count + 1);
 	*out_str = malloc(ft_strlen(input_str) + mall_size.val_len
 			- mall_size.key_len - vars->q_count
 			+ mall_size.exit_stat_len + mall_size.sp_count + 1);

@@ -29,8 +29,16 @@ void	restore_spaces(char **str)
 
 	i = -1;
 	while (*str && (*str)[++i])
+	{
 		if ((*str)[i] == 1)
 			(*str)[i] = 32;
+		if ((*str)[i] == 2)
+			(*str)[i] = '<';
+		if ((*str)[i] == 3)
+			(*str)[i] = '>';
+		if ((*str)[i] == 4)
+			(*str)[i] = '|';
+	}
 }
 
 int	key_value_len(t_vars vars, char *input_str, t_mall_size *mall_size)

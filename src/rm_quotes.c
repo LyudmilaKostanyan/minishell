@@ -52,18 +52,30 @@ void	replace_exit_stat(t_vars *vars, char **tmp, int *i)
 	(*tmp) += 1;
 }
 
-void	rm_q_elseelse(t_vars *vars, char **tmp, int *i)
+void	rm_q_elseelse(t_vars *vars, char **tmp, int *i, char main_c)
 {
-	vars->out_str[++(*i)] = **tmp;
+	printf("%d\t%s\n", *i, *tmp);
+	if (**tmp == '<' && main_c)
+		vars->out_str[++(*i)] = 2;
+	else if (**tmp == '>' && main_c)
+		vars->out_str[++(*i)] = 3;
+	else if (**tmp == '|' && main_c)
+		vars->out_str[++(*i)] = 4;
+	else
+		vars->out_str[++(*i)] = **tmp;
 	if (*(*tmp + 1) && **tmp != 32 && **tmp != '>' && **tmp != '<'
 		&& (*(*tmp + 1) == '>' || *(*tmp + 1) == '<'))
 	{
+		printf("asd:%d\t%s\n", *i, *tmp);
 		vars->out_str[++(*i)] = 32;
 		vars->out_str[++(*i)] = *(*tmp + 1);
 		(*tmp)++;
 	}
-	if ((**tmp == '>' || **tmp == '<'))
+	if ((**tmp == '>' || **tmp == '<') && !main_c)
+	{
+		printf("qwe:%d\t%s\n", *i, *tmp);
 		rm_q_if(vars, tmp, i);
+	}
 }
 
 void	rm_q_else(t_vars *vars, char **tmp, int *i, char main_c)
@@ -76,6 +88,7 @@ void	rm_q_else(t_vars *vars, char **tmp, int *i, char main_c)
 		&& (*(*tmp + 1) == '_' || ft_isalpha(*(*tmp + 1))
 			|| *(*tmp + 1) == '?') && !vars->here_doc)
 	{
+		printf("ghjkl: %d\t%s\n", *i, *tmp);
 		if (*(*tmp + 1) == '?')
 		{
 			replace_exit_stat(vars, tmp, i);
@@ -90,7 +103,7 @@ void	rm_q_else(t_vars *vars, char **tmp, int *i, char main_c)
 					;
 	}
 	else
-		rm_q_elseelse(vars, tmp, i);
+		rm_q_elseelse(vars, tmp, i, main_c);
 }
 
 char	*rm_quotes(t_vars *vars, char *input_str)
@@ -106,7 +119,7 @@ char	*rm_quotes(t_vars *vars, char *input_str)
 	{
 		if (*input_str == vars->main_c)
 		{
-			if (--vars->q_count % 2 == 1)
+			if (--vars->q_count % 2 == 1 && vars->main_c == main_c)
 			{
 				find_main_c(vars, input_str + 1);
 				main_c = 0;
