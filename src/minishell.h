@@ -23,6 +23,7 @@
 # define CRV "creating redirection vars"
 # define CCL "creating cmd list"
 # define PD "Permission denied"
+# define IAD "is a directory"
 
 # include <limits.h>
 # include <errno.h>
