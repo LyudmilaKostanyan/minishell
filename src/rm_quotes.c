@@ -12,17 +12,17 @@
 
 #include "minishell.h"
 
-void	rm_q_if(t_vars *vars, char **tmp, int *i)
+void	rm_q_if(t_vars *vars, char **tmp, int *i, char main_c)
 {
 	int		j;
 
 	if (**tmp == '<' && *(*tmp + 1) && *(*tmp + 1) == **tmp)
 	{
 		vars->here_doc++;
-		j = 1;
+		j = 2;
 		vars->hd_stat = 0;
-		while ((*tmp)[++j] == 32)
-			;
+		while ((*tmp)[j] && (*tmp)[j] != 32 && (*tmp)[j] != main_c)
+			j++;
 		vars->hd_end = *tmp + j + 1;
 		if ((*tmp)[j] == '\'' || (*tmp)[j] == '\"')
 			vars->hd_stat = 1;
@@ -70,7 +70,7 @@ void	rm_q_elseelse(t_vars *vars, char **tmp, int *i, char main_c)
 		(*tmp)++;
 	}
 	if ((**tmp == '>' || **tmp == '<') && !main_c)
-		rm_q_if(vars, tmp, i);
+		rm_q_if(vars, tmp, i, main_c);
 }
 
 void	rm_q_else(t_vars *vars, char **tmp, int *i, char main_c)
