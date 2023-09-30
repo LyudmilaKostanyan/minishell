@@ -19,10 +19,13 @@ void	rm_q_if(t_vars *vars, char **tmp, int *i, char main_c)
 	if (**tmp == '<' && *(*tmp + 1) && *(*tmp + 1) == **tmp)
 	{
 		vars->here_doc++;
-		if (*(*tmp + 2) == 32)
-			j = 3;
-		else
-			j = 2;
+		// if (*(*tmp + 2) == 32)
+		// 	j = 3;
+		// else
+		// 	j = 2;
+		j = 1;
+		while ((*tmp)[++j] && (*tmp)[j] == 32)
+			;
 		vars->hd_stat = 0;
 		while ((*tmp)[j] && (*tmp)[j] != 32 && (*tmp)[j] != main_c)
 			j++;
