@@ -15,20 +15,30 @@
 void	pwd(t_vars *vars)
 {
 	char	*pwd;
+	t_env	*env;
 
 	pwd = getcwd(NULL, 0);
-	malloc_err(!pwd, "pwd", vars);
-	printf("%s\n", pwd);
+	if (!pwd)
+	{
+		env = find_key(*vars, "PWD");
+		if (env)
+			printf("%s\n", env->value);
+		else
+			err_mes(1, join_err(vars, "pwd", NULL), RCD, vars);
+	}
+	else
+		printf("%s\n", pwd);
 	free(pwd);
 	g_exit_status = 0;
 }
 
-void	change_oldpwd(t_vars *vars, char **cmd)
+void	change_oldpwd(t_vars *vars)
 {
 	char	*old_pwd;
 
 	old_pwd = getcwd(NULL, 0);
-	malloc_err(!old_pwd, *cmd, vars);
+	if (!old_pwd)
+		return ;
 	vars->equal = 0;
 	vars->key = "OLDPWD";
 	if (!check_set(vars, vars->env, old_pwd, "OLDPWD"))
@@ -54,14 +64,14 @@ int	cd_check_args(t_vars *vars, char **cmd)
 		malloc_err(!pwd, *cmd, vars);
 		if (tmp)
 		{
-			change_oldpwd(vars, cmd);
+			change_oldpwd(vars);
 			err_mes(chdir(pwd) == -1, join_err(vars, "cd", pwd), PD, vars);
 		}
 		free(pwd);
 		return (0);
 	}
 	else
-		change_oldpwd(vars, cmd);
+		change_oldpwd(vars);
 	return (1);
 }
 
@@ -96,7 +106,11 @@ void	cd(t_vars *vars, char **cmd)
 	{
 		err_mes(chdir(cmd[1]) == -1, join_err(vars, "cd", cmd[1]), PD, vars);
 		pwd = getcwd(NULL, 0);
-		malloc_err(!pwd, cmd[0], vars);
+		if (!pwd)
+		{
+			printf("cd: %s: %s\n", RCD, CD_ERR);
+			return ;
+		}
 		if (!check_set(vars, vars->env, pwd, "PWD"))
 			creat_env_var(vars, &vars->env, pwd, "PWD");
 		free(pwd);

@@ -24,6 +24,7 @@
 # define CCL "creating cmd list"
 # define PD "Permission denied"
 # define IAD "is a directory"
+# define RCD "error retrieving current directory"
 
 # include <limits.h>
 # include <errno.h>
