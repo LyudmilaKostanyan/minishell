@@ -12,21 +12,43 @@
 
 #include "minishell.h"
 
-int	redirection(t_vars *vars, t_cmds **cmds, int i)
+void	redirection_out(t_vars *vars, t_cmds **cmds, int i)
 {
-	if ((*cmds)[i].in_stat == 1 && err_mes(dup2(open((*cmds)[i].red_in,
-		O_RDONLY), 0) == -1, join_err(vars, (*cmds)[i].red_in, NULL),
-			CD_ERR, vars))
-		return (0);
-	else if ((*cmds)[i].in_stat == 2)
-		stop_program(dup2(here_doc(vars, (*cmds)[i].red_in), 0) == -1, NULL,
-			IO, vars);
+	int	fd;
+
 	if ((*cmds)[i].out_stat == 1)
-		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_TRUNC
-					| O_WRONLY, 0644), 1) == -1, NULL, IO, vars);
+	{
+		fd = open((*cmds)[i].red_out, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+		stop_program(dup2(fd, 1) == -1, NULL, IO, vars);
+		close(fd);
+	}
 	else if ((*cmds)[i].out_stat == 2)
-		stop_program(dup2(open((*cmds)[i].red_out, O_CREAT | O_APPEND
-					| O_WRONLY, 0644), 1) == -1, NULL, IO, vars);
+	{
+		fd = open((*cmds)[i].red_out, O_CREAT | O_APPEND | O_WRONLY, 0644);
+		stop_program(dup2(fd, 1) == -1, NULL, IO, vars);
+		close(fd);
+	}
+}
+
+int	redirection_in(t_vars *vars, t_cmds **cmds, int i)
+{
+	int	fd;
+
+	if ((*cmds)[i].in_stat == 1)
+	{
+		fd = open((*cmds)[i].red_in, O_RDONLY);
+		if (err_mes(dup2(fd, 0) == -1, join_err(vars,
+					(*cmds)[i].red_in, NULL), CD_ERR, vars))
+			return (0);
+		close(fd);
+	}
+	else if ((*cmds)[i].in_stat == 2)
+	{
+		fd = here_doc(vars, (*cmds)[i].red_in);
+		stop_program(dup2(fd, 0) == -1, NULL, IO, vars);
+		close(fd);
+	}
+	redirection_out(vars, cmds, i);
 	return (1);
 }
 
@@ -34,7 +56,7 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 {
 	int	cond;
 
-	cond = redirection(vars, cmds, i);
+	cond = redirection_in(vars, cmds, i);
 	if (i == 0 && !(*cmds)[i].red_out && count != 1)
 	{
 		stop_program(dup2((*cmds)[i].pipe[1], 1) == -1,

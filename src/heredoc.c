@@ -28,10 +28,10 @@ int	check_init(t_vars *vars, char **line, char **out_str, int *i)
 
 void	check_env_var(t_vars *vars, char **line)
 {
-	int			i;
-	char		*out_str;
-	char		*tmp;
-	t_env		*env;
+	int		i;
+	char	*out_str;
+	char	*tmp;
+	t_env	*env;
 
 	if (check_init(vars, line, &out_str, &i))
 		return ;
@@ -97,9 +97,9 @@ int	hd_while(t_vars *vars, char *end, int fd)
 
 int	here_doc(t_vars *vars, char *end)
 {
-	int					*fds;
-	int					fd;
-	int					cond;
+	int	*fds;
+	int	fd;
+	int	cond;
 
 	g_exit_status = 0;
 	fds = malloc(sizeof(int) * 2);

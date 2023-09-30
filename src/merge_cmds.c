@@ -12,21 +12,25 @@
 
 #include "minishell.h"
 
-int	red_if(char **red_in_out, t_vars *vars, int stat)
+int	red_if(char **red_in_out, t_vars *vars, char *str)
 {
 	int	fd;
 	int	timur;
 
 	timur = 1;
+	fd = 0;
 	if (*red_in_out)
 	{
-		if (stat)
+		if (*str == '>')
 			fd = open(*red_in_out, O_CREAT | O_WRONLY, 0644);
-		else
+		else if (ft_strlen(str) == 1)
 			fd = open(*red_in_out, O_WRONLY, 0644);
+		else
+			close(here_doc(vars, *red_in_out));
 		if (err_mes(fd == -1, join_err(vars, *red_in_out, NULL), PD, vars))
 			timur = 0;
-		close(fd);
+		if (fd)
+			close(fd);
 	}
 	return (timur);
 }
@@ -46,7 +50,7 @@ int	red_in(t_cmds *cmds, char **sp_split, int j, t_vars *vars)
 			cmds->in_stat = 2;
 		if (sp_split[j + 1])
 		{
-			if (!red_if(&cmds->red_in, vars, 0))
+			if (!red_if(&cmds->red_in, vars, sp_split[j]))
 				return (0);
 			free(cmds->red_in);
 			cmds->red_in = ft_strdup(sp_split[j + 1]);
@@ -71,7 +75,7 @@ int	red_out(t_cmds *cmds, char **sp_split, int j, t_vars *vars)
 			cmds->out_stat = 2;
 		if (sp_split[j + 1])
 		{
-			if (!red_if(&cmds->red_out, vars, 1))
+			if (!red_if(&cmds->red_out, vars, sp_split[j]))
 				return (0);
 			free(cmds->red_out);
 			cmds->red_out = ft_strdup(sp_split[j + 1]);
