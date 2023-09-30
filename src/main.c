@@ -86,6 +86,7 @@ static void	main_help(t_vars vars, t_cmds *cmds, char **env)
 			|| !check_redirection(&vars, cmds, count))
 		{
 			free_cmds(&vars, &cmds, count);
+			system("leaks minishell");
 			continue ;
 		}
 		if (count == 1 && strcmp_help(*cmds[0].cmd)

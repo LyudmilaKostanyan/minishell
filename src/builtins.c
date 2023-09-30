@@ -85,12 +85,12 @@ void	exit_prog(t_vars *vars, char **cmd)
 {
 	long long	exit_code;
 
-	if (err_mes(cmd[1] && cmd[2] != NULL,
-			join_err(vars, *cmd, NULL), TMA, vars))
-		return ;
 	if (cmd[1])
 	{
 		exit_code = ft_atoll(vars, cmd[1]);
+		if (err_mes(cmd[2] != NULL,
+				join_err(vars, *cmd, NULL), TMA, vars))
+			return ;
 		exit(exit_code % 256);
 	}
 	else

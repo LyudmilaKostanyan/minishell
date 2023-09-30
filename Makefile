@@ -23,7 +23,7 @@ OBJS = $(patsubst $(PREF_SRC)/%.c, $(PREF_OBJ)/%.o, $(SRCS))
 #
 CC = cc
 FLAGS = -Wall -Wextra -Werror
-FSANITIZE = -fsanitize=address -g
+FSANITIZE = #-fsanitize=address -g
 
 #
 all: readline $(NAME)
