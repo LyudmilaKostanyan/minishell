@@ -45,6 +45,8 @@ int	redirection_in(t_vars *vars, t_cmds **cmds, int i)
 	else if ((*cmds)[i].in_stat == 2)
 	{
 		fd = here_doc(vars, (*cmds)[i].red_in);
+		if (fd == -1)
+			return (0);
 		stop_program(dup2(fd, 0) == -1, NULL, IO, vars);
 		close(fd);
 	}
