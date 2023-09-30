@@ -91,6 +91,8 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	malloc_err(!pipe_splt, "split cmds", vars);
 	restore_spaces(&input_str);
 	count = split_size(pipe_splt);
+	if (!count)
+		return (-1);
 	free(*cmds);
 	*cmds = malloc((sizeof(t_cmds) * count) + 1);
 	malloc_err(!*cmds, "creat cmds", vars);
