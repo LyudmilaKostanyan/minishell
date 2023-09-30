@@ -119,6 +119,7 @@ void		free_cmds(t_vars *vars, t_cmds **cmds, int count);
 void		action(int signal);
 void		sig_handler(int sig);
 void		rm_quotes(t_vars *vars, char *input_str);
+void		free_in_while(t_vars *vars, t_cmds **cmds, int count);
 
 char		*tolower_str(char *str);
 char		*join_err(t_vars *vars, char *cmd, char *line);

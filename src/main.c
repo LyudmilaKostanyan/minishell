@@ -88,6 +88,8 @@ static void	main_help(t_vars vars, t_cmds *cmds, char **env)
 			free_cmds(&vars, &cmds, count);
 			continue ;
 		}
+		if (count == -2)
+			continue ;
 		if (count == 1 && strcmp_help(*cmds[0].cmd)
 			&& !redirect_pipes(&vars, &cmds, count, 0))
 		{

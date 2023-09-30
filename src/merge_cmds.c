@@ -22,7 +22,7 @@ int	red_if(char **red_in_out, t_vars *vars, char *str)
 	if (*red_in_out)
 	{
 		if (*str == '>')
-			fd = open(*red_in_out, O_CREAT | O_WRONLY, 0644);
+			fd = open(*red_in_out, O_CREAT | O_TRUNC | O_WRONLY, 0644);
 		else if (ft_strlen(str) == 1)
 			fd = open(*red_in_out, O_WRONLY, 0644);
 		else
@@ -108,7 +108,10 @@ int	redirections_init(t_vars *vars, t_cmds **cmds, char **sp_split, int i)
 		}
 		if (!red_in((*cmds) + i, sp_split, j, vars)
 			|| !red_out((*cmds) + i, sp_split, j, vars))
+		{
+			(*cmds)[i].cmd[++k] = NULL;
 			return (0);
+		}
 	}
 	(*cmds)[i].cmd[++k] = NULL;
 	return (1);
@@ -128,11 +131,17 @@ int	merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
 		(*cmds)[i].red_in = NULL;
 		(*cmds)[i].red_out = NULL;
 		(*cmds)[i].pipe = NULL;
+		(*cmds)[i].cmd = NULL;
 		sp_split = splt_by_spaces(vars, cmds, pipe_splt, i);
 		if (!sp_split)
 			return (-1);
 		if (!redirections_init(vars, cmds, sp_split, i))
-			count = -1;
+		{
+			split_free(sp_split);
+			split_free(pipe_splt);
+			free_cmds(vars, cmds, i + 1);
+			return (-2);
+		}
 		split_free(sp_split);
 		j = -1;
 		while ((*cmds)[i].cmd[++j])

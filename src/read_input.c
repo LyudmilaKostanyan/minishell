@@ -92,8 +92,12 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	restore_spaces(&input_str);
 	count = split_size(pipe_splt);
 	if (!count)
+	{
+		split_free(pipe_splt);
+		add_history(input_str);
+		free(input_str);
 		return (-1);
-	free(*cmds);
+	}
 	*cmds = malloc((sizeof(t_cmds) * count) + 1);
 	malloc_err(!*cmds, "creat cmds", vars);
 	count = merge_cmds(vars, cmds, pipe_splt, count);
