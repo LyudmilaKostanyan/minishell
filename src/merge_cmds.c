@@ -129,7 +129,7 @@ int	merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
 		(*cmds)[i].red_out = NULL;
 		(*cmds)[i].pipe = NULL;
 		sp_split = splt_by_spaces(vars, cmds, pipe_splt, i);
-		if (!redirections_init(vars, cmds, sp_split, i) || !sp_split)
+		if (!sp_split || !redirections_init(vars, cmds, sp_split, i))
 			return (-1);
 		split_free(sp_split);
 		j = -1;
