@@ -73,6 +73,18 @@ static void	init_ri(t_vars *vars, t_cmds **cmds)
 	vars->out_str = NULL;
 }
 
+static int	read_input_help(char **input_str, char ***pipe_splt, int count)
+{
+	if (!count)
+	{
+		split_free(*pipe_splt);
+		add_history(*input_str);
+		free(*input_str);
+		return (1);
+	}
+	return (0);
+}
+
 int	read_input(t_vars *vars, t_cmds **cmds)
 {
 	char	*input_str;
@@ -91,13 +103,8 @@ int	read_input(t_vars *vars, t_cmds **cmds)
 	malloc_err(!pipe_splt, "split cmds", vars);
 	restore_spaces(&input_str);
 	count = split_size(pipe_splt);
-	if (!count)
-	{
-		split_free(pipe_splt);
-		add_history(input_str);
-		free(input_str);
+	if (read_input_help(&input_str, &pipe_splt, count))
 		return (-1);
-	}
 	*cmds = malloc((sizeof(t_cmds) * count) + 1);
 	malloc_err(!*cmds, "creat cmds", vars);
 	count = merge_cmds(vars, cmds, pipe_splt, count);

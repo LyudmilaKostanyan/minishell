@@ -20,7 +20,7 @@ int	redirection_out(t_vars *vars, t_cmds **cmds, int i)
 	{
 		fd = open((*cmds)[i].red_out, O_CREAT | O_TRUNC | O_WRONLY, 0644);
 		if (err_mes(dup2(fd, 1) == -1, join_err(vars,
-				(*cmds)[i].red_out, NULL), PD, vars))
+					(*cmds)[i].red_out, NULL), PD, vars))
 			return (0);
 		close(fd);
 	}
@@ -28,7 +28,7 @@ int	redirection_out(t_vars *vars, t_cmds **cmds, int i)
 	{
 		fd = open((*cmds)[i].red_out, O_CREAT | O_APPEND | O_WRONLY, 0644);
 		if (err_mes(dup2(fd, 1) == -1, join_err(vars,
-				(*cmds)[i].red_out, NULL), PD, vars))
+					(*cmds)[i].red_out, NULL), PD, vars))
 			return (0);
 		close(fd);
 	}
@@ -51,7 +51,7 @@ int	redirection_in(t_vars *vars, t_cmds **cmds, int i)
 	{
 		fd = here_doc(vars, (*cmds)[i].red_in);
 		if (fd == -1 || err_mes(dup2(fd, 0) == -1, join_err(vars,
-				(*cmds)[i].red_in, NULL), IO, vars))
+					(*cmds)[i].red_in, NULL), IO, vars))
 			return (0);
 		close(fd);
 	}
@@ -78,7 +78,7 @@ int	redirect_pipes(t_vars *vars, t_cmds **cmds, int count, int i)
 	else if (count != 1 && !(*cmds)[i].red_in && !(*cmds)[i].red_out)
 	{
 		if (err_mes(dup2((*cmds)[i - 1].pipe[0], 0) == -1,
-				NULL, IO, vars) || err_mes(dup2((*cmds)[i].pipe[1], 1) == -1,
+			NULL, IO, vars) || err_mes(dup2((*cmds)[i].pipe[1], 1) == -1,
 				NULL, IO, vars))
 			return (0);
 	}
