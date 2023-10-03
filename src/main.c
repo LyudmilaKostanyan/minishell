@@ -59,12 +59,21 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 	}
 }
 
-static int	strcmp_help(const char *command)
+static int	strcmp_help(t_cmds *cmds, int count, t_vars vars)
 {
-	return ((!ft_strcmp(command, "pwd")
-			|| !ft_strcmp(command, "cd") || !ft_strcmp(command, "echo")
-			|| !ft_strcmp(command, "export") || !ft_strcmp(command, "unset")
-			|| !ft_strcmp(command, "exit") || !ft_strcmp(command, "env")));
+	if (count == 1 && ((!ft_strcmp(*cmds[0].cmd, "pwd")
+				|| !ft_strcmp(*cmds[0].cmd, "export")
+				|| !ft_strcmp(*cmds[0].cmd, "unset")
+				|| !ft_strcmp(*cmds[0].cmd, "exit")
+				|| !ft_strcmp(*cmds[0].cmd, "env"))
+			|| !ft_strcmp(*cmds[0].cmd, "cd")
+			|| !ft_strcmp(*cmds[0].cmd, "echo"))
+		&& !redirect_pipes(&vars, &cmds, count, 0))
+	{
+		free_cmds(&vars, &cmds, count);
+		return (1);
+	}
+	return (0);
 }
 
 static void	main_help(t_vars vars, t_cmds *cmds, char **env)
@@ -85,12 +94,8 @@ static void	main_help(t_vars vars, t_cmds *cmds, char **env)
 		}
 		if (count == -2)
 			continue ;
-		if (count == 1 && strcmp_help(*cmds[0].cmd)
-			&& !redirect_pipes(&vars, &cmds, count, 0))
-		{
-			free_cmds(&vars, &cmds, count);
+		if (strcmp_help(cmds, count, vars))
 			continue ;
-		}
 		if (!(count == 1 && check_builtins(&vars, cmds[0].cmd))
 			&& !check_equal(&vars, cmds[0].cmd))
 			processes(&vars, &cmds, count);
