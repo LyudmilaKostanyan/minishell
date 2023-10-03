@@ -122,6 +122,8 @@ void		action(int signal);
 void		sig_handler(int sig);
 void		rm_quotes(t_vars *vars, char *input_str);
 void		free_in_while(t_vars *vars, t_cmds **cmds, int count);
+void		merge_cmds_init(t_cmds **cmds, int i);
+void		merge_cmds_rs(t_cmds **cmds, int i);
 
 char		*tolower_str(char *str);
 char		*join_err(t_vars *vars, char *cmd, char *line);
@@ -158,5 +160,6 @@ int			check_equal(t_vars *vars, char **cmd);
 int			quotes_handler(t_vars *vars, char **input_str);
 int			ft_intlen(int n);
 int			creat_out_str(t_vars *vars, char *input_str, char **out_str);
+int			red_if_cmd(t_vars *vars, char **cmd, char **sp_split, int j);
 
 #endif

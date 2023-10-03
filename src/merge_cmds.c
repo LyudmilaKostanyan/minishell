@@ -97,14 +97,8 @@ int	redirections_init(t_vars *vars, t_cmds **cmds, char **sp_split, int i)
 		if (ft_strcmp(sp_split[j], ">") && ft_strcmp(sp_split[j], "<")
 			&& ft_strcmp(sp_split[j], ">>") && ft_strcmp(sp_split[j], "<<"))
 		{
-			if (j == 0 || (ft_strcmp(sp_split[j - 1], ">")
-					&& ft_strcmp(sp_split[j - 1], "<")
-					&& ft_strcmp(sp_split[j - 1], ">>")
-					&& ft_strcmp(sp_split[j - 1], "<<")))
-			{
-				(*cmds)[i].cmd[++k] = ft_strdup(sp_split[j]);
-				malloc_err(!(*cmds)[i].cmd[k], CCL, vars);
-			}
+			if (red_if_cmd(vars, &((*cmds)[i].cmd[k + 1]), sp_split, j))
+				k++;
 		}
 		if (!red_in((*cmds) + i, sp_split, j, vars)
 			|| !red_out((*cmds) + i, sp_split, j, vars))
@@ -120,18 +114,12 @@ int	redirections_init(t_vars *vars, t_cmds **cmds, char **sp_split, int i)
 int	merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
 {
 	int		i;
-	int		j;
 	char	**sp_split;
 
 	i = -1;
 	while (++i < count)
 	{
-		(*cmds)[i].in_stat = 0;
-		(*cmds)[i].out_stat = 0;
-		(*cmds)[i].red_in = NULL;
-		(*cmds)[i].red_out = NULL;
-		(*cmds)[i].pipe = NULL;
-		(*cmds)[i].cmd = NULL;
+		merge_cmds_init(cmds, i);
 		sp_split = splt_by_spaces(vars, cmds, pipe_splt, i);
 		if (!sp_split)
 			return (-1);
@@ -143,11 +131,7 @@ int	merge_cmds(t_vars *vars, t_cmds **cmds, char **pipe_splt, int count)
 			return (-2);
 		}
 		split_free(sp_split);
-		j = -1;
-		while ((*cmds)[i].cmd[++j])
-			restore_spaces(&(*cmds)[i].cmd[j]);
-		restore_spaces(&(*cmds)[i].red_in);
-		restore_spaces(&(*cmds)[i].red_out);
+		merge_cmds_rs(cmds, i);
 	}
 	split_free(pipe_splt);
 	return (count);
