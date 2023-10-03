@@ -63,12 +63,9 @@ int	cd_check_args(t_vars *vars, char **cmd)
 			return (0);
 		pwd = ft_strdup(tmp->value);
 		malloc_err(!pwd, *cmd, vars);
-		if (tmp)
-		{
-			change_oldpwd(vars);
-			if (!err_mes(chdir(pwd) == -1, join_err(vars, "cd", pwd), PD, vars))
-				printf("%s\n", pwd);
-		}
+		change_oldpwd(vars);
+		if (!err_mes(chdir(pwd) == -1, join_err(vars, "cd", pwd), PD, vars))
+			printf("%s\n", pwd);
 		free(pwd);
 		return (0);
 	}
