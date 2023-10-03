@@ -41,8 +41,9 @@ void	change_oldpwd(t_vars *vars)
 		return ;
 	vars->equal = 0;
 	vars->key = "OLDPWD";
-	if (!check_set(vars, vars->env, old_pwd, "OLDPWD"))
-		creat_env_var(vars, &vars->env, old_pwd, "OLDPWD");
+	check_set(vars, vars->env, old_pwd, "OLDPWD");
+	if (!check_set(vars, vars->set, old_pwd, "OLDPWD"))
+		creat_env_var(vars, &vars->set, old_pwd, "OLDPWD");
 	free(old_pwd);
 }
 
@@ -65,7 +66,8 @@ int	cd_check_args(t_vars *vars, char **cmd)
 		if (tmp)
 		{
 			change_oldpwd(vars);
-			err_mes(chdir(pwd) == -1, join_err(vars, "cd", pwd), PD, vars);
+			if (!err_mes(chdir(pwd) == -1, join_err(vars, "cd", pwd), PD, vars))
+				printf("%s\n", pwd);
 		}
 		free(pwd);
 		return (0);
@@ -85,8 +87,9 @@ int	cd_help(t_vars *vars, char **cmd)
 	if (tmp)
 		err_mes(chdir(tmp->value) == -1,
 			join_err(vars, "cd", tmp->value), PD, vars);
-	if (!check_set(vars, vars->env, tmp->value, "PWD"))
-		creat_env_var(vars, &vars->env, tmp->value, "PWD");
+	check_set(vars, vars->env, tmp->value, "PWD");
+	if (!check_set(vars, vars->set, tmp->value, "PWD"))
+		creat_env_var(vars, &vars->set, tmp->value, "PWD");
 	return (1);
 }
 
@@ -111,8 +114,9 @@ void	cd(t_vars *vars, char **cmd)
 			printf("cd: %s: %s\n", RCD, CD_ERR);
 			return ;
 		}
-		if (!check_set(vars, vars->env, pwd, "PWD"))
-			creat_env_var(vars, &vars->env, pwd, "PWD");
+		check_set(vars, vars->env, pwd, "PWD");
+		if (!check_set(vars, vars->set, pwd, "PWD"))
+			creat_env_var(vars, &vars->set, pwd, "PWD");
 		free(pwd);
 	}
 	g_exit_status = 0;

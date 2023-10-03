@@ -72,9 +72,9 @@ typedef struct s_vars
 	char				*out_str;
 	int					exit_stat;
 	t_env				*env;
+	t_env				*set;
 	char				**true_env;
 	char				**env_var;
-	t_env				*set;
 	char				main_c;
 	int					q_count;
 	int					fd_in;
