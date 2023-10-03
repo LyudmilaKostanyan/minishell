@@ -48,7 +48,7 @@ int	red_in(t_cmds *cmds, char **sp_split, int j, t_vars *vars)
 			cmds->in_stat = 1;
 		else if (cmds->in_stat != -1)
 			cmds->in_stat = 2;
-		if (sp_split[j + 1])
+		if (sp_split[j + 1] && cmds->in_stat != -1)
 		{
 			if (!red_if(&cmds->red_in, vars, sp_split[j]))
 				return (0);
@@ -73,7 +73,7 @@ int	red_out(t_cmds *cmds, char **sp_split, int j, t_vars *vars)
 			cmds->out_stat = 1;
 		else if (cmds->out_stat != -1)
 			cmds->out_stat = 2;
-		if (sp_split[j + 1])
+		if (sp_split[j + 1] && cmds->out_stat != -1)
 		{
 			if (!red_if(&cmds->red_out, vars, sp_split[j]))
 				return (0);
