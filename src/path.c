@@ -89,11 +89,20 @@ static int	path_check_help(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 
 int	path_check(t_vars *vars, t_cmds **cmds, char *cmd, int i)
 {
+	DIR	*dir;
+
 	if (!cmd)
 		return (1);
 	creating_exec_path(vars);
 	if (path_check_help(vars, cmds, cmd, i))
 		return (1);
+	dir = opendir(cmd);
+	if (dir)
+	{
+		err_mes(1, join_err(vars, cmd, NULL), IAD, vars);
+		closedir(dir);
+		exit(126);
+	}
 	if (access(cmd, X_OK) != -1)
 	{
 		(*cmds)[i].ex_cmd = ft_strdup(cmd);

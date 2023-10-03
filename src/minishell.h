@@ -41,6 +41,8 @@
 # include <sys/stat.h>
 # include <sys/ioctl.h>
 # include <libft.h>
+# include <dirent.h>
+# include <dirent.h>
 
 extern int	g_exit_status;
 
