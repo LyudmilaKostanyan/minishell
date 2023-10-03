@@ -56,11 +56,6 @@ void	processes(t_vars *vars, t_cmds **cmds, int count)
 			g_exit_status = WEXITSTATUS(g_exit_status);
 		else
 			g_exit_status += 128;
-		if (g_exit_status == 255)
-		{
-			err_mes(1, join_err(vars, *(*cmds)[i].cmd, NULL), IAD, vars);
-			g_exit_status = 126;
-		}
 	}
 }
 
